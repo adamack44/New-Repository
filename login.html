@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StyleBook — Sign In</title>
+<title>Salon Assist CX — Sign In</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -92,7 +92,7 @@ input:focus { border-color: var(--rust); background: #fff; }
 <div class="card">
   <div class="brand">
     <div class="brand-icon">✂️</div>
-    Style<em>Book</em>
+    Salon Assist <em>CX</em>
   </div>
 
   <div class="tabs">
@@ -137,7 +137,7 @@ function setMode(m) {
   mode = m;
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&m==='login')||(i===1&&m==='signup')));
   document.getElementById('formTitle').textContent = m === 'login' ? 'Welcome back' : 'Create your account';
-  document.getElementById('formSub').textContent = m === 'login' ? 'Sign in to your stylist dashboard' : 'Set up your StyleBook in minutes';
+  document.getElementById('formSub').textContent = m === 'login' ? 'Sign in to your stylist dashboard' : 'Set up your Salon Assist CX in minutes';
   document.getElementById('submitBtn').textContent = m === 'login' ? 'Sign In →' : 'Create Account →';
   document.querySelectorAll('.extra-field').forEach(f => f.classList.toggle('show', m === 'signup'));
   clearMessages();
