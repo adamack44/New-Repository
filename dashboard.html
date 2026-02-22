@@ -9,7 +9,8 @@
 <script>
   const SUPABASE_URL = 'https://pwytzdclfiuepbcceoqd.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3eXR6ZGNsZml1ZXBiY2Nlb3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTUzMzAsImV4cCI6MjA4NzI5MTMzMH0.lemmT3-2ooVyQN9X-wVnssqJ1epZ4DCoLEMy23gfYSE';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -342,7 +343,7 @@ const ALL_SERVICES = ["Color","Natural Hair","Braids","Locs","Silk Press","Cuts"
 // ── INIT ──────────────────────────────────────────────────
 window.addEventListener('load', async () => {
   // Check if logged in
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) { window.location.href = 'login.html'; return; }
 
   await loadStylistProfile(user);
@@ -361,7 +362,7 @@ window.addEventListener('load', async () => {
 
 // ── AUTH ──────────────────────────────────────────────────
 async function signOut() {
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
   window.location.href = 'login.html';
 }
 
@@ -483,7 +484,7 @@ function formatDate(dateStr) {
 }
 
 async function cancelAppointment(id) {
-  const { error } = await supabase.from('appointments').update({ status: 'cancelled' }).eq('id', id);
+  const { error } = await supabaseClient.from('appointments').update({ status: 'cancelled' }).eq('id', id);
   if (error) { showToast('⚠️ Could not cancel appointment'); return; }
   await loadAppointments();
   renderTodayAppointments();
@@ -544,7 +545,7 @@ function renderAvailability() {
 
 async function removeSlot(id) {
   document.getElementById('savingIndicator').style.display = 'inline';
-  const { error } = await supabase.from('availability').delete().eq('id', id);
+  const { error } = await supabaseClient.from('availability').delete().eq('id', id);
   document.getElementById('savingIndicator').style.display = 'none';
   if (error) { showToast('⚠️ Could not remove slot'); return; }
   await loadAvailability();
@@ -597,7 +598,7 @@ async function confirmAddSlot() {
   const dateStr = document.getElementById('slotDate').value;
   if (!dateStr) { showToast('⚠️ Please select a date'); return; }
 
-  const { error } = await supabase.from('availability').insert({
+  const { error } = await supabaseClient.from('availability').insert({
     stylist_id: stylist.id,
     date: dateStr,
     time: selectedModalTime,
@@ -616,7 +617,7 @@ async function saveProfile() {
   if (!stylist) return;
   const services = [...document.querySelectorAll('.service-tag.on')].map(t => t.textContent);
 
-  const { error } = await supabase.from('stylists').update({
+  const { error } = await supabaseClient.from('stylists').update({
     name: document.getElementById('profileName').value,
     salon_name: document.getElementById('profileSalon').value,
     phone: document.getElementById('profilePhone').value,
@@ -632,7 +633,7 @@ async function saveProfile() {
 }
 
 async function loadProfile() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabaseClient.auth.getUser();
   await loadStylistProfile(user);
   showToast('↩️ Changes discarded');
 }
