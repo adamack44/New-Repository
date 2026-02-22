@@ -180,7 +180,17 @@ async function handleSubmit() {
     if (mode === 'login') {
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) { showError(error.message); btn.disabled = false; btn.textContent = 'Sign In →'; return; }
-      window.location.href = 'dashboard.html';
+      // Check subscription status before redirecting
+      const { data: subCheck } = await supabaseClient
+        .from('stylists')
+        .select('subscription_status')
+        .eq('user_id', data.user.id)
+        .single();
+      if (subCheck?.subscription_status === 'active') {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'upgrade.html';
+      }
 
     } else {
       const name = document.getElementById('nameInput').value.trim();
@@ -199,8 +209,8 @@ async function handleSubmit() {
 
       if (profileError) { showError('Account created but profile setup failed: ' + profileError.message); btn.disabled = false; btn.textContent = 'Create Account →'; return; }
 
-      showSuccess('Account created! Check your email to confirm, then sign in.');
-      setMode('login');
+      showSuccess('Account created! Redirecting to upgrade…');
+      setTimeout(() => { window.location.href = 'upgrade.html'; }, 1500);
     }
   } catch(err) {
     showError('Something went wrong: ' + err.message);
