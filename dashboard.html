@@ -346,6 +346,18 @@ window.addEventListener('load', async () => {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) { window.location.href = 'login.html'; return; }
 
+  // Check subscription — redirect to upgrade page if not active
+  const { data: subCheck } = await supabaseClient
+    .from('stylists')
+    .select('subscription_status')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!subCheck || subCheck.subscription_status !== 'active') {
+    window.location.href = 'upgrade.html';
+    return;
+  }
+
   await loadStylistProfile(user);
   await Promise.all([loadAppointments(), loadAvailability()]);
 
@@ -694,3 +706,4 @@ function showToast(msg) {
 </script>
 </body>
 </html>
+
