@@ -7,9 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // !! PASTE YOUR VALUES BETWEEN THE SINGLE QUOTES BELOW !!
   const SUPABASE_URL = 'https://pwytzdclfiuepbcceoqd.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3eXR6ZGNsZml1ZXBiY2Nlb3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTUzMzAsImV4cCI6MjA4NzI5MTMzMH0.lemmT3-2ooVyQN9X-wVnssqJ1epZ4DCoLEMy23gfYSE';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Fixed initialization — do not change this part
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -110,7 +114,7 @@ input:focus { border-color: var(--rust); background: #fff; }
   <div class="form-group extra-field" id="slugField">
     <label>Your Booking URL</label>
     <input type="text" id="slugInput" placeholder="e.g. jasmine-rivera" oninput="cleanSlug(this)">
-    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:5px;">stylebook.app/<span id="slugPreview" style="color:var(--rust);font-weight:500;">jasmine-rivera</span></div>
+    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:5px;">salonassistcx.com/booking.html?stylist=<span id="slugPreview" style="color:var(--rust);font-weight:500;">your-name</span></div>
   </div>
 
   <div class="form-group">
@@ -172,30 +176,34 @@ async function handleSubmit() {
   btn.disabled = true;
   btn.textContent = mode === 'login' ? 'Signing in…' : 'Creating account…';
 
-  if (mode === 'login') {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { showError(error.message); btn.disabled = false; btn.textContent = 'Sign In →'; return; }
-    window.location.href = 'dashboard.html';
+  try {
+    if (mode === 'login') {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) { showError(error.message); btn.disabled = false; btn.textContent = 'Sign In →'; return; }
+      window.location.href = 'dashboard.html';
 
-  } else {
-    const name = document.getElementById('nameInput').value.trim();
-    const slug = document.getElementById('slugInput').value.trim();
-    if (!name || !slug) { showError('Please fill in your name and booking URL.'); btn.disabled = false; btn.textContent = 'Create Account →'; return; }
+    } else {
+      const name = document.getElementById('nameInput').value.trim();
+      const slug = document.getElementById('slugInput').value.trim();
+      if (!name || !slug) { showError('Please fill in your name and booking URL.'); btn.disabled = false; btn.textContent = 'Create Account →'; return; }
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) { showError(error.message); btn.disabled = false; btn.textContent = 'Create Account →'; return; }
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) { showError(error.message); btn.disabled = false; btn.textContent = 'Create Account →'; return; }
 
-    // Create stylist profile row
-    const { error: profileError } = await supabase.from('stylists').insert({
-      user_id: data.user.id,
-      name,
-      slug,
-      email
-    });
+      const { error: profileError } = await supabaseClient.from('stylists').insert({
+        user_id: data.user.id,
+        name,
+        slug,
+        email
+      });
 
-    if (profileError) { showError('Account created but profile setup failed. Please contact support.'); return; }
-    showSuccess('Account created! Check your email to confirm, then sign in.');
-    setMode('login');
+      if (profileError) { showError('Account created but profile setup failed: ' + profileError.message); btn.disabled = false; btn.textContent = 'Create Account →'; return; }
+
+      showSuccess('Account created! Check your email to confirm, then sign in.');
+      setMode('login');
+    }
+  } catch(err) {
+    showError('Something went wrong: ' + err.message);
   }
 
   btn.disabled = false;
