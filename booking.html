@@ -200,7 +200,7 @@ window.addEventListener('load', async () => {
 
 // ── LOAD DATA ────────────────────────────────────────────
 async function loadStylistData(slug) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('stylists')
     .select('*')
     .eq('slug', slug)
@@ -220,7 +220,7 @@ async function loadAvailability() {
   const futureDate = new Date(); futureDate.setDate(futureDate.getDate() + 14);
   const futureDateStr = futureDate.toISOString().split('T')[0];
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('availability')
     .select('*')
     .eq('stylist_id', stylist.id)
