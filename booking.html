@@ -9,7 +9,8 @@
 <script>
   const SUPABASE_URL = 'https://pwytzdclfiuepbcceoqd.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3eXR6ZGNsZml1ZXBiY2Nlb3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTUzMzAsImV4cCI6MjA4NzI5MTMzMH0.lemmT3-2ooVyQN9X-wVnssqJ1epZ4DCoLEMy23gfYSE';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -380,7 +381,7 @@ async function processBookingIfConfirmed(reply) {
     if (!slot) return;
 
     // Create appointment in database
-    await supabase.from('appointments').insert({
+    await supabaseClient.from('appointments').insert({
       stylist_id: stylist.id,
       availability_id: slot.id,
       customer_name: customerName,
@@ -391,7 +392,7 @@ async function processBookingIfConfirmed(reply) {
     });
 
     // Mark slot as booked
-    await supabase.from('availability').update({ is_booked: true }).eq('id', slot.id);
+    await supabaseClient.from('availability').update({ is_booked: true }).eq('id', slot.id);
 
     // Refresh local availability
     await loadAvailability();
