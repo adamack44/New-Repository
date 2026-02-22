@@ -331,7 +331,7 @@ LIVE AVAILABILITY (next 14 days):
 ${availStr}
 
 YOUR ROLE:
-- Help customers BOOK new appointments (collect: name, service, preferred date/time from available slots)
+- Help customers BOOK new appointments (collect: name, phone number, service, preferred date/time from available slots — always ask for phone number for appointment reminders)
 - Help customers RESCHEDULE (ask for name/current appointment, offer alternatives)
 - Help customers CANCEL (confirm their name and appointment details)
 - Answer questions about services or the stylist
@@ -344,7 +344,7 @@ BOOKING RULES:
 - Use light emojis occasionally
 
 IMPORTANT: When a customer successfully books, end your message with exactly this on a new line so the system can process it:
-BOOKING_CONFIRMED:name=[customer name]|service=[service]|date=[YYYY-MM-DD]|time=[time]`;
+BOOKING_CONFIRMED:name=[customer name]|phone=[phone number]|service=[service]|date=[YYYY-MM-DD]|time=[time]`;
 }
 
 // ── CLAUDE API ───────────────────────────────────────────
@@ -372,9 +372,9 @@ async function callClaude(userMessage) {
 async function processBookingIfConfirmed(reply) {
   if (!reply.includes('BOOKING_CONFIRMED:')) return;
   try {
-    const match = reply.match(/BOOKING_CONFIRMED:name=([^|]+)\|service=([^|]+)\|date=([^|]+)\|time=(.+)/);
+    const match = reply.match(/BOOKING_CONFIRMED:name=([^|]+)\|phone=([^|]*)\|service=([^|]+)\|date=([^|]+)\|time=(.+)/);
     if (!match) return;
-    const [, customerName, service, date, time] = match.map(s => s.trim());
+    const [, customerName, customerPhone, service, date, time] = match.map(s => s.trim());
 
     // Find the availability slot
     const slot = availabilityData.find(s => s.date === date && s.time === time && !s.is_booked);
@@ -385,11 +385,30 @@ async function processBookingIfConfirmed(reply) {
       stylist_id: stylist.id,
       availability_id: slot.id,
       customer_name: customerName,
+      customer_phone: customerPhone || null,
       service,
       date,
       time,
-      status: 'confirmed'
+      status: 'confirmed',
+      reminder_sent: false
     });
+
+    // Send confirmation SMS if phone provided
+    if (customerPhone && customerPhone.trim()) {
+      const apptDate = new Date(date + 'T12:00:00');
+      const dateLabel = apptDate.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+      const confirmMsg = `Hi ${customerName}! 🎉 Your appointment with ${stylist.name} is confirmed for ${dateLabel} at ${time}${service ? ' for ' + service : ''}. We'll send you a reminder the day before. See you soon! 💇‍♀️\n\nReply STOP to unsubscribe.`;
+
+      try {
+        await fetch('/api/send-sms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: customerPhone, message: confirmMsg })
+        });
+      } catch(smsErr) {
+        console.error('Confirmation SMS failed:', smsErr);
+      }
+    }
 
     // Mark slot as booked
     await supabaseClient.from('availability').update({ is_booked: true }).eq('id', slot.id);
