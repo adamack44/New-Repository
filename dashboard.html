@@ -368,7 +368,7 @@ async function signOut() {
 
 // ── LOAD DATA ─────────────────────────────────────────────
 async function loadStylistProfile(user) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('stylists')
     .select('*')
     .eq('user_id', user.id)
@@ -402,7 +402,7 @@ async function loadStylistProfile(user) {
 
 async function loadAppointments() {
   if (!stylist) return;
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('appointments')
     .select('*')
     .eq('stylist_id', stylist.id)
@@ -416,7 +416,7 @@ async function loadAppointments() {
 async function loadAvailability() {
   if (!stylist) return;
   const today = new Date().toISOString().split('T')[0];
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('availability')
     .select('*')
     .eq('stylist_id', stylist.id)
@@ -694,3 +694,4 @@ function showToast(msg) {
 </script>
 </body>
 </html>
+
