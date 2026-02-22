@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salon Assist CX — Upgrade to Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://pwytzdclfiuepbcceoqd.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3eXR6ZGNsZml1ZXBiY2Nlb3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MTUzMzAsImV4cCI6MjA4NzI5MTMzMH0.lemmT3-2ooVyQN9X-wVnssqJ1epZ4DCoLEMy23gfYSE';
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #16100c; --rust: #b8522e; --rust-light: #d4724f;
+  --rust-pale: #f8ede7; --cream: #faf5ee; --sand: #e8d4bc;
+  --border: #e0ccb4; --text-muted: #7a5c4a; --sage: #5c7860; --sage-pale: #e8f0e9;
+}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 52px 48px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 8px 40px rgba(22,16,12,0.08);
+  text-align: center;
+}
+.brand {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 600;
+  color: var(--ink); margin-bottom: 32px;
+}
+.brand-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--rust) 0%, #7a2e10 100%);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.brand em { color: var(--rust); font-style: italic; }
+.lock-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--rust-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; margin: 0 auto 24px;
+  border: 1px solid rgba(184,82,46,0.15);
+}
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 300;
+  color: var(--ink); line-height: 1.2; margin-bottom: 12px;
+}
+h1 em { font-style: italic; color: var(--rust); }
+.subtitle {
+  font-size: 0.9rem; color: var(--text-muted);
+  font-weight: 300; line-height: 1.65; margin-bottom: 32px;
+}
+.price-box {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.popular-badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--rust) 0%, #942a0e 100%);
+  color: #fff; font-size: 0.68rem; font-weight: 600;
+  padding: 4px 16px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+}
+.price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.2rem; font-weight: 300;
+  color: var(--ink); line-height: 1; letter-spacing: -1px;
+}
+.price sup { font-size: 1.4rem; vertical-align: super; }
+.price-period { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+.features {
+  display: flex; flex-direction: column; gap: 10px;
+  margin: 20px 0 8px; text-align: left;
+}
+.feature {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.85rem; color: var(--text-muted); font-weight: 300;
+}
+.feature-check {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--sage-pale); border: 1px solid rgba(92,120,96,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: var(--sage); flex-shrink: 0;
+}
+.btn-upgrade {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, var(--rust) 0%, #942a0e 100%);
+  color: #fff; border: none; border-radius: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500;
+  cursor: pointer; transition: all 0.18s;
+  box-shadow: 0 3px 14px rgba(184,82,46,0.35);
+  margin-bottom: 14px;
+}
+.btn-upgrade:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(184,82,46,0.45); }
+.btn-upgrade:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.signout-link {
+  font-size: 0.78rem; color: var(--text-muted);
+  cursor: pointer; text-decoration: underline;
+  background: none; border: none; font-family: 'DM Sans', sans-serif;
+}
+.signout-link:hover { color: var(--ink); }
+.cancelled-msg {
+  background: #fef3e2; border: 1px solid rgba(196,125,10,0.25);
+  color: #7a4d08; padding: 10px 14px; border-radius: 8px;
+  font-size: 0.8rem; margin-bottom: 20px; display: none;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">
+    <div class="brand-icon">✂️</div>
+    Salon Assist <em>CX</em>
+  </div>
+
+  <div class="lock-icon">🔒</div>
+
+  <h1>Upgrade to <em>Pro</em><br>to continue</h1>
+  <p class="subtitle">Your account is ready — just one step left. Subscribe to unlock your full dashboard and AI booking page.</p>
+
+  <div class="cancelled-msg" id="cancelledMsg">
+    No worries — your account is saved. Subscribe whenever you're ready.
+  </div>
+
+  <div class="price-box">
+    <div class="popular-badge">Most Popular</div>
+    <div class="price"><sup>$</sup>39</div>
+    <div class="price-period">per month · cancel anytime</div>
+    <div class="features">
+      <div class="feature"><span class="feature-check">✓</span> Your personal AI booking page</div>
+      <div class="feature"><span class="feature-check">✓</span> Unlimited appointments</div>
+      <div class="feature"><span class="feature-check">✓</span> Availability manager</div>
+      <div class="feature"><span class="feature-check">✓</span> SMS & email reminders</div>
+      <div class="feature"><span class="feature-check">✓</span> Revenue dashboard</div>
+    </div>
+  </div>
+
+  <button class="btn-upgrade" id="upgradeBtn" onclick="startCheckout()">
+    Subscribe Now — $39/mo →
+  </button>
+  <br>
+  <button class="signout-link" onclick="signOut()">Sign out</button>
+</div>
+
+<script>
+window.addEventListener('load', async () => {
+  // Show cancelled message if redirected back from Stripe
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('cancelled')) {
+    document.getElementById('cancelledMsg').style.display = 'block';
+  }
+
+  // If already subscribed, send to dashboard
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) { window.location.href = 'login.html'; return; }
+
+  const { data: stylist } = await supabaseClient
+    .from('stylists')
+    .select('subscription_status')
+    .eq('user_id', user.id)
+    .single();
+
+  if (stylist?.subscription_status === 'active') {
+    window.location.href = 'dashboard.html';
+  }
+});
+
+async function startCheckout() {
+  const btn = document.getElementById('upgradeBtn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to checkout…';
+
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) { window.location.href = 'login.html'; return; }
+
+    const { data: stylist } = await supabaseClient
+      .from('stylists')
+      .select('id, email')
+      .eq('user_id', user.id)
+      .single();
+
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stylist_id: stylist.id, email: stylist.email || user.email })
+    });
+
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Could not start checkout: ' + (data.error || 'Unknown error'));
+      btn.disabled = false;
+      btn.textContent = 'Subscribe Now — $39/mo →';
+    }
+  } catch (err) {
+    alert('Something went wrong: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = 'Subscribe Now — $39/mo →';
+  }
+}
+
+async function signOut() {
+  await supabaseClient.auth.signOut();
+  window.location.href = 'login.html';
+}
+</script>
+</body>
+</html>
