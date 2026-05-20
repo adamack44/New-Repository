@@ -1,10 +1,29 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/dashboard", "destination": "/dashboard.html" },
-    { "source": "/booking", "destination": "/booking.html" },
-    { "source": "/upgrade", "destination": "/upgrade.html" }
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/booking",
+      "destination": "/booking.html"
+    },
+    {
+      "source": "/upgrade",
+      "destination": "/upgrade.html"
+    },
+    {
+      "source": "/appointments",
+      "destination": "/appointments.html"
+    }
   ],
   "crons": [
     {
