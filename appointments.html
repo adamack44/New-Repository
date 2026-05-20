@@ -209,9 +209,14 @@ async function lookupAppointments() {
     if (isEmail) {
       query = query.ilike('customer_email', input);
     } else {
-      // Try matching last 10 digits of phone
-      const last10 = searchValue.slice(-10);
-      query = query.ilike('customer_phone', `%${last10}%`);
+      // Try multiple phone formats to handle dashes, spaces, parens
+      const digits = input.replace(/\D/g, '').slice(-10);
+      // Build partial segments to match any format
+      const areaCode = digits.slice(0, 3);
+      const middle = digits.slice(3, 6);
+      const last4 = digits.slice(6, 10);
+      // Search by area code + last 4 which works across all common formats
+      query = query.ilike('customer_phone', `%${areaCode}%${last4}%`);
     }
 
     const { data, error } = await query;
