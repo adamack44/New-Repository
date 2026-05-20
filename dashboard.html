@@ -157,6 +157,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
 /* TOAST */
+.modal-tab { flex:1;padding:9px;text-align:center;font-size:0.8rem;font-weight:500;cursor:pointer;background:transparent;border:none;color:var(--ink-light);font-family:'DM Sans',sans-serif;transition:all 0.15s; }
+.modal-tab.active { background:var(--ink);color:#fff; }
+.repeat-day-btn { padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;cursor:pointer;color:var(--ink-light);transition:all 0.12s; }
+.repeat-day-btn.on { background:var(--rust-pale);border-color:var(--rust-light);color:var(--rust); }
+.time-checkbox-btn { padding:6px 4px;border-radius:8px;border:1.5px solid var(--border);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:500;cursor:pointer;color:var(--ink);transition:all 0.12s;text-align:center; }
+.time-checkbox-btn.on { background:var(--sage-pale);border-color:var(--sage);color:var(--sage); }
+.time-checkbox-btn.taken { opacity:0.35;cursor:not-allowed;text-decoration:line-through; }
+.duration-row { display:flex;align-items:center;gap:10px; }
+.duration-label { font-size:0.8rem;color:var(--ink);flex:1; }
+.duration-select { padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--ink);background:var(--cream);outline:none;cursor:pointer; }
+.duration-select:focus { border-color:var(--rust-light); }
+.slot-chip-duration { font-size:0.65rem;opacity:0.65;margin-left:3px; }
 .toast { position: fixed; bottom: 28px; right: 28px; background: var(--ink); color: var(--cream); padding: 12px 20px; border-radius: 12px; font-size: 0.83rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 28px rgba(0,0,0,0.25); transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(0.34,1.4,0.64,1); z-index: 300; }
 .toast.show { transform: translateY(0); opacity: 1; }
 
@@ -310,18 +322,85 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   </div>
 </div>
 
-<!-- ADD SLOT MODAL -->
+<!-- AVAILABILITY MODAL — upgraded -->
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <h3>Add Available Slot</h3>
-    <p>Choose a date and time to open for bookings.</p>
-    <label class="form-label" style="margin-bottom:6px;display:block;">Date</label>
-    <input type="date" class="date-input" id="slotDate">
-    <label class="form-label" style="margin-bottom:8px;display:block;">Time</label>
-    <div class="time-options" id="timeOptions"></div>
+  <div class="modal" style="width:520px;max-height:88vh;overflow-y:auto;">
+    <h3 id="modalTitle">Add Availability</h3>
+    <p id="modalSubtitle">Choose how to add slots to your schedule.</p>
+
+    <!-- MODE TABS -->
+    <div style="display:flex;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px;">
+      <button id="tabCheckbox" class="modal-tab active" onclick="setModalMode('checkbox')">Pick times</button>
+      <button id="tabInterval" class="modal-tab" onclick="setModalMode('interval')">Time range</button>
+      <button id="tabRepeat" class="modal-tab" onclick="setModalMode('repeat')">Weekly repeat</button>
+    </div>
+
+    <!-- DATE ROW (shared) -->
+    <div id="dateRow" style="margin-bottom:16px;">
+      <label class="form-label" style="margin-bottom:6px;display:block;">Date</label>
+      <input type="date" class="date-input" id="slotDate" style="width:100%">
+    </div>
+
+    <!-- MODE: CHECKBOX — pick multiple times -->
+    <div id="modeCheckbox">
+      <label class="form-label" style="margin-bottom:8px;display:block;">Select times <span style="color:var(--ink-light);font-weight:300;text-transform:none;letter-spacing:0;">(pick as many as you want)</span></label>
+      <div id="timeCheckboxes" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px;"></div>
+    </div>
+
+    <!-- MODE: INTERVAL — start/end/every N mins -->
+    <div id="modeInterval" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div>
+          <label class="form-label" style="margin-bottom:6px;display:block;">Start time</label>
+          <select class="date-input" id="intervalStart" style="width:100%"></select>
+        </div>
+        <div>
+          <label class="form-label" style="margin-bottom:6px;display:block;">End time</label>
+          <select class="date-input" id="intervalEnd" style="width:100%"></select>
+        </div>
+        <div>
+          <label class="form-label" style="margin-bottom:6px;display:block;">Every</label>
+          <select class="date-input" id="intervalStep" style="width:100%">
+            <option value="15">15 min</option>
+            <option value="30" selected>30 min</option>
+            <option value="45">45 min</option>
+            <option value="60">60 min</option>
+            <option value="90">90 min</option>
+            <option value="120">2 hours</option>
+          </select>
+        </div>
+      </div>
+      <div id="intervalPreview" style="background:var(--cream);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:var(--ink-light);margin-bottom:16px;min-height:36px;"></div>
+    </div>
+
+    <!-- MODE: WEEKLY REPEAT -->
+    <div id="modeRepeat" style="display:none;">
+      <label class="form-label" style="margin-bottom:8px;display:block;">Days of the week</label>
+      <div style="display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;" id="repeatDays">
+        <button class="repeat-day-btn" data-day="0">Sun</button>
+        <button class="repeat-day-btn" data-day="1">Mon</button>
+        <button class="repeat-day-btn" data-day="2">Tue</button>
+        <button class="repeat-day-btn" data-day="3">Wed</button>
+        <button class="repeat-day-btn" data-day="4">Thu</button>
+        <button class="repeat-day-btn" data-day="5">Fri</button>
+        <button class="repeat-day-btn" data-day="6">Sat</button>
+      </div>
+      <label class="form-label" style="margin-bottom:8px;display:block;">Times on those days</label>
+      <div id="repeatTimeCheckboxes" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px;"></div>
+      <div style="background:var(--cream);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:var(--ink-light);margin-bottom:16px;">
+        📅 Repeats for <strong>4 weeks</strong> from today
+      </div>
+    </div>
+
+    <!-- SERVICE DURATION SECTION (all modes) -->
+    <div style="background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:20px;">
+      <label class="form-label" style="margin-bottom:10px;display:block;">Service durations <span style="color:var(--ink-light);font-weight:300;text-transform:none;letter-spacing:0;">(optional — set defaults or override per slot)</span></label>
+      <div id="serviceDurations" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmAddSlot()">Add Slot</button>
+      <button class="btn btn-primary" id="confirmSlotBtn" onclick="confirmAddSlots()">Add Slots</button>
     </div>
   </div>
 </div>
@@ -333,8 +412,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 let stylist = null;
 let appointments = [];
 let availability = [];
-let selectedModalTime = null;
-
 const ALL_TIMES = ["8:00am","8:30am","9:00am","9:30am","10:00am","10:30am","11:00am","11:30am",
   "12:00pm","12:30pm","1:00pm","1:30pm","2:00pm","2:30pm","3:00pm","3:30pm","4:00pm","4:30pm","5:00pm","5:30pm"];
 
@@ -506,19 +583,23 @@ async function cancelAppointment(id) {
 }
 
 // ── AVAILABILITY UI ───────────────────────────────────────
+// ── AVAILABILITY ─────────────────────────────────────────
+const DEFAULT_DURATIONS = { 'Color': 120, 'Highlights': 150, 'Silk Press': 90, 'Braids': 180, 'Locs': 120, 'Natural Hair': 90, 'Cuts': 45, 'Extensions': 180, 'Wigs': 120, 'Blowout': 60 };
+const DURATION_OPTIONS = [15,30,45,60,90,120,150,180,240];
+let modalMode = 'checkbox';
+let serviceDurationOverrides = {};
+
 function renderAvailability() {
   const container = document.getElementById('availManager');
   container.innerHTML = '';
 
-  // Group by date
   const byDate = {};
   availability.forEach(slot => {
     if (!byDate[slot.date]) byDate[slot.date] = [];
     byDate[slot.date].push(slot);
   });
 
-  // Show next 14 days
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 28; i++) {
     const d = new Date(); d.setDate(d.getDate() + i);
     const dateStr = d.toISOString().split('T')[0];
     const label = d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
@@ -537,15 +618,20 @@ function renderAvailability() {
     slots.forEach(slot => {
       const chip = document.createElement('div');
       chip.className = 'slot-chip';
-      chip.style.cssText = slot.is_booked ? 'opacity:0.5;text-decoration:line-through;cursor:default' : '';
-      chip.innerHTML = `${slot.time}${!slot.is_booked ? ' <span onclick="removeSlot(\'' + slot.id + '\')" style="opacity:0.6;font-size:10px;">✕</span>' : ' 🔒'}`;
+      const durLabel = slot.duration_minutes ? `<span class="slot-chip-duration">${slot.duration_minutes}m</span>` : '';
+      if (slot.is_booked) {
+        chip.style.cssText = 'opacity:0.5;text-decoration:line-through;cursor:default';
+        chip.innerHTML = `${slot.time}${durLabel} 🔒`;
+      } else {
+        chip.innerHTML = `${slot.time}${durLabel} <span onclick="removeSlot('${slot.id}')" style="opacity:0.6;font-size:10px;cursor:pointer;">✕</span>`;
+      }
       slotsWrap.appendChild(chip);
     });
 
     const addBtn = document.createElement('button');
     addBtn.className = 'add-slot-btn';
     addBtn.textContent = '+';
-    addBtn.title = 'Add a slot for this day';
+    addBtn.title = 'Add slots for this day';
     addBtn.onclick = () => openAddSlotModalForDate(dateStr);
     slotsWrap.appendChild(addBtn);
 
@@ -561,68 +647,242 @@ async function removeSlot(id) {
   document.getElementById('savingIndicator').style.display = 'none';
   if (error) { showToast('⚠️ Could not remove slot'); return; }
   await loadAvailability();
+  renderAvailability();
   showToast('🗑️ Slot removed');
 }
 
-// ── ADD SLOT MODAL ────────────────────────────────────────
+// ── MODAL OPEN ────────────────────────────────────────────
 function openAddSlotModal() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('slotDate').value = today;
   document.getElementById('slotDate').min = today;
-  selectedModalTime = null;
-  renderTimeOptions(today);
+  initModal();
   document.getElementById('modalOverlay').classList.add('open');
 }
 
 function openAddSlotModalForDate(dateStr) {
   document.getElementById('slotDate').value = dateStr;
   document.getElementById('slotDate').min = new Date().toISOString().split('T')[0];
-  selectedModalTime = null;
-  renderTimeOptions(dateStr);
+  initModal();
   document.getElementById('modalOverlay').classList.add('open');
 }
 
-function renderTimeOptions(dateStr) {
-  const taken = availability.filter(a => a.date === dateStr).map(a => a.time);
-  const opts = document.getElementById('timeOptions');
-  opts.innerHTML = '';
-  ALL_TIMES.forEach(t => {
-    if (taken.includes(t)) return;
-    const btn = document.createElement('button');
-    btn.className = 'time-option';
-    btn.textContent = t;
-    btn.onclick = () => {
-      document.querySelectorAll('.time-option').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedModalTime = t;
-    };
-    opts.appendChild(btn);
-  });
-  if (!opts.children.length) opts.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:0.8rem;color:var(--ink-light);padding:12px;">All times already added for this day</div>';
+function initModal() {
+  setModalMode('checkbox');
+  serviceDurationOverrides = {};
+  renderServiceDurations();
+  renderTimeCheckboxes();
+  renderIntervalSelects();
+  renderRepeatTimeCheckboxes();
 }
 
-document.getElementById('slotDate').addEventListener('change', e => renderTimeOptions(e.target.value));
+// ── MODAL TABS ────────────────────────────────────────────
+function setModalMode(mode) {
+  modalMode = mode;
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+  document.getElementById('modeCheckbox').style.display = mode === 'checkbox' ? 'block' : 'none';
+  document.getElementById('modeInterval').style.display = mode === 'interval' ? 'block' : 'none';
+  document.getElementById('modeRepeat').style.display = mode === 'repeat' ? 'block' : 'none';
+  document.getElementById('dateRow').style.display = mode === 'repeat' ? 'none' : 'block';
+  const titles = { checkbox: 'Pick times', interval: 'Add time range', repeat: 'Weekly repeat' };
+  const subs = { checkbox: 'Select one or more times to open for bookings.', interval: 'Generate slots between a start and end time automatically.', repeat: 'Set a weekly schedule that repeats for 4 weeks.' };
+  document.getElementById('modalTitle').textContent = titles[mode];
+  document.getElementById('modalSubtitle').textContent = subs[mode];
+}
+
+// ── TIME CHECKBOXES ───────────────────────────────────────
+function renderTimeCheckboxes() {
+  const dateStr = document.getElementById('slotDate').value;
+  const taken = availability.filter(a => a.date === dateStr).map(a => a.time);
+  const container = document.getElementById('timeCheckboxes');
+  container.innerHTML = '';
+  ALL_TIMES.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'time-checkbox-btn' + (taken.includes(t) ? ' taken' : '');
+    btn.textContent = t;
+    btn.dataset.time = t;
+    if (!taken.includes(t)) {
+      btn.onclick = () => btn.classList.toggle('on');
+    }
+    container.appendChild(btn);
+  });
+}
+
+document.getElementById('slotDate').addEventListener('change', () => {
+  renderTimeCheckboxes();
+  updateIntervalPreview();
+});
+
+// ── INTERVAL MODE ─────────────────────────────────────────
+function renderIntervalSelects() {
+  const startSel = document.getElementById('intervalStart');
+  const endSel = document.getElementById('intervalEnd');
+  startSel.innerHTML = '';
+  endSel.innerHTML = '';
+  ALL_TIMES.forEach((t, i) => {
+    startSel.innerHTML += `<option value="${i}">${t}</option>`;
+    endSel.innerHTML += `<option value="${i}">${t}</option>`;
+  });
+  startSel.selectedIndex = 2; // 9:00am default
+  endSel.selectedIndex = 10;  // 1:00pm default
+  updateIntervalPreview();
+}
+
+function updateIntervalPreview() {
+  const startIdx = parseInt(document.getElementById('intervalStart').value);
+  const endIdx = parseInt(document.getElementById('intervalEnd').value);
+  const step = parseInt(document.getElementById('intervalStep').value);
+  const slots = generateIntervalSlots(startIdx, endIdx, step);
+  const preview = document.getElementById('intervalPreview');
+  if (!slots.length) { preview.textContent = 'End time must be after start time'; return; }
+  preview.innerHTML = `<strong>${slots.length} slots:</strong> ${slots.join(', ')}`;
+}
+
+function generateIntervalSlots(startIdx, endIdx, stepMins) {
+  const slots = [];
+  if (startIdx >= endIdx) return slots;
+  // Convert ALL_TIMES to minutes since midnight for math
+  function timeToMins(t) {
+    const [time, period] = t.split(/(am|pm)/i);
+    let [h, m] = time.split(':').map(Number);
+    if (period.toLowerCase() === 'pm' && h !== 12) h += 12;
+    if (period.toLowerCase() === 'am' && h === 12) h = 0;
+    return h * 60 + (m || 0);
+  }
+  const startMins = timeToMins(ALL_TIMES[startIdx]);
+  const endMins = timeToMins(ALL_TIMES[endIdx]);
+  let cur = startMins;
+  while (cur <= endMins) {
+    // Find closest ALL_TIMES entry
+    const match = ALL_TIMES.find(t => timeToMins(t) === cur);
+    if (match) slots.push(match);
+    else {
+      // Format custom time
+      const h = Math.floor(cur/60);
+      const m = cur % 60;
+      const period = h >= 12 ? 'pm' : 'am';
+      const displayH = h > 12 ? h-12 : (h === 0 ? 12 : h);
+      slots.push(`${displayH}:${String(m).padStart(2,'0')}${period}`);
+    }
+    cur += stepMins;
+  }
+  return slots;
+}
+
+['intervalStart','intervalEnd','intervalStep'].forEach(id => {
+  document.getElementById(id).addEventListener('change', updateIntervalPreview);
+});
+
+// ── REPEAT MODE ───────────────────────────────────────────
+document.querySelectorAll('.repeat-day-btn').forEach(btn => {
+  btn.addEventListener('click', () => btn.classList.toggle('on'));
+});
+
+function renderRepeatTimeCheckboxes() {
+  const container = document.getElementById('repeatTimeCheckboxes');
+  container.innerHTML = '';
+  ALL_TIMES.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'time-checkbox-btn';
+    btn.textContent = t;
+    btn.dataset.time = t;
+    btn.onclick = () => btn.classList.toggle('on');
+    container.appendChild(btn);
+  });
+}
+
+// ── SERVICE DURATIONS ─────────────────────────────────────
+function renderServiceDurations() {
+  const container = document.getElementById('serviceDurations');
+  const services = stylist?.services?.length ? stylist.services : Object.keys(DEFAULT_DURATIONS);
+  container.innerHTML = '';
+  services.forEach(svc => {
+    const defaultDur = DEFAULT_DURATIONS[svc] || 60;
+    const current = serviceDurationOverrides[svc] || defaultDur;
+    const row = document.createElement('div');
+    row.className = 'duration-row';
+    row.innerHTML = `
+      <span class="duration-label">${svc}</span>
+      <select class="duration-select" onchange="serviceDurationOverrides['${svc}'] = parseInt(this.value)">
+        ${DURATION_OPTIONS.map(d => `<option value="${d}" ${d === current ? 'selected' : ''}>${d >= 60 ? (d/60) + 'hr' + (d%60?'':'') : d+'min'}${d === defaultDur ? ' (default)' : ''}</option>`).join('')}
+      </select>`;
+    container.appendChild(row);
+  });
+}
+
+// ── CONFIRM ADD SLOTS ─────────────────────────────────────
+async function confirmAddSlots() {
+  const btn = document.getElementById('confirmSlotBtn');
+  btn.disabled = true;
+  btn.textContent = 'Adding…';
+
+  try {
+    let slotsToAdd = []; // { date, time, duration_minutes }
+
+    if (modalMode === 'checkbox') {
+      const dateStr = document.getElementById('slotDate').value;
+      if (!dateStr) { showToast('⚠️ Please select a date'); btn.disabled=false; btn.textContent='Add Slots'; return; }
+      const selected = [...document.querySelectorAll('#timeCheckboxes .time-checkbox-btn.on')].map(b => b.dataset.time);
+      if (!selected.length) { showToast('⚠️ Please select at least one time'); btn.disabled=false; btn.textContent='Add Slots'; return; }
+      selected.forEach(t => slotsToAdd.push({ date: dateStr, time: t }));
+
+    } else if (modalMode === 'interval') {
+      const dateStr = document.getElementById('slotDate').value;
+      if (!dateStr) { showToast('⚠️ Please select a date'); btn.disabled=false; btn.textContent='Add Slots'; return; }
+      const startIdx = parseInt(document.getElementById('intervalStart').value);
+      const endIdx = parseInt(document.getElementById('intervalEnd').value);
+      const step = parseInt(document.getElementById('intervalStep').value);
+      const times = generateIntervalSlots(startIdx, endIdx, step);
+      if (!times.length) { showToast('⚠️ End time must be after start time'); btn.disabled=false; btn.textContent='Add Slots'; return; }
+      times.forEach(t => slotsToAdd.push({ date: dateStr, time: t }));
+
+    } else if (modalMode === 'repeat') {
+      const selectedDays = [...document.querySelectorAll('.repeat-day-btn.on')].map(b => parseInt(b.dataset.day));
+      const selectedTimes = [...document.querySelectorAll('#repeatTimeCheckboxes .time-checkbox-btn.on')].map(b => b.dataset.time);
+      if (!selectedDays.length) { showToast('⚠️ Please select at least one day'); btn.disabled=false; btn.textContent='Add Slots'; return; }
+      if (!selectedTimes.length) { showToast('⚠️ Please select at least one time'); btn.disabled=false; btn.textContent='Add Slots'; return; }
+      // Generate 4 weeks of slots
+      for (let week = 0; week < 4; week++) {
+        for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+          const d = new Date();
+          d.setDate(d.getDate() + week * 7 + dayOffset);
+          if (selectedDays.includes(d.getDay())) {
+            const dateStr = d.toISOString().split('T')[0];
+            selectedTimes.forEach(t => slotsToAdd.push({ date: dateStr, time: t }));
+          }
+        }
+      }
+    }
+
+    // Get duration for each slot based on service defaults
+    const services = stylist?.services || [];
+    const insertRows = slotsToAdd.map(s => ({
+      stylist_id: stylist.id,
+      date: s.date,
+      time: s.time,
+      is_booked: false,
+      duration_minutes: s.duration_minutes || null
+    }));
+
+    // Insert in batches, ignore duplicates
+    const { error } = await supabaseClient.from('availability').upsert(insertRows, { onConflict: 'stylist_id,date,time', ignoreDuplicates: true });
+    if (error) { showToast('⚠️ Error adding slots: ' + error.message); btn.disabled=false; btn.textContent='Add Slots'; return; }
+
+    closeModal();
+    await loadAvailability();
+    renderAvailability();
+    renderStats();
+    showToast(`✅ ${insertRows.length} slot${insertRows.length !== 1 ? 's' : ''} added!`);
+
+  } catch(err) {
+    showToast('⚠️ Error: ' + err.message);
+  }
+  btn.disabled = false;
+  btn.textContent = 'Add Slots';
+}
 
 function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
-
-async function confirmAddSlot() {
-  if (!selectedModalTime) { showToast('⚠️ Please select a time'); return; }
-  const dateStr = document.getElementById('slotDate').value;
-  if (!dateStr) { showToast('⚠️ Please select a date'); return; }
-
-  const { error } = await supabaseClient.from('availability').insert({
-    stylist_id: stylist.id,
-    date: dateStr,
-    time: selectedModalTime,
-    is_booked: false
-  });
-
-  if (error) { showToast(error.code === '23505' ? '⚠️ Slot already exists' : '⚠️ Could not add slot'); return; }
-  closeModal();
-  await loadAvailability();
-  renderStats();
-  showToast(`✅ ${selectedModalTime} added for ${formatDate(dateStr)}`);
-}
 
 // ── PROFILE SAVE ──────────────────────────────────────────
 async function saveProfile() {
@@ -706,4 +966,3 @@ function showToast(msg) {
 </script>
 </body>
 </html>
-
