@@ -144,20 +144,23 @@ h1 em { font-style: italic; color: var(--rust); }
   </div>
 
   <div class="price-box">
-    <div class="popular-badge">Most Popular</div>
-    <div class="price"><sup>$</sup>39</div>
-    <div class="price-period">per month · cancel anytime</div>
+    <div class="popular-badge">Everything Included</div>
+    <div class="price"><sup>$</sup>30</div>
+    <div class="price-period">per month · everything included · cancel anytime</div>
     <div class="features">
-      <div class="feature"><span class="feature-check">✓</span> Your personal AI booking page</div>
+      <div class="feature"><span class="feature-check">✓</span> AI-powered customer booking page</div>
       <div class="feature"><span class="feature-check">✓</span> Unlimited appointments</div>
       <div class="feature"><span class="feature-check">✓</span> Availability manager</div>
-      <div class="feature"><span class="feature-check">✓</span> SMS & email reminders</div>
-      <div class="feature"><span class="feature-check">✓</span> Revenue dashboard</div>
+      <div class="feature"><span class="feature-check">✓</span> SMS booking confirmations</div>
+      <div class="feature"><span class="feature-check">✓</span> 24-hour SMS reminders</div>
+      <div class="feature"><span class="feature-check">✓</span> Appointment dashboard</div>
+      <div class="feature"><span class="feature-check">✓</span> Customer self-service cancellations</div>
+      <div class="feature"><span class="feature-check">✓</span> Your own booking link</div>
     </div>
   </div>
 
   <button class="btn-upgrade" id="upgradeBtn" onclick="startCheckout()">
-    Subscribe Now — $39/mo →
+    Subscribe Now — $30/mo →
   </button>
   <br>
   <button class="signout-link" onclick="signOut()">Sign out</button>
@@ -213,12 +216,12 @@ async function startCheckout() {
     } else {
       alert('Could not start checkout: ' + (data.error || 'Unknown error'));
       btn.disabled = false;
-      btn.textContent = 'Subscribe Now — $39/mo →';
+      btn.textContent = 'Subscribe Now — $30/mo →';
     }
   } catch (err) {
     alert('Something went wrong: ' + err.message);
     btn.disabled = false;
-    btn.textContent = 'Subscribe Now — $39/mo →';
+    btn.textContent = 'Subscribe Now — $30/mo →';
   }
 }
 
