@@ -121,6 +121,10 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
       <h1>Book with <em id="heroName">…</em></h1>
       <p id="heroSalon">Independent Hair Stylist</p>
       <div class="hero-badges" id="heroBadges"></div>
+      <p id="heroBookingNote" style="display:none;font-size:0.78rem;color:rgba(232,217,200,0.75);margin-top:8px;font-weight:300;background:rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;border:1px solid rgba(255,255,255,0.12);"></p>
+      <p id="heroBio" style="display:none;font-size:0.82rem;color:rgba(232,217,200,0.65);margin-top:10px;font-weight:300;line-height:1.6;max-width:500px;"></p>
+      <p id="heroAddress" style="display:none;font-size:0.78rem;color:rgba(232,217,200,0.6);margin-top:8px;font-weight:300;"></p>
+      <div id="heroSocials" style="display:none;flex-wrap:wrap;gap:7px;margin-top:12px;"></div>
     </div>
   </div>
 </div>
@@ -244,12 +248,27 @@ async function loadAvailability() {
 // ── RENDER HERO ──────────────────────────────────────────
 function renderHero() {
   if (!stylist) return;
-  document.getElementById('heroInitial').textContent = stylist.name[0];
-  document.getElementById('heroName').textContent = stylist.name;
-  document.getElementById('heroSalon').textContent =
-    [stylist.salon_name, 'Independent Hair Stylist'].filter(Boolean).join(' · ');
-  document.getElementById('chatHeaderName').textContent = `${stylist.name}'s Booking Assistant`;
 
+  // Photo or initial
+  if (stylist.photo_url) {
+    document.getElementById('heroInitial').innerHTML =
+      `<img src="${stylist.photo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${stylist.name}">`;
+  } else {
+    document.getElementById('heroInitial').textContent = stylist.name[0];
+  }
+
+  document.getElementById('heroName').textContent = stylist.name;
+
+  // Salon + location
+  const locationParts = [stylist.salon_name];
+  if (stylist.city && stylist.state) locationParts.push(stylist.city + ', ' + stylist.state);
+  else if (stylist.city) locationParts.push(stylist.city);
+  if (stylist.years_experience) locationParts.push(stylist.years_experience + ' yrs experience');
+  document.getElementById('heroSalon').textContent = locationParts.filter(Boolean).join(' · ') || 'Independent Hair Stylist';
+
+  document.getElementById('chatHeaderName').textContent = stylist.name + "'s Booking Assistant";
+
+  // Service badges
   const badges = document.getElementById('heroBadges');
   badges.innerHTML = '';
   const svcList = stylist.serviceMenu?.length ? stylist.serviceMenu : (stylist.services || []).map(s => ({name:s}));
@@ -259,6 +278,57 @@ function renderHero() {
     b.textContent = typeof s === 'string' ? s : s.name;
     badges.appendChild(b);
   });
+
+  // Booking note
+  if (stylist.booking_note) {
+    const noteEl = document.getElementById('heroBookingNote');
+    if (noteEl) { noteEl.textContent = '📌 ' + stylist.booking_note; noteEl.style.display = 'block'; }
+  }
+
+  // Social links
+  renderSocialLinks();
+
+  // Bio
+  if (stylist.bio) {
+    const bioEl = document.getElementById('heroBio');
+    if (bioEl) { bioEl.textContent = stylist.bio; bioEl.style.display = 'block'; }
+  }
+
+  // Address / map link
+  if (stylist.full_address || stylist.city) {
+    const addrEl = document.getElementById('heroAddress');
+    if (addrEl) {
+      const addr = stylist.full_address || (stylist.city + (stylist.state ? ', ' + stylist.state : ''));
+      if (stylist.map_link) {
+        addrEl.innerHTML = `📍 <a href="${stylist.map_link}" target="_blank" style="color:rgba(232,217,200,0.8);text-decoration:underline;">${addr}</a>`;
+      } else {
+        addrEl.textContent = '📍 ' + addr;
+      }
+      addrEl.style.display = 'block';
+    }
+  }
+}
+
+function renderSocialLinks() {
+  const container = document.getElementById('heroSocials');
+  if (!container) return;
+  container.innerHTML = '';
+  const links = [];
+  if (stylist.instagram) links.push({ label: 'Instagram', url: stylist.instagram.startsWith('http') ? stylist.instagram : 'https://instagram.com/' + stylist.instagram.replace('@',''), icon: '📸' });
+  if (stylist.tiktok) links.push({ label: 'TikTok', url: stylist.tiktok.startsWith('http') ? stylist.tiktok : 'https://tiktok.com/@' + stylist.tiktok.replace('@',''), icon: '🎵' });
+  if (stylist.facebook) links.push({ label: 'Facebook', url: stylist.facebook.startsWith('http') ? stylist.facebook : 'https://facebook.com/' + stylist.facebook, icon: '👤' });
+  if (stylist.website) links.push({ label: 'Website', url: stylist.website, icon: '🌐' });
+  (stylist.social_links || []).forEach(l => l.url && links.push({ label: l.label || 'Link', url: l.url, icon: '🔗' }));
+  links.forEach(l => {
+    const a = document.createElement('a');
+    a.href = l.url; a.target = '_blank';
+    a.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:0.72rem;color:rgba(232,217,200,0.85);text-decoration:none;transition:all 0.15s;';
+    a.innerHTML = l.icon + ' ' + l.label;
+    a.onmouseover = () => a.style.background = 'rgba(255,255,255,0.18)';
+    a.onmouseout = () => a.style.background = 'rgba(255,255,255,0.1)';
+    container.appendChild(a);
+  });
+  container.style.display = links.length ? 'flex' : 'none';
 }
 
 // ── RENDER AVAILABILITY PANEL ────────────────────────────
