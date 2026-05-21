@@ -139,8 +139,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
       <div class="week-label">Open Slots</div>
       <div id="availabilityList"><div style="text-align:center;padding:20px;color:#9c7a6a;font-size:0.82rem;">Loading availability…</div></div>
       <div class="legend">
-        <div class="legend-item"><span class="legend-dot open"></span> Available</div>
-        <div class="legend-item"><span class="legend-dot booked"></span> Booked</div>
+        <div class="legend-item"><span class="legend-dot open"></span> Available to book</div>
       </div>
     </div>
   </div>
@@ -352,6 +351,10 @@ function renderAvailabilityPanel() {
 
   dates.forEach(dateStr => {
     const slots = byDate[dateStr];
+    // Only show open (unbooked) slots to customers
+    const openSlots = slots.filter(s => !s.is_booked);
+    if (!openSlots.length) return; // skip days with no open slots
+
     const label = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
     const row = document.createElement('div');
     row.className = 'day-row';
@@ -363,9 +366,9 @@ function renderAvailabilityPanel() {
     const slotsEl = document.createElement('div');
     slotsEl.className = 'slots';
 
-    slots.forEach(s => {
+    openSlots.forEach(s => {
       const chip = document.createElement('span');
-      chip.className = `slot ${s.is_booked ? 'booked' : 'open'}`;
+      chip.className = 'slot open';
       chip.textContent = s.time;
       slotsEl.appendChild(chip);
     });
