@@ -157,6 +157,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
 /* TOAST */
+/* PROFILE PHOTO */
+.photo-preview { width:88px;height:88px;border-radius:50%;overflow:hidden;flex-shrink:0; }
+
 /* SERVICE MENU */
 .svc-category { font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border); }
 .svc-category:first-child { margin-top:0; }
@@ -335,14 +338,65 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       <div class="card" style="margin-bottom:20px;">
         <div class="card-head"><h2>My Profile</h2></div>
         <div class="card-body">
-          <div class="profile-grid">
+
+          <!-- PHOTO UPLOAD -->
+          <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border);">
+            <div style="position:relative;">
+              <div id="profilePhotoPreview" style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--rust) 0%,#6b2e10 100%);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:32px;color:var(--cream);flex-shrink:0;overflow:hidden;border:3px solid var(--border);">
+                <span id="profilePhotoInitial">?</span>
+                <img id="profilePhotoImg" style="width:100%;height:100%;object-fit:cover;display:none;position:absolute;inset:0;" src="" alt="Profile photo">
+              </div>
+            </div>
+            <div>
+              <div style="font-size:0.875rem;font-weight:500;color:var(--ink);margin-bottom:4px;">Profile Photo</div>
+              <div style="font-size:0.78rem;color:var(--ink-light);font-weight:300;margin-bottom:10px;">Shown on your booking page. Square photos work best.</div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <label style="padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);font-size:0.78rem;font-weight:500;color:var(--ink);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--rust)'" onmouseout="this.style.borderColor='var(--border)'">
+                  📷 Upload Photo
+                  <input type="file" id="photoUpload" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)">
+                </label>
+                <button id="removePhotoBtn" class="btn btn-ghost" style="font-size:0.78rem;display:none;" onclick="removePhoto()">Remove</button>
+              </div>
+              <div id="photoUploadStatus" style="font-size:0.72rem;margin-top:6px;color:var(--ink-light);"></div>
+            </div>
+          </div>
+
+          <!-- BASIC INFO -->
+          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">Basic Info</div>
+          <div class="profile-grid" style="margin-bottom:20px;">
             <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="profileName"></div>
             <div class="form-group"><label class="form-label">Salon / Studio</label><input class="form-input" id="profileSalon"></div>
-            <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="profilePhone"></div>
+            <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="profilePhone" placeholder="+1 (615) 000-0000"></div>
             <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="profileEmail" disabled></div>
-            <div class="form-group full"><label class="form-label">Bio</label><textarea class="form-input" id="profileBio" rows="3" style="resize:vertical"></textarea></div>
+            <div class="form-group"><label class="form-label">Years Experience</label><input class="form-input" id="profileYears" type="number" min="0" max="50" placeholder="e.g. 8"></div>
+            <div class="form-group"><label class="form-label">Booking Note <span style="font-weight:300;text-transform:none;letter-spacing:0;">(shown at top of booking page)</span></label><input class="form-input" id="profileBookingNote" placeholder="e.g. Book 48hrs in advance for color services"></div>
+            <div class="form-group full"><label class="form-label">Bio</label><textarea class="form-input" id="profileBio" rows="3" style="resize:vertical" placeholder="Tell customers about your style, specialties, and experience…"></textarea></div>
           </div>
-          <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+
+          <!-- LOCATION -->
+          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">Location</div>
+          <div class="profile-grid" style="margin-bottom:20px;">
+            <div class="form-group"><label class="form-label">City</label><input class="form-input" id="profileCity" placeholder="e.g. Nashville"></div>
+            <div class="form-group"><label class="form-label">State</label><input class="form-input" id="profileState" placeholder="e.g. TN"></div>
+            <div class="form-group full"><label class="form-label">Full Address <span style="font-weight:300;text-transform:none;letter-spacing:0;">(optional — shown on booking page)</span></label><input class="form-input" id="profileAddress" placeholder="e.g. 123 Main St, Suite 4, Nashville TN 37201"></div>
+            <div class="form-group full"><label class="form-label">Google Maps Link <span style="font-weight:300;text-transform:none;letter-spacing:0;">(optional)</span></label><input class="form-input" id="profileMapLink" placeholder="https://maps.google.com/..."></div>
+          </div>
+
+          <!-- SOCIAL LINKS -->
+          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">Social & Web</div>
+          <div class="profile-grid" style="margin-bottom:8px;">
+            <div class="form-group"><label class="form-label">Instagram</label><input class="form-input" id="profileInstagram" placeholder="@yourhandle"></div>
+            <div class="form-group"><label class="form-label">TikTok</label><input class="form-input" id="profileTiktok" placeholder="@yourhandle"></div>
+            <div class="form-group"><label class="form-label">Facebook</label><input class="form-input" id="profileFacebook" placeholder="facebook.com/yourpage"></div>
+            <div class="form-group"><label class="form-label">Website</label><input class="form-input" id="profileWebsite" placeholder="https://yoursite.com"></div>
+          </div>
+          <!-- Custom social links -->
+          <div style="margin-bottom:20px;">
+            <div id="customSocialLinks" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
+            <button class="btn btn-ghost" style="font-size:0.78rem;" onclick="addCustomSocialLink()">+ Add Another Link</button>
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
             <button class="btn btn-ghost" onclick="loadProfile()">Discard</button>
             <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
           </div>
@@ -597,12 +651,39 @@ async function loadStylistProfile(user) {
   document.getElementById('sidebarName').textContent = stylist.name;
   document.getElementById('sidebarInitial').textContent = stylist.name[0];
 
-  // Populate profile form
+  // Populate profile form — basic
   document.getElementById('profileName').value = stylist.name || '';
   document.getElementById('profileSalon').value = stylist.salon_name || '';
   document.getElementById('profilePhone').value = stylist.phone || '';
   document.getElementById('profileEmail').value = stylist.email || '';
   document.getElementById('profileBio').value = stylist.bio || '';
+  document.getElementById('profileYears').value = stylist.years_experience || '';
+  document.getElementById('profileBookingNote').value = stylist.booking_note || '';
+
+  // Location
+  document.getElementById('profileCity').value = stylist.city || '';
+  document.getElementById('profileState').value = stylist.state || '';
+  document.getElementById('profileAddress').value = stylist.full_address || '';
+  document.getElementById('profileMapLink').value = stylist.map_link || '';
+
+  // Social
+  document.getElementById('profileInstagram').value = stylist.instagram || '';
+  document.getElementById('profileTiktok').value = stylist.tiktok || '';
+  document.getElementById('profileFacebook').value = stylist.facebook || '';
+  document.getElementById('profileWebsite').value = stylist.website || '';
+
+  // Custom social links
+  renderCustomSocialLinks(stylist.social_links || []);
+
+  // Photo
+  if (stylist.photo_url) {
+    document.getElementById('profilePhotoImg').src = stylist.photo_url;
+    document.getElementById('profilePhotoImg').style.display = 'block';
+    document.getElementById('profilePhotoInitial').style.display = 'none';
+    document.getElementById('removePhotoBtn').style.display = 'inline-block';
+  } else {
+    document.getElementById('profilePhotoInitial').textContent = stylist.name[0];
+  }
 
   // Services now managed via service menu table
 }
@@ -1087,14 +1168,31 @@ function closeModal() { document.getElementById('modalOverlay').classList.remove
 // ── PROFILE SAVE ──────────────────────────────────────────
 async function saveProfile() {
   if (!stylist) return;
+  // Collect custom social links
+  const customLinks = [...document.querySelectorAll('.custom-social-row')].map(row => ({
+    label: row.querySelector('.custom-social-label').value.trim(),
+    url: row.querySelector('.custom-social-url').value.trim()
+  })).filter(l => l.url);
+
   const { error } = await supabaseClient.from('stylists').update({
     name: document.getElementById('profileName').value,
     salon_name: document.getElementById('profileSalon').value,
     phone: document.getElementById('profilePhone').value,
     bio: document.getElementById('profileBio').value,
+    years_experience: parseInt(document.getElementById('profileYears').value) || null,
+    booking_note: document.getElementById('profileBookingNote').value.trim() || null,
+    city: document.getElementById('profileCity').value.trim() || null,
+    state: document.getElementById('profileState').value.trim() || null,
+    full_address: document.getElementById('profileAddress').value.trim() || null,
+    map_link: document.getElementById('profileMapLink').value.trim() || null,
+    instagram: document.getElementById('profileInstagram').value.trim() || null,
+    tiktok: document.getElementById('profileTiktok').value.trim() || null,
+    facebook: document.getElementById('profileFacebook').value.trim() || null,
+    website: document.getElementById('profileWebsite').value.trim() || null,
+    social_links: customLinks
   }).eq('id', stylist.id);
 
-  if (error) { showToast('⚠️ Could not save profile'); return; }
+  if (error) { showToast('⚠️ Could not save profile: ' + error.message); return; }
   stylist.name = document.getElementById('profileName').value;
   document.getElementById('sidebarName').textContent = stylist.name;
   document.getElementById('sidebarInitial').textContent = stylist.name[0];
@@ -1105,6 +1203,82 @@ async function loadProfile() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   await loadStylistProfile(user);
   showToast('↩️ Changes discarded');
+}
+
+// ── PHOTO UPLOAD ─────────────────────────────────────────
+async function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('⚠️ Photo must be under 5MB'); return; }
+
+  const status = document.getElementById('photoUploadStatus');
+  status.textContent = 'Uploading…';
+
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const ext = file.name.split('.').pop();
+    const path = user.id + '/profile.' + ext;
+
+    const { error: upErr } = await supabaseClient.storage
+      .from('stylist-photos')
+      .upload(path, file, { upsert: true });
+
+    if (upErr) throw upErr;
+
+    const { data: urlData } = supabaseClient.storage
+      .from('stylist-photos')
+      .getPublicUrl(path);
+
+    const photoUrl = urlData.publicUrl + '?t=' + Date.now();
+
+    const { error: dbErr } = await supabaseClient
+      .from('stylists')
+      .update({ photo_url: photoUrl })
+      .eq('id', stylist.id);
+
+    if (dbErr) throw dbErr;
+
+    stylist.photo_url = photoUrl;
+    document.getElementById('profilePhotoImg').src = photoUrl;
+    document.getElementById('profilePhotoImg').style.display = 'block';
+    document.getElementById('profilePhotoInitial').style.display = 'none';
+    document.getElementById('removePhotoBtn').style.display = 'inline-block';
+    status.textContent = '✅ Photo uploaded!';
+    setTimeout(() => status.textContent = '', 3000);
+
+  } catch (err) {
+    status.textContent = '⚠️ Upload failed: ' + err.message;
+  }
+}
+
+async function removePhoto() {
+  const { error } = await supabaseClient.from('stylists').update({ photo_url: null }).eq('id', stylist.id);
+  if (error) { showToast('⚠️ Could not remove photo'); return; }
+  stylist.photo_url = null;
+  document.getElementById('profilePhotoImg').style.display = 'none';
+  document.getElementById('profilePhotoInitial').style.display = 'block';
+  document.getElementById('profilePhotoInitial').textContent = stylist.name[0];
+  document.getElementById('removePhotoBtn').style.display = 'none';
+  showToast('🗑️ Photo removed');
+}
+
+// ── CUSTOM SOCIAL LINKS ───────────────────────────────────
+function renderCustomSocialLinks(links) {
+  const container = document.getElementById('customSocialLinks');
+  container.innerHTML = '';
+  (links || []).forEach(l => addCustomSocialLink(l.label, l.url));
+}
+
+function addCustomSocialLink(label = '', url = '') {
+  const container = document.getElementById('customSocialLinks');
+  const row = document.createElement('div');
+  row.className = 'custom-social-row';
+  row.style.cssText = 'display:grid;grid-template-columns:140px 1fr 32px;gap:8px;align-items:center;';
+  row.innerHTML = `
+    <input class="form-input custom-social-label" placeholder="Label (e.g. YouTube)" value="${label}" style="font-size:0.82rem;">
+    <input class="form-input custom-social-url" placeholder="https://..." value="${url}" style="font-size:0.82rem;">
+    <button onclick="this.parentElement.remove()" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--cream);cursor:pointer;color:var(--ink-light);font-size:14px;display:flex;align-items:center;justify-content:center;" title="Remove">✕</button>`;
+  container.appendChild(row);
 }
 
 // ── SERVICE MENU ──────────────────────────────────────────
