@@ -344,7 +344,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     <!-- MODE: CHECKBOX — pick multiple times -->
     <div id="modeCheckbox">
       <label class="form-label" style="margin-bottom:8px;display:block;">Select times <span style="color:var(--ink-light);font-weight:300;text-transform:none;letter-spacing:0;">(pick as many as you want)</span></label>
-      <div id="timeCheckboxes" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px;"></div>
+      <div id="timeCheckboxes" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px;"></div>
+      <div id="selectedTimesServices" style="display:none;margin-bottom:16px;">
+        <label class="form-label" style="margin-bottom:8px;display:block;">Assign a service to each selected time <span style="color:var(--ink-light);font-weight:300;text-transform:none;letter-spacing:0;">(optional)</span></label>
+        <div id="timeServiceRows" style="display:flex;flex-direction:column;gap:7px;"></div>
+      </div>
     </div>
 
     <!-- MODE: INTERVAL — start/end/every N mins -->
@@ -392,9 +396,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       </div>
     </div>
 
-    <!-- SERVICE DURATION SECTION (all modes) -->
-    <div style="background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:20px;">
-      <label class="form-label" style="margin-bottom:10px;display:block;">Service durations <span style="color:var(--ink-light);font-weight:300;text-transform:none;letter-spacing:0;">(optional — set defaults or override per slot)</span></label>
+    <!-- SERVICE DURATION DEFAULTS (repeat and interval modes) -->
+    <div id="durationDefaultsSection" style="background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:20px;display:none;">
+      <label class="form-label" style="margin-bottom:10px;display:block;">Service durations <span style="color:var(--ink-light);font-weight:300;text-transform:none;letter-spacing:0;">(applied to all slots)</span></label>
       <div id="serviceDurations" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
@@ -618,12 +622,13 @@ function renderAvailability() {
     slots.forEach(slot => {
       const chip = document.createElement('div');
       chip.className = 'slot-chip';
+      const svcLabel = slot.service_type ? `<span class="slot-chip-duration">${slot.service_type}</span>` : '';
       const durLabel = slot.duration_minutes ? `<span class="slot-chip-duration">${slot.duration_minutes}m</span>` : '';
       if (slot.is_booked) {
         chip.style.cssText = 'opacity:0.5;text-decoration:line-through;cursor:default';
-        chip.innerHTML = `${slot.time}${durLabel} 🔒`;
+        chip.innerHTML = `${slot.time}${svcLabel}${durLabel} 🔒`;
       } else {
-        chip.innerHTML = `${slot.time}${durLabel} <span onclick="removeSlot('${slot.id}')" style="opacity:0.6;font-size:10px;cursor:pointer;">✕</span>`;
+        chip.innerHTML = `${slot.time}${svcLabel}${durLabel} <span onclick="removeSlot('${slot.id}')" style="opacity:0.6;font-size:10px;cursor:pointer;">✕</span>`;
       }
       slotsWrap.appendChild(chip);
     });
@@ -689,6 +694,9 @@ function setModalMode(mode) {
   const subs = { checkbox: 'Select one or more times to open for bookings.', interval: 'Generate slots between a start and end time automatically.', repeat: 'Set a weekly schedule that repeats for 4 weeks.' };
   document.getElementById('modalTitle').textContent = titles[mode];
   document.getElementById('modalSubtitle').textContent = subs[mode];
+  // Show duration defaults for interval and repeat modes only
+  document.getElementById('durationDefaultsSection').style.display = mode !== 'checkbox' ? 'block' : 'none';
+  if (mode !== 'checkbox') renderServiceDurations();
 }
 
 // ── TIME CHECKBOXES ───────────────────────────────────────
@@ -703,10 +711,60 @@ function renderTimeCheckboxes() {
     btn.textContent = t;
     btn.dataset.time = t;
     if (!taken.includes(t)) {
-      btn.onclick = () => btn.classList.toggle('on');
+      btn.onclick = () => {
+        btn.classList.toggle('on');
+        updateTimeServiceRows();
+      };
     }
     container.appendChild(btn);
   });
+}
+
+function updateTimeServiceRows() {
+  const selected = [...document.querySelectorAll('#timeCheckboxes .time-checkbox-btn.on')];
+  const wrapper = document.getElementById('selectedTimesServices');
+  const rowContainer = document.getElementById('timeServiceRows');
+  if (!selected.length) { wrapper.style.display = 'none'; return; }
+  wrapper.style.display = 'block';
+  // Keep existing selections, only add/remove rows
+  const existing = {};
+  rowContainer.querySelectorAll('.time-service-row').forEach(r => {
+    existing[r.dataset.time] = r.querySelector('select').value;
+  });
+  rowContainer.innerHTML = '';
+  const services = stylist?.services?.length ? stylist.services : Object.keys(DEFAULT_DURATIONS);
+  selected.forEach(btn => {
+    const t = btn.dataset.time;
+    const existingSvc = existing[t] || '';
+    const existingDur = existing[t + '_dur'] || '';
+    const row = document.createElement('div');
+    row.className = 'time-service-row';
+    row.dataset.time = t;
+    row.style.cssText = 'display:grid;grid-template-columns:80px 1fr 100px;gap:8px;align-items:center;';
+    row.innerHTML = `
+      <span style="font-size:0.8rem;font-weight:500;color:var(--rust);">${t}</span>
+      <select class="duration-select" style="width:100%" onchange="updateDurationFromService(this, '${t}')">
+        <option value="">Any service</option>
+        ${services.map(s => `<option value="${s}" ${existingSvc === s ? 'selected' : ''}>${s}</option>`).join('')}
+      </select>
+      <select class="duration-select" id="dur_${t.replace(/[^a-z0-9]/gi,'_')}" style="width:100%">
+        ${DURATION_OPTIONS.map(d => {
+          const label = d >= 60 ? (d % 60 === 0 ? (d/60)+'hr' : Math.floor(d/60)+'hr '+(d%60)+'min') : d+'min';
+          const svcDefault = existingSvc ? (DEFAULT_DURATIONS[existingSvc] || 60) : 60;
+          return `<option value="${d}" ${d === svcDefault ? 'selected' : ''}>${label}</option>`;
+        }).join('')}
+      </select>`;
+    rowContainer.appendChild(row);
+  });
+}
+
+function updateDurationFromService(selectEl, time) {
+  const svc = selectEl.value;
+  const durId = 'dur_' + time.replace(/[^a-z0-9]/gi,'_');
+  const durSel = document.getElementById(durId);
+  if (durSel && svc && DEFAULT_DURATIONS[svc]) {
+    durSel.value = DEFAULT_DURATIONS[svc];
+  }
 }
 
 document.getElementById('slotDate').addEventListener('change', () => {
@@ -802,10 +860,11 @@ function renderServiceDurations() {
     const current = serviceDurationOverrides[svc] || defaultDur;
     const row = document.createElement('div');
     row.className = 'duration-row';
+    const label = d => d >= 60 ? (d % 60 === 0 ? (d/60)+'hr' : Math.floor(d/60)+'hr '+(d%60)+'min') : d+'min';
     row.innerHTML = `
       <span class="duration-label">${svc}</span>
       <select class="duration-select" onchange="serviceDurationOverrides['${svc}'] = parseInt(this.value)">
-        ${DURATION_OPTIONS.map(d => `<option value="${d}" ${d === current ? 'selected' : ''}>${d >= 60 ? (d/60) + 'hr' + (d%60?'':'') : d+'min'}${d === defaultDur ? ' (default)' : ''}</option>`).join('')}
+        ${DURATION_OPTIONS.map(d => `<option value="${d}" ${d === current ? 'selected' : ''}>${label(d)}${d === defaultDur ? ' (default)' : ''}</option>`).join('')}
       </select>`;
     container.appendChild(row);
   });
@@ -825,7 +884,19 @@ async function confirmAddSlots() {
       if (!dateStr) { showToast('⚠️ Please select a date'); btn.disabled=false; btn.textContent='Add Slots'; return; }
       const selected = [...document.querySelectorAll('#timeCheckboxes .time-checkbox-btn.on')].map(b => b.dataset.time);
       if (!selected.length) { showToast('⚠️ Please select at least one time'); btn.disabled=false; btn.textContent='Add Slots'; return; }
-      selected.forEach(t => slotsToAdd.push({ date: dateStr, time: t }));
+      selected.forEach(t => {
+        // Get per-slot service and duration from assignment rows
+        const row = document.querySelector(`.time-service-row[data-time="${t}"]`);
+        let duration = null;
+        let service = null;
+        if (row) {
+          service = row.querySelector('select').value || null;
+          const durId = 'dur_' + t.replace(/[^a-z0-9]/gi,'_');
+          const durEl = document.getElementById(durId);
+          duration = durEl ? parseInt(durEl.value) : null;
+        }
+        slotsToAdd.push({ date: dateStr, time: t, duration_minutes: duration, service_type: service });
+      });
 
     } else if (modalMode === 'interval') {
       const dateStr = document.getElementById('slotDate').value;
@@ -855,15 +926,20 @@ async function confirmAddSlots() {
       }
     }
 
-    // Get duration for each slot based on service defaults
-    const services = stylist?.services || [];
-    const insertRows = slotsToAdd.map(s => ({
-      stylist_id: stylist.id,
-      date: s.date,
-      time: s.time,
-      is_booked: false,
-      duration_minutes: s.duration_minutes || null
-    }));
+    // Build insert rows with service type and duration
+    const insertRows = slotsToAdd.map(s => {
+      // For interval/repeat modes, look up duration from service overrides
+      let dur = s.duration_minutes;
+      if (!dur && s.service_type) dur = serviceDurationOverrides[s.service_type] || DEFAULT_DURATIONS[s.service_type] || null;
+      return {
+        stylist_id: stylist.id,
+        date: s.date,
+        time: s.time,
+        is_booked: false,
+        duration_minutes: dur || null,
+        service_type: s.service_type || null
+      };
+    });
 
     // Insert in batches, ignore duplicates
     const { error } = await supabaseClient.from('availability').upsert(insertRows, { onConflict: 'stylist_id,date,time', ignoreDuplicates: true });
