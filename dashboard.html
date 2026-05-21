@@ -767,7 +767,9 @@ function openAddSlotModalForDate(dateStr) {
   document.getElementById('modalOverlay').classList.add('open');
 }
 
-function initModal() {
+async function initModal() {
+  // Make sure services are loaded before opening modal
+  if (!stylistServices.length) await loadServices();
   setModalMode('checkbox');
   serviceDurationOverrides = {};
   renderServiceDurations();
@@ -1283,9 +1285,9 @@ function showPage(id, el) {
   if (el) el.classList.add('active');
   const titles = { overview:'Overview', appointments:'Appointments', availability:'Availability', profile:'My Profile' };
   document.getElementById('pageTitle').textContent = titles[id] || id;
-  if (id === 'availability') renderAvailability();
+  if (id === 'availability') { if (!stylistServices.length) loadServices().then(renderAvailability); else renderAvailability(); }
   if (id === 'appointments') renderAllAppointments();
-  if (id === 'profile') { loadServices(); }
+  if (id === 'profile') loadServices();
 }
 
 // ── CALENDAR ──────────────────────────────────────────────
