@@ -157,6 +157,26 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
 /* TOAST */
+/* SERVICE MENU */
+.svc-category { font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border); }
+.svc-category:first-child { margin-top:0; }
+.svc-row { display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--cream);margin-bottom:7px;transition:all 0.15s; }
+.svc-row:hover { border-color:var(--rust-light);background:var(--rust-pale); }
+.svc-row.inactive { opacity:0.45; }
+.svc-info { flex:1; }
+.svc-name { font-size:0.875rem;font-weight:600;color:var(--ink);line-height:1.2; }
+.svc-meta { font-size:0.72rem;color:var(--ink-light);margin-top:2px; }
+.svc-price { font-size:0.82rem;font-weight:500;color:var(--sage);min-width:48px;text-align:right; }
+.svc-actions { display:flex;gap:6px; }
+.svc-btn { width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-light);transition:all 0.1s; }
+.svc-btn:hover { border-color:var(--rust);color:var(--rust);background:var(--rust-pale); }
+.category-pill { display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-right:6px; }
+.cat-quick { background:#e8f4e8;color:#2d6a35; }
+.cat-standard { background:#e8eef8;color:#1a4580; }
+.cat-long { background:#f5e8f0;color:#7a1a6a; }
+.cat-color { background:#fef0e2;color:#8a4010; }
+.cat-custom { background:var(--sand);color:var(--ink-mid); }
+.add-svc-modal { width:480px; }
 .modal-tab { flex:1;padding:9px;text-align:center;font-size:0.8rem;font-weight:500;cursor:pointer;background:transparent;border:none;color:var(--ink-light);font-family:'DM Sans',sans-serif;transition:all 0.15s; }
 .modal-tab.active { background:var(--ink);color:#fff; }
 .repeat-day-btn { padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;cursor:pointer;color:var(--ink-light);transition:all 0.12s; }
@@ -284,9 +304,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
     <!-- AVAILABILITY -->
     <div class="page-section" id="page-availability">
-      <div class="card">
+      <div class="card" style="margin-bottom:20px;">
         <div class="card-head">
-          <h2>Availability Manager</h2>
+          <h2>Availability</h2>
           <span class="saving-indicator" id="savingIndicator">Saving…</span>
         </div>
         <div class="card-body">
@@ -297,7 +317,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
     <!-- PROFILE -->
     <div class="page-section" id="page-profile">
-      <div class="card">
+
+      <!-- Profile info card -->
+      <div class="card" style="margin-bottom:20px;">
         <div class="card-head"><h2>My Profile</h2></div>
         <div class="card-body">
           <div class="profile-grid">
@@ -306,10 +328,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
             <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="profilePhone"></div>
             <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="profileEmail" disabled></div>
             <div class="form-group full"><label class="form-label">Bio</label><textarea class="form-input" id="profileBio" rows="3" style="resize:vertical"></textarea></div>
-            <div class="form-group full">
-              <label class="form-label">Services Offered (click to toggle)</label>
-              <div class="service-tags" id="serviceTags"></div>
-            </div>
           </div>
           <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
             <button class="btn btn-ghost" onclick="loadProfile()">Discard</button>
@@ -317,6 +335,19 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
           </div>
         </div>
       </div>
+
+      <!-- Service Menu card -->
+      <div class="card">
+        <div class="card-head">
+          <h2>Service Menu</h2>
+          <button class="btn btn-primary" onclick="openAddServiceModal()">+ Add Service</button>
+        </div>
+        <div class="card-body">
+          <p style="font-size:0.8rem;color:var(--ink-light);margin-bottom:18px;font-weight:300;">Define the services you offer. The AI booking assistant will use these to match customers to the right time slots.</p>
+          <div id="serviceMenuList"><div class="empty-state">Loading services…</div></div>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -409,6 +440,79 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   </div>
 </div>
 
+<!-- ADD/EDIT SERVICE MODAL -->
+<div class="modal-overlay" id="serviceModalOverlay" onclick="if(event.target===this)closeServiceModal()">
+  <div class="modal add-svc-modal">
+    <h3 id="serviceModalTitle">Add Service</h3>
+    <p style="font-size:0.83rem;color:var(--ink-light);margin-bottom:20px;">Define a service you offer. The AI will match customers to slots based on duration.</p>
+
+    <div class="form-group" style="margin-bottom:14px;">
+      <label class="form-label" style="margin-bottom:6px;display:block;">Service Name</label>
+      <input class="form-input date-input" id="svcName" placeholder="e.g. Women's Haircut" style="width:100%">
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div>
+        <label class="form-label" style="margin-bottom:6px;display:block;">Category</label>
+        <select class="date-input" id="svcCategory" style="width:100%">
+          <option value="Quick">⚡ Quick (15–45 min)</option>
+          <option value="Standard" selected>✂️ Standard (30–60 min)</option>
+          <option value="Long">💅 Long (45–120 min)</option>
+          <option value="Color">🎨 Color (1–4+ hrs)</option>
+          <option value="Custom">⚙️ Custom</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label" style="margin-bottom:6px;display:block;">Duration</label>
+        <select class="date-input" id="svcDuration" style="width:100%">
+          <option value="15">15 min</option>
+          <option value="20">20 min</option>
+          <option value="30">30 min</option>
+          <option value="45">45 min</option>
+          <option value="60" selected>60 min (1 hr)</option>
+          <option value="75">75 min</option>
+          <option value="90">90 min (1.5 hr)</option>
+          <option value="105">105 min</option>
+          <option value="120">120 min (2 hr)</option>
+          <option value="150">150 min (2.5 hr)</option>
+          <option value="180">180 min (3 hr)</option>
+          <option value="210">210 min (3.5 hr)</option>
+          <option value="240">240 min (4 hr)</option>
+          <option value="300">300 min (5 hr)</option>
+          <option value="360">360 min (6 hr)</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div>
+        <label class="form-label" style="margin-bottom:6px;display:block;">Price (optional)</label>
+        <div style="position:relative;">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-light);font-size:0.85rem;">$</span>
+          <input class="form-input date-input" id="svcPrice" type="number" min="0" step="5" placeholder="0.00" style="width:100%;padding-left:24px;">
+        </div>
+      </div>
+      <div>
+        <label class="form-label" style="margin-bottom:6px;display:block;">Active</label>
+        <select class="date-input" id="svcActive" style="width:100%">
+          <option value="true">✅ Showing on booking page</option>
+          <option value="false">⏸️ Hidden from booking page</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:20px;">
+      <label class="form-label" style="margin-bottom:6px;display:block;">Description (optional)</label>
+      <textarea class="form-input date-input" id="svcDescription" rows="2" placeholder="Brief description shown to customers…" style="width:100%;resize:none;"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeServiceModal()">Cancel</button>
+      <button class="btn btn-primary" id="saveServiceBtn" onclick="saveService()">Save Service</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -440,7 +544,7 @@ window.addEventListener('load', async () => {
   }
 
   await loadStylistProfile(user);
-  await Promise.all([loadAppointments(), loadAvailability()]);
+  await Promise.all([loadAppointments(), loadAvailability(), loadServices()]);
 
   document.getElementById('topbarDate').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
@@ -481,16 +585,7 @@ async function loadStylistProfile(user) {
   document.getElementById('profileEmail').value = stylist.email || '';
   document.getElementById('profileBio').value = stylist.bio || '';
 
-  // Render service tags
-  const tagContainer = document.getElementById('serviceTags');
-  tagContainer.innerHTML = '';
-  ALL_SERVICES.forEach(s => {
-    const tag = document.createElement('span');
-    tag.className = 'service-tag' + ((stylist.services || []).includes(s) ? ' on' : '');
-    tag.textContent = s;
-    tag.onclick = () => tag.classList.toggle('on');
-    tagContainer.appendChild(tag);
-  });
+  // Services now managed via service menu table
 }
 
 async function loadAppointments() {
@@ -745,7 +840,7 @@ function updateTimeServiceRows() {
       <span style="font-size:0.8rem;font-weight:500;color:var(--rust);">${t}</span>
       <select class="duration-select" style="width:100%" onchange="updateDurationFromService(this, '${t}')">
         <option value="">Any service</option>
-        ${services.map(s => `<option value="${s}" ${existingSvc === s ? 'selected' : ''}>${s}</option>`).join('')}
+        ${stylistServices.filter(s=>s.is_active).map(s => `<option value="${s.id}" data-dur="${s.duration_minutes}" ${existingSvc === s.id ? 'selected' : ''}>${s.name} (${s.duration_minutes>=60?(Math.floor(s.duration_minutes/60)+'hr'+(s.duration_minutes%60?s.duration_minutes%60+'min':'')):(s.duration_minutes+'min')})</option>`).join('')}
       </select>
       <select class="duration-select" id="dur_${t.replace(/[^a-z0-9]/gi,'_')}" style="width:100%">
         ${DURATION_OPTIONS.map(d => {
@@ -759,12 +854,11 @@ function updateTimeServiceRows() {
 }
 
 function updateDurationFromService(selectEl, time) {
-  const svc = selectEl.value;
+  const svcId = selectEl.value;
+  const svc = stylistServices.find(s => s.id === svcId);
   const durId = 'dur_' + time.replace(/[^a-z0-9]/gi,'_');
   const durSel = document.getElementById(durId);
-  if (durSel && svc && DEFAULT_DURATIONS[svc]) {
-    durSel.value = DEFAULT_DURATIONS[svc];
-  }
+  if (durSel && svc) durSel.value = svc.duration_minutes;
 }
 
 document.getElementById('slotDate').addEventListener('change', () => {
@@ -895,7 +989,8 @@ async function confirmAddSlots() {
           const durEl = document.getElementById(durId);
           duration = durEl ? parseInt(durEl.value) : null;
         }
-        slotsToAdd.push({ date: dateStr, time: t, duration_minutes: duration, service_type: service });
+        const svcObj = service ? stylistServices.find(s => s.id === service) : null;
+        slotsToAdd.push({ date: dateStr, time: t, duration_minutes: duration || (svcObj?.duration_minutes || null), service_type: svcObj?.name || null, service_id: service || null });
       });
 
     } else if (modalMode === 'interval') {
@@ -937,7 +1032,8 @@ async function confirmAddSlots() {
         time: s.time,
         is_booked: false,
         duration_minutes: dur || null,
-        service_type: s.service_type || null
+        service_type: s.service_type || null,
+        service_id: s.service_id || null
       };
     });
 
@@ -963,14 +1059,11 @@ function closeModal() { document.getElementById('modalOverlay').classList.remove
 // ── PROFILE SAVE ──────────────────────────────────────────
 async function saveProfile() {
   if (!stylist) return;
-  const services = [...document.querySelectorAll('.service-tag.on')].map(t => t.textContent);
-
   const { error } = await supabaseClient.from('stylists').update({
     name: document.getElementById('profileName').value,
     salon_name: document.getElementById('profileSalon').value,
     phone: document.getElementById('profilePhone').value,
     bio: document.getElementById('profileBio').value,
-    services
   }).eq('id', stylist.id);
 
   if (error) { showToast('⚠️ Could not save profile'); return; }
@@ -984,6 +1077,194 @@ async function loadProfile() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   await loadStylistProfile(user);
   showToast('↩️ Changes discarded');
+}
+
+// ── SERVICE MENU ──────────────────────────────────────────
+const DEFAULT_SERVICES = [
+  // Quick
+  { name:'Bang Trim / Neck Cleanup', category:'Quick', duration_minutes:20, price_cents:1500 },
+  { name:"Basic Men's Haircut", category:'Quick', duration_minutes:30, price_cents:2500 },
+  { name:'Simple Trim', category:'Quick', duration_minutes:30, price_cents:2000 },
+  { name:'Blowout / Styling', category:'Quick', duration_minutes:45, price_cents:4500 },
+  // Standard
+  { name:"Women's Haircut", category:'Standard', duration_minutes:60, price_cents:6500 },
+  { name:'Layered / Precision Cut', category:'Standard', duration_minutes:60, price_cents:7500 },
+  { name:'Wash + Cut + Style', category:'Standard', duration_minutes:60, price_cents:8000 },
+  // Long
+  { name:'Formal Updo / Styling', category:'Long', duration_minutes:90, price_cents:12000 },
+  { name:'Deep Conditioning Treatment', category:'Long', duration_minutes:60, price_cents:5500 },
+  { name:'Keratin Treatment', category:'Long', duration_minutes:120, price_cents:20000 },
+  { name:'Silk Press', category:'Long', duration_minutes:90, price_cents:9500 },
+  { name:'Braids', category:'Long', duration_minutes:180, price_cents:15000 },
+  { name:'Locs', category:'Long', duration_minutes:120, price_cents:12000 },
+  // Color
+  { name:'Root Touch-Up', category:'Color', duration_minutes:90, price_cents:8500 },
+  { name:'Single-Process Color', category:'Color', duration_minutes:120, price_cents:12000 },
+  { name:'Highlights (Full)', category:'Color', duration_minutes:150, price_cents:18000 },
+  { name:'Balayage / Ombré', category:'Color', duration_minutes:180, price_cents:22000 },
+  { name:'Color Correction', category:'Color', duration_minutes:300, price_cents:35000 },
+];
+
+const CATEGORY_ORDER = ['Quick','Standard','Long','Color','Custom'];
+const CATEGORY_LABELS = { Quick:'⚡ Quick (15–45 min)', Standard:'✂️ Standard (30–60 min)', Long:'💅 Long (45–120 min)', Color:'🎨 Color (1–4+ hrs)', Custom:'⚙️ Custom' };
+
+let stylistServices = [];
+let editingServiceId = null;
+
+async function loadServices() {
+  if (!stylist) return;
+  const { data, error } = await supabaseClient
+    .from('services')
+    .select('*')
+    .eq('stylist_id', stylist.id)
+    .order('category').order('sort_order').order('name');
+  if (!error) stylistServices = data || [];
+  renderServiceMenu();
+}
+
+async function seedDefaultServices() {
+  if (!stylist || stylistServices.length > 0) return;
+  const rows = DEFAULT_SERVICES.map((s, i) => ({ ...s, stylist_id: stylist.id, sort_order: i, is_active: true }));
+  const { error } = await supabaseClient.from('services').insert(rows);
+  if (!error) await loadServices();
+}
+
+function renderServiceMenu() {
+  const container = document.getElementById('serviceMenuList');
+  if (!stylistServices.length) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding:24px 0;">
+        <p style="margin-bottom:14px;">No services yet. Start with our recommended menu or add your own.</p>
+        <button class="btn btn-primary" onclick="seedDefaultServices()">Load Recommended Services</button>
+      </div>`;
+    return;
+  }
+  container.innerHTML = '';
+  const byCategory = {};
+  CATEGORY_ORDER.forEach(c => byCategory[c] = []);
+  stylistServices.forEach(s => {
+    const cat = byCategory[s.category] ? s.category : 'Custom';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(s);
+  });
+  CATEGORY_ORDER.forEach(cat => {
+    if (!byCategory[cat]?.length) return;
+    const catEl = document.createElement('div');
+    catEl.className = 'svc-category';
+    catEl.textContent = CATEGORY_LABELS[cat] || cat;
+    container.appendChild(catEl);
+    byCategory[cat].forEach(svc => container.appendChild(buildServiceRow(svc)));
+  });
+}
+
+function buildServiceRow(svc) {
+  const dur = svc.duration_minutes >= 60
+    ? (svc.duration_minutes % 60 === 0 ? (svc.duration_minutes/60)+'hr' : Math.floor(svc.duration_minutes/60)+'hr '+(svc.duration_minutes%60)+'min')
+    : svc.duration_minutes+'min';
+  const price = svc.price_cents ? '$'+(svc.price_cents/100).toFixed(0) : '';
+  const catClass = 'cat-'+svc.category.toLowerCase();
+
+  const row = document.createElement('div');
+  row.className = 'svc-row' + (!svc.is_active ? ' inactive' : '');
+  row.innerHTML = `
+    <div class="svc-info">
+      <div class="svc-name">
+        <span class="category-pill ${catClass}">${svc.category}</span>
+        ${svc.name}
+      </div>
+      <div class="svc-meta">${dur}${svc.description ? ' · ' + svc.description : ''}</div>
+    </div>
+    <div class="svc-price">${price}</div>
+    <div class="svc-actions">
+      <button class="svc-btn" title="${svc.is_active ? 'Hide service' : 'Show service'}" onclick="toggleService('${svc.id}', ${!svc.is_active})">${svc.is_active ? '👁️' : '🙈'}</button>
+      <button class="svc-btn" title="Edit" onclick="openEditServiceModal('${svc.id}')">✏️</button>
+      <button class="svc-btn" title="Delete" onclick="deleteService('${svc.id}')">🗑️</button>
+    </div>`;
+  return row;
+}
+
+async function toggleService(id, active) {
+  const { error } = await supabaseClient.from('services').update({ is_active: active }).eq('id', id);
+  if (error) { showToast('⚠️ Could not update service'); return; }
+  await loadServices();
+  showToast(active ? '✅ Service shown' : '⏸️ Service hidden');
+}
+
+async function deleteService(id) {
+  if (!confirm('Delete this service from your menu?')) return;
+  const { error } = await supabaseClient.from('services').delete().eq('id', id);
+  if (error) { showToast('⚠️ Could not delete service'); return; }
+  await loadServices();
+  showToast('🗑️ Service removed');
+}
+
+// ── SERVICE MODAL ─────────────────────────────────────────
+function openAddServiceModal() {
+  editingServiceId = null;
+  document.getElementById('serviceModalTitle').textContent = 'Add Service';
+  document.getElementById('svcName').value = '';
+  document.getElementById('svcCategory').value = 'Standard';
+  document.getElementById('svcDuration').value = '60';
+  document.getElementById('svcPrice').value = '';
+  document.getElementById('svcDescription').value = '';
+  document.getElementById('svcActive').value = 'true';
+  document.getElementById('saveServiceBtn').textContent = 'Add Service';
+  document.getElementById('serviceModalOverlay').classList.add('open');
+}
+
+function openEditServiceModal(id) {
+  const svc = stylistServices.find(s => s.id === id);
+  if (!svc) return;
+  editingServiceId = id;
+  document.getElementById('serviceModalTitle').textContent = 'Edit Service';
+  document.getElementById('svcName').value = svc.name;
+  document.getElementById('svcCategory').value = svc.category;
+  document.getElementById('svcDuration').value = svc.duration_minutes;
+  document.getElementById('svcPrice').value = svc.price_cents ? (svc.price_cents/100).toFixed(0) : '';
+  document.getElementById('svcDescription').value = svc.description || '';
+  document.getElementById('svcActive').value = svc.is_active ? 'true' : 'false';
+  document.getElementById('saveServiceBtn').textContent = 'Save Changes';
+  document.getElementById('serviceModalOverlay').classList.add('open');
+}
+
+function closeServiceModal() {
+  document.getElementById('serviceModalOverlay').classList.remove('open');
+  editingServiceId = null;
+}
+
+async function saveService() {
+  const btn = document.getElementById('saveServiceBtn');
+  const name = document.getElementById('svcName').value.trim();
+  if (!name) { showToast('⚠️ Please enter a service name'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const priceVal = document.getElementById('svcPrice').value;
+  const row = {
+    stylist_id: stylist.id,
+    name,
+    category: document.getElementById('svcCategory').value,
+    duration_minutes: parseInt(document.getElementById('svcDuration').value),
+    price_cents: priceVal ? Math.round(parseFloat(priceVal) * 100) : null,
+    description: document.getElementById('svcDescription').value.trim() || null,
+    is_active: document.getElementById('svcActive').value === 'true'
+  };
+
+  let error;
+  if (editingServiceId) {
+    ({ error } = await supabaseClient.from('services').update(row).eq('id', editingServiceId));
+  } else {
+    ({ error } = await supabaseClient.from('services').insert({ ...row, sort_order: stylistServices.length }));
+  }
+
+  btn.disabled = false;
+  btn.textContent = editingServiceId ? 'Save Changes' : 'Add Service';
+
+  if (error) { showToast('⚠️ Could not save service: ' + error.message); return; }
+  closeServiceModal();
+  await loadServices();
+  showToast(editingServiceId ? '✅ Service updated' : '✅ Service added');
 }
 
 // ── BOOKING LINK ──────────────────────────────────────────
@@ -1004,6 +1285,7 @@ function showPage(id, el) {
   document.getElementById('pageTitle').textContent = titles[id] || id;
   if (id === 'availability') renderAvailability();
   if (id === 'appointments') renderAllAppointments();
+  if (id === 'profile') { loadServices(); }
 }
 
 // ── CALENDAR ──────────────────────────────────────────────
