@@ -304,6 +304,19 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
     <!-- AVAILABILITY -->
     <div class="page-section" id="page-availability">
+
+      <!-- Setup nudge — only shown when no services exist -->
+      <div id="availServicesNudge" style="display:none;background:#fef3e2;border:1px solid rgba(196,125,10,0.25);border-radius:14px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+        <span style="font-size:24px;flex-shrink:0;">💡</span>
+        <div style="flex:1;">
+          <div style="font-size:0.875rem;font-weight:600;color:var(--ink);margin-bottom:3px;">Set up your service menu first</div>
+          <div style="font-size:0.8rem;color:var(--text-muted,#7a5c4a);font-weight:300;">Before adding availability slots, define the services you offer so customers know what to book and how long each appointment takes.</div>
+        </div>
+        <button class="btn btn-primary" style="white-space:nowrap;flex-shrink:0;" onclick="showPage('profile',document.querySelectorAll('.nav-item')[3])">
+          Set Up Services →
+        </button>
+      </div>
+
       <div class="card" style="margin-bottom:20px;">
         <div class="card-head">
           <h2>Availability</h2>
@@ -364,6 +377,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       <button id="tabCheckbox" class="modal-tab active" onclick="setModalMode('checkbox')">Pick times</button>
       <button id="tabInterval" class="modal-tab" onclick="setModalMode('interval')">Time range</button>
       <button id="tabRepeat" class="modal-tab" onclick="setModalMode('repeat')">Weekly repeat</button>
+    </div>
+
+    <!-- SERVICE SETUP NUDGE — shown when no services configured -->
+    <div id="noServicesNudge" style="display:none;background:#fef3e2;border:1px solid rgba(196,125,10,0.25);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:0.8rem;color:#7a4d08;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:18px;flex-shrink:0;">💡</span>
+      <span>You haven't set up your service menu yet. <button onclick="closeModal();showPage('profile',document.querySelectorAll('.nav-item')[3])" style="background:none;border:none;color:#b85c38;font-weight:600;cursor:pointer;font-family:inherit;font-size:inherit;text-decoration:underline;padding:0;">Set up services in My Profile</button> to assign services and durations to your slots.</span>
     </div>
 
     <!-- DATE ROW (shared) -->
@@ -689,6 +708,10 @@ let modalMode = 'checkbox';
 let serviceDurationOverrides = {};
 
 function renderAvailability() {
+  // Show or hide the services setup nudge
+  const nudge = document.getElementById('availServicesNudge');
+  if (nudge) nudge.style.display = stylistServices.length === 0 ? 'flex' : 'none';
+
   const container = document.getElementById('availManager');
   container.innerHTML = '';
 
@@ -770,6 +793,9 @@ function openAddSlotModalForDate(dateStr) {
 async function initModal() {
   // Make sure services are loaded before opening modal
   if (!stylistServices.length) await loadServices();
+  // Show nudge if no services configured
+  const nudge = document.getElementById('noServicesNudge');
+  if (nudge) nudge.style.display = stylistServices.length === 0 ? 'flex' : 'none';
   setModalMode('checkbox');
   serviceDurationOverrides = {};
   renderServiceDurations();
