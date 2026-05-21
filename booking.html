@@ -157,6 +157,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
         <button class="quick-prompt" onclick="sendQuick('I need to reschedule my appointment')">🔄 Reschedule</button>
         <button class="quick-prompt" onclick="sendQuick('I need to cancel my appointment')">❌ Cancel</button>
         <button class="quick-prompt" onclick="sendQuick('What times are available this week?')">🕐 Availability</button>
+        <button class="quick-prompt" onclick="window.open('appointments.html?stylist=' + (stylist?.slug || ''), '_blank')">📋 My Appointments</button>
       </div>
       <div class="chat-input-row">
         <input type="text" class="chat-input" id="chatInput" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMessage()">
@@ -212,6 +213,15 @@ async function loadStylistData(slug) {
   }
   stylist = data;
   document.title = `Book with ${stylist.name} — Salon Assist CX`;
+
+  // Load service menu
+  const { data: svcs } = await supabaseClient
+    .from('services')
+    .select('*')
+    .eq('stylist_id', stylist.id)
+    .eq('is_active', true)
+    .order('category').order('sort_order');
+  stylist.serviceMenu = svcs || [];
 }
 
 async function loadAvailability() {
@@ -242,10 +252,11 @@ function renderHero() {
 
   const badges = document.getElementById('heroBadges');
   badges.innerHTML = '';
-  (stylist.services || []).slice(0, 4).forEach(s => {
+  const svcList = stylist.serviceMenu?.length ? stylist.serviceMenu : (stylist.services || []).map(s => ({name:s}));
+  svcList.slice(0, 5).forEach(s => {
     const b = document.createElement('span');
     b.className = 'badge';
-    b.textContent = s;
+    b.textContent = typeof s === 'string' ? s : s.name;
     badges.appendChild(b);
   });
 }
@@ -319,32 +330,41 @@ function buildSystemPrompt() {
     return `${day}: ${open}`;
   }).join('\n') || 'No availability currently set.';
 
-  return `You are a warm, professional booking assistant for ${stylist.name}, an independent hairstylist${stylist.salon_name ? ` at ${stylist.salon_name}` : ''}.
+  // Build service menu
+  const menuLines = stylist.serviceMenu?.length
+    ? stylist.serviceMenu.map(s => {
+        const dur = s.duration_minutes >= 60
+          ? (Math.floor(s.duration_minutes/60)+'hr'+(s.duration_minutes%60 ? s.duration_minutes%60+'min' : ''))
+          : s.duration_minutes+'min';
+        const price = s.price_cents ? ' · $'+(s.price_cents/100).toFixed(0) : '';
+        return '- ' + s.name + ' (' + s.category + ', ' + dur + price + ')';
+      }).join('\n')
+    : (stylist.services || []).join(', ') || 'Various hair services';
 
-TODAY'S DATE: ${new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' })}.
+  const stylistName = stylist.name;
+  const salonPart = stylist.salon_name ? ' at ' + stylist.salon_name : '';
+  const bioPart = stylist.bio ? 'ABOUT ' + stylistName.toUpperCase() + ': ' + stylist.bio + '\n\n' : '';
+  const dateStr2 = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
 
-${stylist.bio ? `ABOUT ${stylist.name.toUpperCase()}: ${stylist.bio}` : ''}
-
-SERVICES OFFERED: ${(stylist.services || []).join(', ') || 'Various hair services'}
-
-LIVE AVAILABILITY (next 14 days):
-${availStr}
-
-YOUR ROLE:
-- Help customers BOOK new appointments (collect: name, phone number, service, preferred date/time from available slots — always ask for phone number for appointment reminders)
-- Help customers RESCHEDULE (ask for name/current appointment, offer alternatives)
-- Help customers CANCEL (confirm their name and appointment details)
-- Answer questions about services or the stylist
-
-BOOKING RULES:
-- Only offer slots listed as "Available" above — never suggest a booked slot
-- When a customer confirms a booking, tell them it's confirmed and summarize: name, service, date, time
-- Be warm and conversational — like a friendly salon receptionist
-- Keep responses concise; avoid long paragraphs
-- Use light emojis occasionally
-
-IMPORTANT: When a customer successfully books, end your message with exactly this on a new line so the system can process it:
-BOOKING_CONFIRMED:name=[customer name]|phone=[phone number]|service=[service]|date=[YYYY-MM-DD]|time=[time]`;
+  return 'You are a warm, professional booking assistant for ' + stylistName + ', an independent hairstylist' + salonPart + '.\n\n' +
+    'TODAY\'S DATE: ' + dateStr2 + '.\n\n' +
+    bioPart +
+    'SERVICE MENU:\n' + menuLines + '\n\n' +
+    'LIVE AVAILABILITY (next 14 days):\n' + availStr + '\n\n' +
+    'YOUR ROLE:\n' +
+    '- Help customers BOOK new appointments — ask what service they want first, then match to available slots\n' +
+    '- Help customers RESCHEDULE (ask for name/current appointment, offer alternatives)\n' +
+    '- Help customers CANCEL (confirm their name and appointment details)\n' +
+    '- Answer questions about services, pricing, or the stylist\n\n' +
+    'BOOKING RULES:\n' +
+    '- Always ask what service the customer wants before suggesting times\n' +
+    '- Only offer slots listed as Available above — never suggest a booked slot\n' +
+    '- Always collect the customer name and phone number\n' +
+    '- Mention pricing if the customer asks\n' +
+    '- Be warm and conversational like a friendly salon receptionist\n' +
+    '- Keep responses concise\n\n' +
+    'IMPORTANT: When a customer successfully books, end your message with exactly this on a new line:\n' +
+    'BOOKING_CONFIRMED:name=[customer name]|phone=[phone number]|service=[service name]|date=[YYYY-MM-DD]|time=[time]';
 }
 
 // ── CLAUDE API ───────────────────────────────────────────
@@ -397,7 +417,7 @@ async function processBookingIfConfirmed(reply) {
     if (customerPhone && customerPhone.trim()) {
       const apptDate = new Date(date + 'T12:00:00');
       const dateLabel = apptDate.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-      const confirmMsg = `Hi ${customerName}! 🎉 Your appointment with ${stylist.name} is confirmed for ${dateLabel} at ${time}${service ? ' for ' + service : ''}. We'll send you a reminder the day before. See you soon! 💇‍♀️\n\nReply STOP to unsubscribe.`;
+      const confirmMsg = `Hi ${customerName}! 🎉 Your appointment with ${stylist.name} is confirmed for ${dateLabel} at ${time}${service ? ' for ' + service : ''}. We'll remind you the day before.\n\nView or cancel: https://www.salonassistcx.com/appointments.html?stylist=${stylist.slug}\n\nReply STOP to unsubscribe.`;
 
       try {
         await fetch('/api/send-sms', {
