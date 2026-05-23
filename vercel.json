@@ -29,6 +29,10 @@
       "destination": "/reset-password.html"
     },
     {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
       "source": "/:slug",
       "destination": "/booking.html?stylist=:slug"
     }
