@@ -642,7 +642,7 @@ function appendMessage(role, text) {
 
   const avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
-  if (role === 'ai') { avatar.innerHTML = '<img src="/logo.png" style="width:28px;height:28px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">'; avatar.style.background = 'rgba(196,113,74,0.1)'; avatar.style.padding = '4px'; } else { avatar.textContent = stylist?.name?.[0] || 'Y'; }
+  if (role === 'ai') { avatar.innerHTML = '<img src="/logo.png" style="width:56px;height:56px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">'; avatar.style.background = 'rgba(196,113,74,0.1)'; avatar.style.padding = '4px'; } else { avatar.textContent = stylist?.name?.[0] || 'Y'; }
   if (role === 'user') { avatar.style.fontSize = '10px'; avatar.style.fontWeight = '600'; }
 
   const bubble = document.createElement('div');
@@ -659,7 +659,7 @@ function showTyping() {
   const container = document.getElementById('chatMessages');
   const wrap = document.createElement('div');
   wrap.className = 'message ai'; wrap.id = 'typingWrap';
-  const avatar = document.createElement('div'); avatar.className = 'msg-avatar'; avatar.style.cssText = 'background:rgba(196,113,74,0.1);padding:4px;'; avatar.innerHTML = '<img src="/logo.png" style="width:28px;height:28px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">';
+  const avatar = document.createElement('div'); avatar.className = 'msg-avatar'; avatar.style.cssText = 'background:rgba(196,113,74,0.1);padding:4px;'; avatar.innerHTML = '<img src="/logo.png" style="width:56px;height:56px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">';
   const ind = document.createElement('div'); ind.className = 'typing-indicator';
   ind.innerHTML = '<span></span><span></span><span></span>';
   wrap.appendChild(avatar); wrap.appendChild(ind);
