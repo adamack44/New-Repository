@@ -23,6 +23,10 @@
     {
       "source": "/appointments",
       "destination": "/appointments.html"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/reset-password.html"
     }
   ],
   "crons": [
