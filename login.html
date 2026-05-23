@@ -127,11 +127,32 @@ input:focus { border-color: var(--rust); background: #fff; }
     <input type="password" id="passwordInput" placeholder="••••••••">
   </div>
 
+  <div id="forgotPasswordLink" style="text-align:right;margin-top:-8px;margin-bottom:12px;display:none;">
+    <button onclick="showForgotPassword()" style="background:none;border:none;color:var(--rust);font-size:0.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:0;">Forgot password?</button>
+  </div>
+
+  <!-- FORGOT PASSWORD FORM -->
+  <div id="forgotPasswordForm" style="display:none;">
+    <div style="background:var(--rust-pale);border:1px solid rgba(184,82,46,0.2);border-radius:10px;padding:16px;margin-bottom:16px;">
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;font-weight:300;">Enter your email and we'll send you a reset link.</p>
+      <input type="email" id="resetEmailInput" class="form-input" placeholder="your@email.com" style="margin-bottom:10px;">
+      <div style="display:flex;gap:8px;">
+        <button onclick="sendPasswordReset()" style="flex:1;padding:9px;background:linear-gradient(135deg,var(--rust) 0%,#942a0e 100%);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;">Send Reset Link</button>
+        <button onclick="hideForgotPassword()" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;color:var(--text-muted);">Cancel</button>
+      </div>
+      <div id="resetStatus" style="font-size:0.78rem;margin-top:8px;display:none;"></div>
+    </div>
+  </div>
+
   <button class="btn-submit" id="submitBtn" onclick="handleSubmit()">Sign In →</button>
 </div>
 
 <script>
 let mode = 'login';
+// Show forgot password link on initial load
+window.addEventListener('load', () => {
+  document.getElementById('forgotPasswordLink').style.display = 'block';
+});
 
 function setMode(m) {
   mode = m;
@@ -140,6 +161,8 @@ function setMode(m) {
   document.getElementById('formSub').textContent = m === 'login' ? 'Sign in to your stylist dashboard' : 'Set up your Salon Assist CX in minutes';
   document.getElementById('submitBtn').textContent = m === 'login' ? 'Sign In →' : 'Create Account →';
   document.querySelectorAll('.extra-field').forEach(f => f.classList.toggle('show', m === 'signup'));
+  document.getElementById('forgotPasswordLink').style.display = m === 'login' ? 'block' : 'none';
+  hideForgotPassword();
   clearMessages();
 }
 
@@ -163,6 +186,42 @@ function showSuccess(msg) {
 function clearMessages() {
   document.getElementById('errorMsg').style.display = 'none';
   document.getElementById('successMsg').style.display = 'none';
+}
+
+function showForgotPassword() {
+  document.getElementById('forgotPasswordForm').style.display = 'block';
+  document.getElementById('forgotPasswordLink').style.display = 'none';
+  document.getElementById('resetEmailInput').value = document.getElementById('emailInput').value || '';
+  document.getElementById('resetStatus').style.display = 'none';
+}
+
+function hideForgotPassword() {
+  document.getElementById('forgotPasswordForm').style.display = 'none';
+  document.getElementById('forgotPasswordLink').style.display = mode === 'login' ? 'block' : 'none';
+}
+
+async function sendPasswordReset() {
+  const email = document.getElementById('resetEmailInput').value.trim();
+  const status = document.getElementById('resetStatus');
+  if (!email) { 
+    status.style.display = 'block';
+    status.style.color = '#c0392b';
+    status.textContent = 'Please enter your email address.';
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://www.salonassistcx.com/reset-password.html'
+  });
+
+  status.style.display = 'block';
+  if (error) {
+    status.style.color = '#c0392b';
+    status.textContent = '⚠️ ' + error.message;
+  } else {
+    status.style.color = '#2d6a35';
+    status.textContent = '✅ Reset link sent! Check your email inbox and spam folder.';
+  }
 }
 
 async function handleSubmit() {
