@@ -4,16 +4,24 @@
 <meta charset="UTF-8">
 <title>Salon Assist CX</title>
 <script>
-  // When Vercel gets an unknown path like /adam-test it serves this 404 page
-  // We intercept and redirect to the booking page with the slug
   const path = window.location.pathname.replace(/^\//, '').trim();
   const systemPaths = ['login','dashboard','upgrade','appointments','reset-password','sacx-admin','admin','booking','api','index.html','404.html','logo.png',''];
-  
+
   if (path && !systemPaths.includes(path) && !path.includes('.') && !path.startsWith('api/')) {
-    // It's a stylist slug — redirect to booking page
-    window.location.replace('/booking.html?stylist=' + encodeURIComponent(path));
+    // It's a stylist slug — load booking page content WITHOUT changing the URL
+    // Use fetch to get the booking page then replace the document
+    fetch('/booking.html?stylist=' + encodeURIComponent(path))
+      .then(r => r.text())
+      .then(html => {
+        // Replace page content but keep the clean URL
+        document.open();
+        document.write(html);
+        document.close();
+        // Update the URL to stay clean
+        window.history.replaceState(null, '', '/' + path);
+      })
+      .catch(() => window.location.replace('/'));
   } else {
-    // Genuinely unknown — go to homepage
     window.location.replace('/');
   }
 </script>
