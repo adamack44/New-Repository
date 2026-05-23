@@ -244,11 +244,15 @@ let conversationHistory = [];
 window.addEventListener('load', async () => {
   // Get stylist slug from URL: booking.html?stylist=jasmine-rivera
   const params = new URLSearchParams(window.location.search);
-  // Support both /adam-test (clean URL) and /booking.html?stylist=adam-test (legacy)
+  // Support /adam-test (clean URL), /booking.html?stylist=adam-test (legacy), and /:path* rewrite
   let slug = params.get('stylist');
   if (!slug) {
-    const path = window.location.pathname.replace('/', '').trim();
-    if (path && !path.includes('.html')) slug = path;
+    const path = window.location.pathname.replace(/^\//, '').trim();
+    // Exclude system paths
+    const systemPaths = ['login','dashboard','upgrade','appointments','reset-password','sacx-admin','admin','booking','api','index.html',''];
+    if (path && !systemPaths.includes(path) && !path.includes('.html') && !path.startsWith('api/')) {
+      slug = path;
+    }
   }
 
   if (!slug) {
