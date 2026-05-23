@@ -44,7 +44,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 }
 .sidebar-brand { padding: 26px 24px 22px; border-bottom: 1px solid rgba(255,255,255,0.07); }
 .brand-mark { display: flex; align-items: center; gap: 10px; }
-.brand-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--rust) 0%, #8b3a1e 100%); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.brand-icon { width: 64px; height: 64px; border-radius: 14px; background: linear-gradient(135deg, var(--rust) 0%, #8b3a1e 100%); display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .brand-name { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--cream); }
 .brand-name span { color: var(--rust-light); font-style: italic; }
 .stylist-pill { margin: 16px 16px 0; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
@@ -219,7 +219,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 <nav class="sidebar">
   <div class="sidebar-brand">
     <div class="brand-mark">
-      <div class="brand-icon">✂️</div>
+      <div class="brand-icon" style="background:transparent;padding:2px;"><img src="/logo.png" style="width:48px;height:48px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt="Salon Assist CX"></div>
       <div class="brand-name">Salon Assist <span>CX</span></div>
     </div>
   </div>
@@ -529,7 +529,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
         <label class="form-label" style="margin-bottom:6px;display:block;">Category</label>
         <select class="date-input" id="svcCategory" style="width:100%">
           <option value="Quick">⚡ Quick (15–45 min)</option>
-          <option value="Standard" selected>✂️ Standard (30–60 min)</option>
+          <option value="Standard" selected><img src="/logo.png" style="width:24px;height:24px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt=""> Standard (30–60 min)</option>
           <option value="Long">💅 Long (45–120 min)</option>
           <option value="Color">🎨 Color (1–4+ hrs)</option>
           <option value="Custom">⚙️ Custom</option>
@@ -1308,7 +1308,7 @@ const DEFAULT_SERVICES = [
 ];
 
 const CATEGORY_ORDER = ['Quick','Standard','Long','Color','Custom'];
-const CATEGORY_LABELS = { Quick:'⚡ Quick (15–45 min)', Standard:'✂️ Standard (30–60 min)', Long:'💅 Long (45–120 min)', Color:'🎨 Color (1–4+ hrs)', Custom:'⚙️ Custom' };
+const CATEGORY_LABELS = { Quick:'⚡ Quick (15–45 min)', Standard:'<img src="/logo.png" style="width:24px;height:24px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt=""> Standard (30–60 min)', Long:'💅 Long (45–120 min)', Color:'🎨 Color (1–4+ hrs)', Custom:'⚙️ Custom' };
 
 let stylistServices = [];
 let editingServiceId = null;
