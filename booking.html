@@ -244,7 +244,12 @@ let conversationHistory = [];
 window.addEventListener('load', async () => {
   // Get stylist slug from URL: booking.html?stylist=jasmine-rivera
   const params = new URLSearchParams(window.location.search);
-  const slug = params.get('stylist');
+  // Support both /adam-test (clean URL) and /booking.html?stylist=adam-test (legacy)
+  let slug = params.get('stylist');
+  if (!slug) {
+    const path = window.location.pathname.replace('/', '').trim();
+    if (path && !path.includes('.html')) slug = path;
+  }
 
   if (!slug) {
     document.getElementById('loadingScreen').style.display = 'none';
