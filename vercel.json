@@ -27,16 +27,25 @@
     {
       "source": "/sacx-admin",
       "destination": "/admin.html"
-    },
-    {
-      "source": "/:path*",
-      "destination": "/booking.html"
     }
   ],
   "crons": [
     {
       "path": "/api/send-reminders",
       "schedule": "0 10 * * *"
+    }
+  ],
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/sacx-admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/404.html"
     }
   ]
 }
