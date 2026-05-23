@@ -1472,7 +1472,7 @@ async function saveService() {
 // ── BOOKING LINK ──────────────────────────────────────────
 function copyBookingLink() {
   if (!stylist) return;
-  const link = `${window.location.origin}/booking.html?stylist=${stylist.slug}`;
+  const link = `${window.location.origin}/${stylist.slug}`;
   navigator.clipboard.writeText(link).catch(() => {});
   showToast('🔗 Booking link copied!');
 }
