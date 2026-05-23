@@ -59,11 +59,12 @@ nav {
 }
 
 .nav-brand-icon {
-  width: 34px; height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--rust) 0%, #7a2e10 100%);
+  width: 72px; height: 72px;
+  border-radius: 0;
+  background: transparent;
   display: flex; align-items: center; justify-content: center;
   font-size: 16px;
+  overflow: visible;
 }
 
 .nav-brand em { color: var(--rust); font-style: italic; }
@@ -1013,7 +1014,7 @@ footer {
 <!-- NAV -->
 <nav>
   <a class="nav-brand" href="#">
-    <div class="nav-brand-icon" style="background:transparent;padding:0;overflow:visible;"><img src="/logo.png" style="width:56px;height:56px;object-fit:contain;" alt="Salon Assist CX"></div>
+    <div class="nav-brand-icon" style="background:transparent;padding:0;overflow:visible;"><img src="/logo.png" style="width:72px;height:72px;object-fit:contain;" alt="Salon Assist CX"></div>
     Salon Assist <em>CX</em>
   </a>
   <ul class="nav-links">
@@ -1031,10 +1032,7 @@ footer {
 <!-- HERO -->
 <section class="hero">
   <div class="hero-copy">
-    <div style="margin-bottom:24px;">
-        <img src="/logo.png" style="width:200px;height:200px;object-fit:contain;filter:drop-shadow(0 6px 20px rgba(255,255,255,0.2));" alt="Salon Assist CX">
-      </div>
-      <div class="hero-eyebrow">
+    <div class="hero-eyebrow">
         <span class="hero-eyebrow-dot"></span>
         Now with AI scheduling
       </div>
