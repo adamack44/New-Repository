@@ -50,7 +50,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
   display: flex; align-items: flex-start; gap: 48px;
 }
 .stylist-avatar {
-  width: 160px; height: 160px; border-radius: 20px;
+  width: 160px; height: 160px; border-radius: 16px;
   background: linear-gradient(135deg, var(--terracotta) 0%, var(--bark) 100%);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Playfair Display', serif; font-size: 56px; color: var(--cream);
@@ -58,7 +58,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
   box-shadow: 0 12px 40px rgba(92,64,51,0.18), 0 2px 8px rgba(92,64,51,0.1);
   border: 3px solid rgba(255,255,255,0.7);
 }
-.stylist-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.stylist-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .hero-text { flex: 1; padding-top: 8px; }
 .hero-text h1 {
   font-family: 'Playfair Display', serif; font-size: 2.8rem;
@@ -244,12 +244,11 @@ let conversationHistory = [];
 window.addEventListener('load', async () => {
   // Get stylist slug from URL: booking.html?stylist=jasmine-rivera
   const params = new URLSearchParams(window.location.search);
-  // Support /adam-test (clean URL), /booking.html?stylist=adam-test (legacy), and /:path* rewrite
+  // Support ?stylist=adam-test (query param) and /adam-test (clean URL via 404 redirect)
   let slug = params.get('stylist');
   if (!slug) {
     const path = window.location.pathname.replace(/^\//, '').trim();
-    // Exclude system paths
-    const systemPaths = ['login','dashboard','upgrade','appointments','reset-password','sacx-admin','admin','booking','api','index.html',''];
+    const systemPaths = ['login','dashboard','upgrade','appointments','reset-password','sacx-admin','admin','booking','api','index.html','booking.html','404.html','logo.png',''];
     if (path && !systemPaths.includes(path) && !path.includes('.html') && !path.startsWith('api/')) {
       slug = path;
     }
