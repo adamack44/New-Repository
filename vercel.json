@@ -1,19 +1,67 @@
 {
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/login.html",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/dashboard.html",
+      "destination": "/dashboard.html"
+    },
+    {
       "source": "/booking",
       "destination": "/booking.html"
+    },
+    {
+      "source": "/booking.html",
+      "destination": "/booking.html"
+    },
+    {
+      "source": "/upgrade",
+      "destination": "/upgrade.html"
+    },
+    {
+      "source": "/upgrade.html",
+      "destination": "/upgrade.html"
+    },
+    {
+      "source": "/appointments",
+      "destination": "/appointments.html"
+    },
+    {
+      "source": "/appointments.html",
+      "destination": "/appointments.html"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/reset-password.html"
+    },
+    {
+      "source": "/reset-password.html",
+      "destination": "/reset-password.html"
     },
     {
       "source": "/sacx-admin",
       "destination": "/admin.html"
     },
     {
-      "source": "/(login|dashboard|upgrade|appointments|reset-password)(.html)?",
-      "destination": "/$1.html"
+      "source": "/admin.html",
+      "destination": "/admin.html"
     },
     {
-      "source": "/:slug",
+      "source": "/:slug((?!login|dashboard|booking|upgrade|appointments|reset-password|sacx-admin|admin|api|logo\\.png|index\\.html).*)",
       "destination": "/booking.html?stylist=:slug"
     }
   ],
