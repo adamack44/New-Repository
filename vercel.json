@@ -1,36 +1,16 @@
 {
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/dashboard",
-      "destination": "/dashboard.html"
-    },
-    {
       "source": "/booking",
       "destination": "/booking.html"
     },
     {
-      "source": "/upgrade",
-      "destination": "/upgrade.html"
-    },
-    {
-      "source": "/appointments",
-      "destination": "/appointments.html"
-    },
-    {
-      "source": "/reset-password",
-      "destination": "/reset-password.html"
-    },
-    {
-      "source": "/admin",
+      "source": "/sacx-admin",
       "destination": "/admin.html"
+    },
+    {
+      "source": "/(login|dashboard|upgrade|appointments|reset-password)(.html)?",
+      "destination": "/$1.html"
     },
     {
       "source": "/:slug",
