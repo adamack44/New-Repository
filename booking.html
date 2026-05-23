@@ -374,30 +374,38 @@ function renderHero() {
   }
 }
 
+
+// ── SOCIAL LINKS BAR ─────────────────────────────────────
 function renderSocialLinks() {
-  const container = document.getElementById('heroSocials');
-  if (!container) return;
-  container.innerHTML = '';
   const links = [];
-  if (stylist.instagram) links.push({ label: 'Instagram', url: stylist.instagram.startsWith('http') ? stylist.instagram : 'https://instagram.com/' + stylist.instagram.replace('@',''), icon: '📸' });
-  if (stylist.tiktok) links.push({ label: 'TikTok', url: stylist.tiktok.startsWith('http') ? stylist.tiktok : 'https://tiktok.com/@' + stylist.tiktok.replace('@',''), icon: '🎵' });
-  if (stylist.facebook) links.push({ label: 'Facebook', url: stylist.facebook.startsWith('http') ? stylist.facebook : 'https://facebook.com/' + stylist.facebook, icon: '👤' });
-  if (stylist.website) links.push({ label: 'Website', url: stylist.website, icon: '🌐' });
-  (stylist.social_links || []).forEach(l => l.url && links.push({ label: l.label || 'Link', url: l.url, icon: '🔗' }));
+  if (stylist.instagram) links.push({ type: 'instagram', url: stylist.instagram.startsWith('http') ? stylist.instagram : 'https://instagram.com/' + stylist.instagram.replace('@',''), label: 'Instagram' });
+  if (stylist.tiktok) links.push({ type: 'tiktok', url: stylist.tiktok.startsWith('http') ? stylist.tiktok : 'https://tiktok.com/@' + stylist.tiktok.replace('@',''), label: 'TikTok' });
+  if (stylist.facebook) links.push({ type: 'facebook', url: stylist.facebook.startsWith('http') ? stylist.facebook : 'https://facebook.com/' + stylist.facebook, label: 'Facebook' });
+  if (stylist.website) links.push({ type: 'website', url: stylist.website, label: 'Website' });
+  (stylist.social_links || []).forEach(l => l.url && links.push({ type: 'link', url: l.url, label: l.label || 'Link' }));
+
+  if (!links.length) return;
+
+  const bar = document.getElementById('socialBar');
+  const container = document.getElementById('socialBarLinks');
+  if (!bar || !container) return;
+  bar.style.display = 'block';
+  container.innerHTML = '';
+
   links.forEach(l => {
+    const color = SOCIAL_COLORS[l.type] || '#5c4033';
     const a = document.createElement('a');
-    a.href = l.url; a.target = '_blank';
-    a.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:0.72rem;color:rgba(232,217,200,0.85);text-decoration:none;transition:all 0.15s;';
-    a.innerHTML = l.icon + ' ' + l.label;
-    a.onmouseover = () => a.style.background = 'rgba(255,255,255,0.18)';
-    a.onmouseout = () => a.style.background = 'rgba(255,255,255,0.1)';
+    a.href = l.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.style.cssText = 'display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;background:' + color + ';color:#fff;text-decoration:none;font-family:Lato,sans-serif;font-size:0.82rem;font-weight:500;transition:all 0.18s;box-shadow:0 2px 8px ' + color + '40;';
+    a.innerHTML = '<span style="display:flex;align-items:center;flex-shrink:0;">' + (SOCIAL_ICONS[l.type] || SOCIAL_ICONS.link) + '</span><span>' + l.label + '</span>';
+    a.onmouseover = () => { a.style.transform = 'translateY(-2px)'; a.style.filter = 'brightness(1.12)'; };
+    a.onmouseout = () => { a.style.transform = 'none'; a.style.filter = 'none'; };
     container.appendChild(a);
   });
-  container.style.display = links.length ? 'flex' : 'none';
-  container.style.flexWrap = 'wrap';
 }
 
-// ── RENDER AVAILABILITY PANEL ────────────────────────────
 function renderAvailabilityPanel() {
   const container = document.getElementById('availabilityList');
   container.innerHTML = '';
