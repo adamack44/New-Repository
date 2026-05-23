@@ -65,30 +65,29 @@ export default async function handler(req, res) {
 <head>
 <meta charset="UTF-8">
 <style>
-  body { font-family: 'Georgia', serif; background: #faf6f1; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; background: #faf6f1; margin: 0; padding: 0; }
   .wrapper { max-width: 560px; margin: 0 auto; padding: 40px 20px; }
   .card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.08); }
   .header { background: linear-gradient(135deg, #b85c38 0%, #8b3a1e 100%); padding: 32px; text-align: center; }
-  .header img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 12px; }
+  .header img { width: 72px; height: 72px; object-fit: contain; margin-bottom: 12px; display: block; margin-left: auto; margin-right: auto; }
   .header h1 { color: #fff; font-size: 1.4rem; margin: 0; font-weight: 400; }
   .body { padding: 32px; }
   .greeting { font-size: 1rem; color: #2d1f18; margin-bottom: 20px; }
-  .appt-box { background: #faf6f1; border: 1px solid #e0ccb8; border-radius: 12px; padding: 20px; margin: 20px 0; }
-  .appt-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e0ccb8; font-size: 0.9rem; }
+  .appt-box { background: #faf6f1; border: 1px solid #e0ccb8; border-radius: 12px; padding: 4px 20px; margin: 20px 0; }
+  .appt-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e0ccb8; font-size: 0.9rem; gap: 16px; }
   .appt-row:last-child { border-bottom: none; }
-  .appt-label { color: #7a5c4a; font-weight: 400; }
-  .appt-value { color: #2d1f18; font-weight: 600; }
+  .appt-label { color: #7a5c4a; font-weight: 400; white-space: nowrap; }
+  .appt-value { color: #2d1f18; font-weight: 600; text-align: right; }
   .btn { display: inline-block; background: linear-gradient(135deg, #b85c38 0%, #8b3a1e 100%); color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 0.9rem; margin: 20px 0; }
   .footer { text-align: center; padding: 20px 32px; color: #9c7a6a; font-size: 0.78rem; border-top: 1px solid #e0ccb8; }
-  .brand { text-align: center; margin-bottom: 24px; color: #9c7a6a; font-size: 0.78rem; }
 </style>
 </head>
 <body>
 <div class="wrapper">
-  <div class="brand">Salon Assist CX</div>
   <div class="card">
     <div class="header">
-      <h1>⏰ Appointment Reminder</h1>
+      <img src="https://www.salonassistcx.com/logo.png" alt="Salon Assist CX">
+      <h1>Appointment Reminder</h1>
     </div>
     <div class="body">
       <p class="greeting">Hi ${appt.customer_name}! Just a friendly reminder that you have an appointment <strong>tomorrow</strong>.</p>
