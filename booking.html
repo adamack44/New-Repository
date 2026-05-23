@@ -168,7 +168,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 
 <div class="hero">
   <div class="hero-inner">
-    <div class="stylist-avatar" id="heroInitial">✂️</div>
+    <div class="stylist-avatar" id="heroInitial"><img src="/logo.png" style="width:80%;height:80%;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt=""></div>
     <div class="hero-text">
       <h1>Book with <em id="heroName">…</em></h1>
       <div class="hero-salon" id="heroSalon">Independent Hair Stylist</div>
@@ -206,7 +206,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 
   <div class="chat-panel">
     <div class="chat-header">
-      <div class="chat-avatar">✂️</div>
+      <div class="chat-avatar" style="background:rgba(255,255,255,0.25);padding:6px;"><img src="/logo.png" style="width:100%;height:100%;object-fit:contain;" alt="Salon Assist CX"></div>
       <div class="chat-header-text">
         <h3 id="chatHeaderName">Booking Assistant</h3>
         <p>Powered by AI · Replies instantly</p>
@@ -642,7 +642,7 @@ function appendMessage(role, text) {
 
   const avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
-  avatar.textContent = role === 'ai' ? '✂️' : (stylist?.name?.[0] || 'Y');
+  if (role === 'ai') { avatar.innerHTML = '<img src="/logo.png" style="width:28px;height:28px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">'; avatar.style.background = 'rgba(196,113,74,0.1)'; avatar.style.padding = '4px'; } else { avatar.textContent = stylist?.name?.[0] || 'Y'; }
   if (role === 'user') { avatar.style.fontSize = '10px'; avatar.style.fontWeight = '600'; }
 
   const bubble = document.createElement('div');
@@ -659,7 +659,7 @@ function showTyping() {
   const container = document.getElementById('chatMessages');
   const wrap = document.createElement('div');
   wrap.className = 'message ai'; wrap.id = 'typingWrap';
-  const avatar = document.createElement('div'); avatar.className = 'msg-avatar'; avatar.textContent = '✂️';
+  const avatar = document.createElement('div'); avatar.className = 'msg-avatar'; avatar.style.cssText = 'background:rgba(196,113,74,0.1);padding:4px;'; avatar.innerHTML = '<img src="/logo.png" style="width:28px;height:28px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">';
   const ind = document.createElement('div'); ind.className = 'typing-indicator';
   ind.innerHTML = '<span></span><span></span><span></span>';
   wrap.appendChild(avatar); wrap.appendChild(ind);
