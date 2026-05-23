@@ -525,7 +525,7 @@ function buildSystemPrompt() {
     'SERVICE MENU:\n' + menuLines + '\n\n' +
     'LIVE AVAILABILITY (next 14 days):\n' + availStr + '\n\n' +
     'YOUR ROLE:\n' +
-    '- Help customers BOOK new appointments — ask what service they want first, then match to available slots\n' +
+    '- Help customers BOOK new appointments — ask what service they want, then collect their name, phone number, and email address for confirmation and reminders\n' +
     '- Help customers RESCHEDULE (ask for name/current appointment, offer alternatives)\n' +
     '- Help customers CANCEL (confirm their name and appointment details)\n' +
     '- Answer questions about services, pricing, or the stylist\n\n' +
@@ -537,7 +537,7 @@ function buildSystemPrompt() {
     '- Be warm and conversational like a friendly salon receptionist\n' +
     '- Keep responses concise\n\n' +
     'IMPORTANT: When a customer successfully books, end your message with exactly this on a new line:\n' +
-    'BOOKING_CONFIRMED:name=[customer name]|phone=[phone number]|service=[service name]|date=[YYYY-MM-DD]|time=[time]';
+    'BOOKING_CONFIRMED:name=[customer name]|phone=[phone number]|email=[email address]|service=[service name]|date=[YYYY-MM-DD]|time=[time]';
 }
 
 // ── CLAUDE API ───────────────────────────────────────────
@@ -565,9 +565,9 @@ async function callClaude(userMessage) {
 async function processBookingIfConfirmed(reply) {
   if (!reply.includes('BOOKING_CONFIRMED:')) return;
   try {
-    const match = reply.match(/BOOKING_CONFIRMED:name=([^|]+)\|phone=([^|]*)\|service=([^|]+)\|date=([^|]+)\|time=(.+)/);
+    const match = reply.match(/BOOKING_CONFIRMED:name=([^|]+)\|phone=([^|]*)\|email=([^|]*)\|service=([^|]+)\|date=([^|]+)\|time=(.+)/);
     if (!match) return;
-    const [, customerName, customerPhone, service, date, time] = match.map(s => s.trim());
+    const [, customerName, customerPhone, customerEmail, service, date, time] = match.map(s => s.trim());
 
     // Find the availability slot
     const slot = availabilityData.find(s => s.date === date && s.time === time && !s.is_booked);
@@ -579,12 +579,31 @@ async function processBookingIfConfirmed(reply) {
       availability_id: slot.id,
       customer_name: customerName,
       customer_phone: customerPhone || null,
+      customer_email: customerEmail || null,
       service,
       date,
       time,
       status: 'confirmed',
       reminder_sent: false
     });
+
+    // Send confirmation EMAIL if email provided
+    if (customerEmail && customerEmail.trim() && customerEmail.includes('@')) {
+      const apptDate2 = new Date(date + 'T12:00:00');
+      const dateLabel2 = apptDate2.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+      const emailHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Georgia,serif;background:#faf6f1;margin:0;padding:0}.wrapper{max-width:560px;margin:0 auto;padding:40px 20px}.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(92,64,51,.08)}.header{background:linear-gradient(135deg,#b85c38 0%,#8b3a1e 100%);padding:32px;text-align:center}.header h1{color:#fff;font-size:1.4rem;margin:0;font-weight:400}.body{padding:32px}.appt-box{background:#faf6f1;border:1px solid #e0ccb8;border-radius:12px;padding:20px;margin:20px 0}.appt-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e0ccb8;font-size:.9rem}.appt-row:last-child{border-bottom:none}.appt-label{color:#7a5c4a}.appt-value{color:#2d1f18;font-weight:600}.btn{display:inline-block;background:linear-gradient(135deg,#b85c38 0%,#8b3a1e 100%);color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:.9rem;margin:20px 0}.footer{text-align:center;padding:20px 32px;color:#9c7a6a;font-size:.78rem;border-top:1px solid #e0ccb8}</style></head><body><div class="wrapper"><div class="card"><div class="header"><h1>✅ Booking Confirmed!</h1></div><div class="body"><p style="font-size:1rem;color:#2d1f18;">Hi ${customerName}! Your appointment is confirmed.</p><div class="appt-box"><div class="appt-row"><span class="appt-label">Stylist</span><span class="appt-value">${stylist.name}</span></div><div class="appt-row"><span class="appt-label">Date</span><span class="appt-value">${dateLabel2}</span></div><div class="appt-row"><span class="appt-label">Time</span><span class="appt-value">${time}</span></div>${service ? `<div class="appt-row"><span class="appt-label">Service</span><span class="appt-value">${service}</span></div>` : ''}</div><p style="color:#7a5c4a;font-size:.88rem;">Need to make changes? You can view or cancel below.</p><a href="https://www.salonassistcx.com/appointments.html" class="btn">Manage My Appointment →</a></div><div class="footer">Powered by Salon Assist CX</div></div></div></body></html>`;
+      try {
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: customerEmail,
+            subject: 'Appointment Confirmed with ' + stylist.name,
+            html: emailHtml
+          })
+        });
+      } catch(emailErr) { console.error('Confirmation email failed:', emailErr); }
+    }
 
     // Send confirmation SMS if phone provided
     if (customerPhone && customerPhone.trim()) {
