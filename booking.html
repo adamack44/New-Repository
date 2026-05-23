@@ -32,15 +32,66 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 @keyframes spin { to { transform: rotate(360deg); } }
 #loadingScreen p { font-size: 0.82rem; color: var(--text-light); font-weight: 300; }
 
-.hero { background: linear-gradient(160deg, #3d2416 0%, #5c3525 40%, #7a4a35 100%); position: relative; overflow: hidden; }
-.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 50%, rgba(196,113,74,0.25) 0%, transparent 60%); }
-.hero-inner { position: relative; display: flex; align-items: center; gap: 40px; padding: 48px 60px; max-width: 1100px; margin: 0 auto; }
-.stylist-avatar { width: 110px; height: 110px; border-radius: 50%; border: 3px solid rgba(232,217,200,0.4); background: linear-gradient(135deg, var(--terracotta) 0%, var(--bark) 100%); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 42px; color: var(--cream); flex-shrink: 0; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-.hero-text h1 { font-family: 'Playfair Display', serif; font-size: 2.6rem; color: var(--cream); font-weight: 400; line-height: 1.2; }
-.hero-text h1 em { color: var(--terracotta-light); font-style: italic; }
-.hero-text p { margin-top: 10px; font-size: 0.95rem; color: rgba(232,217,200,0.75); font-weight: 300; }
-.hero-badges { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-.badge { background: rgba(232,217,200,0.12); border: 1px solid rgba(232,217,200,0.25); color: var(--sand); font-size: 0.75rem; padding: 5px 14px; border-radius: 20px; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 500; }
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(180deg, #f5ede4 0%, #eedfd2 100%);
+  position: relative; overflow: hidden;
+  border-bottom: 1px solid #e0ccb8;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 0%, rgba(196,113,74,0.08) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-inner {
+  position: relative;
+  max-width: 1100px; margin: 0 auto;
+  padding: 56px 60px 48px;
+  display: flex; align-items: flex-start; gap: 48px;
+}
+.stylist-avatar {
+  width: 160px; height: 160px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--terracotta) 0%, var(--bark) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 56px; color: var(--cream);
+  flex-shrink: 0; overflow: hidden;
+  box-shadow: 0 12px 40px rgba(92,64,51,0.18), 0 2px 8px rgba(92,64,51,0.1);
+  border: 3px solid rgba(255,255,255,0.7);
+}
+.stylist-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.hero-text { flex: 1; padding-top: 8px; }
+.hero-text h1 {
+  font-family: 'Playfair Display', serif; font-size: 2.8rem;
+  color: var(--text-dark); font-weight: 400; line-height: 1.15; margin-bottom: 6px;
+}
+.hero-text h1 em { color: var(--terracotta); font-style: italic; }
+.hero-salon { font-size: 0.92rem; color: var(--text-mid); font-weight: 400; margin-bottom: 14px; }
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.badge {
+  background: rgba(196,113,74,0.1); border: 1px solid rgba(196,113,74,0.25);
+  color: var(--terracotta); font-size: 0.72rem; padding: 4px 12px;
+  border-radius: 20px; letter-spacing: 0.5px; font-weight: 500;
+}
+.hero-bio {
+  font-size: 0.88rem; color: var(--text-mid); font-weight: 300;
+  line-height: 1.65; max-width: 520px; margin-bottom: 12px;
+}
+.hero-booking-note {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(196,113,74,0.08); border: 1px solid rgba(196,113,74,0.2);
+  color: var(--text-mid); font-size: 0.78rem; font-weight: 400;
+  padding: 6px 14px; border-radius: 8px; margin-bottom: 12px;
+}
+.hero-address { font-size: 0.78rem; color: var(--text-light); margin-bottom: 10px; }
+.hero-address a { color: var(--terracotta); text-decoration: none; }
+.hero-socials { display: flex; flex-wrap: wrap; gap: 7px; }
+.hero-socials a {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(92,64,51,0.07); border: 1px solid rgba(92,64,51,0.15);
+  border-radius: 20px; padding: 4px 12px; font-size: 0.72rem;
+  color: var(--text-mid); text-decoration: none; transition: all 0.15s;
+}
+.hero-socials a:hover { background: rgba(196,113,74,0.1); border-color: rgba(196,113,74,0.3); color: var(--terracotta); }
 
 .main { max-width: 1100px; margin: 0 auto; padding: 40px 60px 60px; display: grid; grid-template-columns: 1fr 1.6fr; gap: 36px; align-items: start; }
 
@@ -66,7 +117,8 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 
 .chat-panel { background: var(--warm-white); border-radius: 20px; border: 1px solid var(--sand); box-shadow: 0 4px 24px rgba(92,64,51,0.07); display: flex; flex-direction: column; height: 560px; overflow: hidden; }
 .chat-header { background: linear-gradient(135deg, var(--terracotta) 0%, #b5603e 100%); padding: 20px 26px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-.chat-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.chat-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; flex-shrink: 0; }
+.chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .chat-header-text h3 { font-family: 'Playfair Display', serif; font-size: 1rem; color: #fff; font-weight: 600; }
 .chat-header-text p { font-size: 0.73rem; color: rgba(255,255,255,0.75); font-weight: 300; }
 .chat-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #a8e6a3; margin-left: auto; box-shadow: 0 0 6px rgba(168,230,163,0.8); animation: pulse 2s infinite; }
@@ -119,12 +171,12 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
     <div class="stylist-avatar" id="heroInitial">✂️</div>
     <div class="hero-text">
       <h1>Book with <em id="heroName">…</em></h1>
-      <p id="heroSalon">Independent Hair Stylist</p>
+      <div class="hero-salon" id="heroSalon">Independent Hair Stylist</div>
       <div class="hero-badges" id="heroBadges"></div>
-      <p id="heroBookingNote" style="display:none;font-size:0.78rem;color:rgba(232,217,200,0.75);margin-top:8px;font-weight:300;background:rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;border:1px solid rgba(255,255,255,0.12);"></p>
-      <p id="heroBio" style="display:none;font-size:0.82rem;color:rgba(232,217,200,0.65);margin-top:10px;font-weight:300;line-height:1.6;max-width:500px;"></p>
-      <p id="heroAddress" style="display:none;font-size:0.78rem;color:rgba(232,217,200,0.6);margin-top:8px;font-weight:300;"></p>
-      <div id="heroSocials" style="display:none;flex-wrap:wrap;gap:7px;margin-top:12px;"></div>
+      <div id="heroBookingNote" class="hero-booking-note" style="display:none;"></div>
+      <p id="heroBio" class="hero-bio" style="display:none;"></p>
+      <p id="heroAddress" class="hero-address" style="display:none;"></p>
+      <div id="heroSocials" class="hero-socials" style="display:none;"></div>
     </div>
   </div>
 </div>
@@ -267,6 +319,12 @@ function renderHero() {
 
   document.getElementById('chatHeaderName').textContent = stylist.name + "'s Booking Assistant";
 
+  // Update chat avatar with stylist photo
+  if (stylist.photo_url) {
+    const chatAvatar = document.querySelector('.chat-avatar');
+    if (chatAvatar) chatAvatar.innerHTML = `<img src="${stylist.photo_url}" alt="${stylist.name}">`;
+  }
+
   // Service badges
   const badges = document.getElementById('heroBadges');
   badges.innerHTML = '';
@@ -281,7 +339,7 @@ function renderHero() {
   // Booking note
   if (stylist.booking_note) {
     const noteEl = document.getElementById('heroBookingNote');
-    if (noteEl) { noteEl.textContent = '📌 ' + stylist.booking_note; noteEl.style.display = 'block'; }
+    if (noteEl) { noteEl.innerHTML = '📌 ' + stylist.booking_note; noteEl.style.display = 'inline-flex'; }
   }
 
   // Social links
@@ -328,6 +386,7 @@ function renderSocialLinks() {
     container.appendChild(a);
   });
   container.style.display = links.length ? 'flex' : 'none';
+  container.style.flexWrap = 'wrap';
 }
 
 // ── RENDER AVAILABILITY PANEL ────────────────────────────
