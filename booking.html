@@ -93,7 +93,8 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 .hero-socials a:hover { background: rgba(196,113,74,0.1); border-color: rgba(196,113,74,0.3); color: var(--terracotta); }
 
 .main { max-width: 1100px; margin: 0 auto; padding: 28px 60px 60px; display: flex; flex-direction: column; gap: 24px; }
-.bottom-panels { display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px; align-items: start; }
+.top-panels { display: grid; grid-template-columns: 1fr 1.6fr; gap: 24px; align-items: start; }
+.bottom-panels { width: 100%; }
 
 .availability-panel { background: var(--warm-white); border-radius: 20px; border: 1px solid var(--sand); overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.07); }
 .panel-header { background: linear-gradient(135deg, var(--sand) 0%, #e0ccb8 100%); padding: 22px 28px; border-bottom: 1px solid var(--sand-dark); }
@@ -194,7 +195,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 @media (max-width: 800px) {
   .hero-inner { padding: 32px 24px; }
   .main { padding: 20px 16px 40px; }
-  .bottom-panels { grid-template-columns: 1fr; }
+  .top-panels { grid-template-columns: 1fr; }
   .hero-text h1 { font-size: 1.9rem; }
 }
 </style>
@@ -227,7 +228,21 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 </div>
 
 <div class="main">
-  <div class="chat-panel">
+  <div class="top-panels">
+    <div class="availability-panel">
+      <div class="panel-header">
+        <h2>Upcoming Availability</h2>
+        <p id="availDateRange">Next 7 days</p>
+      </div>
+      <div class="availability-body">
+        <div class="week-label">Open Slots</div>
+        <div id="availabilityList"><div style="text-align:center;padding:20px;color:#9c7a6a;font-size:0.82rem;">Loading availability…</div></div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot open"></span> Available to book</div>
+        </div>
+      </div>
+    </div>
+    <div class="chat-panel">
     <div class="chat-header">
       <div class="chat-avatar" style="background:rgba(255,255,255,0.25);padding:6px;"><img src="/logo.png" style="width:100%;height:100%;object-fit:contain;" alt="Salon Assist CX"></div>
       <div class="chat-header-text">
@@ -254,22 +269,9 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
     </div>
   </div>
 </div>
+  </div>
 
   <div class="bottom-panels">
-    <div class="availability-panel">
-      <div class="panel-header">
-        <h2>Upcoming Availability</h2>
-        <p id="availDateRange">Next 7 days</p>
-      </div>
-      <div class="availability-body">
-        <div class="week-label">Open Slots</div>
-        <div id="availabilityList"><div style="text-align:center;padding:20px;color:#9c7a6a;font-size:0.82rem;">Loading availability…</div></div>
-        <div class="legend">
-          <div class="legend-item"><span class="legend-dot open"></span> Available to book</div>
-        </div>
-      </div>
-    </div>
-
     <div id="serviceMenuBottom" style="display:none;">
       <div class="services-section">
         <div class="services-header">
