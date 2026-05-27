@@ -151,7 +151,43 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 .send-btn:hover { transform: scale(1.05); box-shadow: 0 4px 14px rgba(196,113,74,0.4); }
 .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
+.services-section { background: var(--warm-white); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.07); margin-bottom: 0; }
+.services-header { background: linear-gradient(135deg, var(--sand) 0%, #e0ccb8 100%); padding: 18px 28px; border-bottom: 1px solid var(--sand-dark); }
+.services-header h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--bark); font-weight: 600; }
+.services-header p { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; font-weight: 300; }
+.services-body { padding: 16px 20px; }
+.service-category-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); font-weight: 600; margin: 14px 0 8px; }
+.service-category-label:first-child { margin-top: 0; }
+.service-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; background: var(--cream); border: 1px solid rgba(232,217,200,0.6); transition: all 0.15s; cursor: pointer; }
+.service-item:hover { border-color: var(--terracotta); background: rgba(196,113,74,0.05); }
+.service-item:last-child { margin-bottom: 0; }
+.service-item-left { flex: 1; }
+.service-item-name { font-size: 0.85rem; font-weight: 500; color: var(--text-dark); line-height: 1.2; }
+.service-item-desc { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; font-weight: 300; }
+.service-item-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.service-item-dur { font-size: 0.72rem; color: var(--text-light); background: rgba(92,64,51,0.07); padding: 2px 8px; border-radius: 4px; }
+.service-item-price { font-size: 0.85rem; font-weight: 600; color: var(--terracotta); min-width: 40px; text-align: right; }
+.services-empty { text-align: center; padding: 20px; color: var(--text-light); font-size: 0.82rem; font-style: italic; }
+
 .page-footer { text-align: center; padding: 24px; font-size: 0.75rem; color: var(--text-light); border-top: 1px solid var(--sand); }
+.services-section { background: var(--warm-white); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.07); margin-bottom: 0; }
+.services-header { background: linear-gradient(135deg, var(--sand) 0%, #e0ccb8 100%); padding: 18px 28px; border-bottom: 1px solid var(--sand-dark); }
+.services-header h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--bark); font-weight: 600; }
+.services-header p { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; font-weight: 300; }
+.services-body { padding: 16px 20px; }
+.service-category-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); font-weight: 600; margin: 14px 0 8px; }
+.service-category-label:first-child { margin-top: 0; }
+.service-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; background: var(--cream); border: 1px solid rgba(232,217,200,0.6); transition: all 0.15s; cursor: pointer; }
+.service-item:hover { border-color: var(--terracotta); background: rgba(196,113,74,0.05); }
+.service-item:last-child { margin-bottom: 0; }
+.service-item-left { flex: 1; }
+.service-item-name { font-size: 0.85rem; font-weight: 500; color: var(--text-dark); line-height: 1.2; }
+.service-item-desc { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; font-weight: 300; }
+.service-item-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.service-item-dur { font-size: 0.72rem; color: var(--text-light); background: rgba(92,64,51,0.07); padding: 2px 8px; border-radius: 4px; }
+.service-item-price { font-size: 0.85rem; font-weight: 600; color: var(--terracotta); min-width: 40px; text-align: right; }
+.services-empty { text-align: center; padding: 20px; color: var(--text-light); font-size: 0.82rem; font-style: italic; }
+
 .page-footer a { color: var(--terracotta); text-decoration: none; }
 
 @media (max-width: 800px) {
@@ -185,6 +221,17 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
   <div style="max-width:1100px;margin:0 auto;padding:16px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
     <span style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-light);margin-right:4px;">Connect</span>
     <div id="socialBarLinks" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;"></div>
+  </div>
+</div>
+
+<!-- SERVICE MENU -->
+<div id="serviceMenuSection" style="display:none; max-width:1100px; margin:0 auto; padding:28px 60px 0;">
+  <div class="services-section">
+    <div class="services-header">
+      <h2>Services & Pricing</h2>
+      <p id="serviceMenuSubtitle">Click a service to start booking</p>
+    </div>
+    <div class="services-body" id="serviceMenuBody"></div>
   </div>
 </div>
 
@@ -263,6 +310,7 @@ window.addEventListener('load', async () => {
   await loadAvailability();
 
   renderHero();
+  renderServiceMenu();
   renderAvailabilityPanel();
   renderWelcomeMessage();
 
@@ -474,6 +522,75 @@ function renderAvailabilityPanel() {
     row.appendChild(name);
     row.appendChild(slotsEl);
     container.appendChild(row);
+  });
+}
+
+// ── SERVICE MENU ─────────────────────────────────────────
+const CATEGORY_ORDER = ['Quick','Standard','Long','Color','Custom'];
+const CATEGORY_LABELS = {
+  Quick: '⚡ Quick Services',
+  Standard: '✂️ Standard Services',
+  Long: '💅 Styling & Treatments',
+  Color: '🎨 Color Services',
+  Custom: '⚙️ Other Services'
+};
+
+function renderServiceMenu() {
+  const menu = stylist.serviceMenu || [];
+  const active = menu.filter(s => s.is_active !== false);
+  const section = document.getElementById('serviceMenuSection');
+  const body = document.getElementById('serviceMenuBody');
+
+  if (!active.length) { section.style.display = 'none'; return; }
+
+  section.style.display = 'block';
+  body.innerHTML = '';
+
+  // Group by category
+  const byCategory = {};
+  CATEGORY_ORDER.forEach(c => byCategory[c] = []);
+  active.forEach(s => {
+    const cat = byCategory[s.category] ? s.category : 'Custom';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push(s);
+  });
+
+  CATEGORY_ORDER.forEach(cat => {
+    if (!byCategory[cat]?.length) return;
+
+    const label = document.createElement('div');
+    label.className = 'service-category-label';
+    label.textContent = CATEGORY_LABELS[cat] || cat;
+    body.appendChild(label);
+
+    byCategory[cat].forEach(svc => {
+      const dur = svc.duration_minutes >= 60
+        ? (Math.floor(svc.duration_minutes/60) + 'hr' + (svc.duration_minutes % 60 ? svc.duration_minutes % 60 + 'min' : ''))
+        : svc.duration_minutes + 'min';
+      const price = svc.price_cents ? '$' + (svc.price_cents / 100).toFixed(0) : '';
+
+      const item = document.createElement('div');
+      item.className = 'service-item';
+      item.innerHTML = `
+        <div class="service-item-left">
+          <div class="service-item-name">${svc.name}</div>
+          ${svc.description ? `<div class="service-item-desc">${svc.description}</div>` : ''}
+        </div>
+        <div class="service-item-right">
+          <span class="service-item-dur">${dur}</span>
+          ${price ? `<span class="service-item-price">${price}</span>` : ''}
+        </div>`;
+
+      // Clicking a service pre-fills the chat
+      item.onclick = () => {
+        const msg = `I'd like to book a ${svc.name}`;
+        document.getElementById('chatInput').value = msg;
+        document.getElementById('chatInput').focus();
+        document.querySelector('.chat-panel').scrollIntoView({ behavior: 'smooth' });
+      };
+
+      body.appendChild(item);
+    });
   });
 }
 
