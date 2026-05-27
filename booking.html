@@ -92,7 +92,8 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 }
 .hero-socials a:hover { background: rgba(196,113,74,0.1); border-color: rgba(196,113,74,0.3); color: var(--terracotta); }
 
-.main { max-width: 1100px; margin: 0 auto; padding: 40px 60px 60px; display: grid; grid-template-columns: 1fr 1.6fr; gap: 36px; align-items: start; }
+.main { max-width: 1100px; margin: 0 auto; padding: 28px 60px 60px; display: flex; flex-direction: column; gap: 24px; }
+.bottom-panels { display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px; align-items: start; }
 
 .availability-panel { background: var(--warm-white); border-radius: 20px; border: 1px solid var(--sand); overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.07); }
 .panel-header { background: linear-gradient(135deg, var(--sand) 0%, #e0ccb8 100%); padding: 22px 28px; border-bottom: 1px solid var(--sand-dark); }
@@ -114,7 +115,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 .legend-dot.open { background: var(--sage); }
 .legend-dot.booked { background: var(--sand-dark); }
 
-.chat-panel { background: var(--warm-white); border-radius: 20px; border: 1px solid var(--sand); box-shadow: 0 4px 24px rgba(92,64,51,0.07); display: flex; flex-direction: column; height: 560px; overflow: hidden; }
+.chat-panel { background: var(--warm-white); border-radius: 20px; border: 1px solid var(--sand); box-shadow: 0 4px 24px rgba(92,64,51,0.07); display: flex; flex-direction: column; height: 520px; overflow: hidden; width: 100%; }
 .chat-header { background: linear-gradient(135deg, var(--terracotta) 0%, #b5603e 100%); padding: 20px 26px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
 .chat-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; flex-shrink: 0; }
 .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -192,7 +193,8 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 
 @media (max-width: 800px) {
   .hero-inner { padding: 32px 24px; }
-  .main { grid-template-columns: 1fr; padding: 24px 20px 40px; }
+  .main { padding: 20px 16px 40px; }
+  .bottom-panels { grid-template-columns: 1fr; }
   .hero-text h1 { font-size: 1.9rem; }
 }
 </style>
@@ -224,32 +226,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
   </div>
 </div>
 
-<!-- SERVICE MENU -->
-<div id="serviceMenuSection" style="display:none; max-width:1100px; margin:0 auto; padding:28px 60px 0;">
-  <div class="services-section">
-    <div class="services-header">
-      <h2>Services & Pricing</h2>
-      <p id="serviceMenuSubtitle">Click a service to start booking</p>
-    </div>
-    <div class="services-body" id="serviceMenuBody"></div>
-  </div>
-</div>
-
 <div class="main">
-  <div class="availability-panel">
-    <div class="panel-header">
-      <h2>Upcoming Availability</h2>
-      <p id="availDateRange">Next 7 days</p>
-    </div>
-    <div class="availability-body">
-      <div class="week-label">Open Slots</div>
-      <div id="availabilityList"><div style="text-align:center;padding:20px;color:#9c7a6a;font-size:0.82rem;">Loading availability…</div></div>
-      <div class="legend">
-        <div class="legend-item"><span class="legend-dot open"></span> Available to book</div>
-      </div>
-    </div>
-  </div>
-
   <div class="chat-panel">
     <div class="chat-header">
       <div class="chat-avatar" style="background:rgba(255,255,255,0.25);padding:6px;"><img src="/logo.png" style="width:100%;height:100%;object-fit:contain;" alt="Salon Assist CX"></div>
@@ -276,6 +253,34 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
       </div>
     </div>
   </div>
+</div>
+
+  <div class="bottom-panels">
+    <div class="availability-panel">
+      <div class="panel-header">
+        <h2>Upcoming Availability</h2>
+        <p id="availDateRange">Next 7 days</p>
+      </div>
+      <div class="availability-body">
+        <div class="week-label">Open Slots</div>
+        <div id="availabilityList"><div style="text-align:center;padding:20px;color:#9c7a6a;font-size:0.82rem;">Loading availability…</div></div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot open"></span> Available to book</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="serviceMenuBottom" style="display:none;">
+      <div class="services-section">
+        <div class="services-header">
+          <h2>Services & Pricing</h2>
+          <p>Click any service to start booking</p>
+        </div>
+        <div class="services-body" id="serviceMenuBodyBottom"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div class="page-footer">Powered by <a href="index.html">Salon Assist CX</a> · AI scheduling for independent stylists</div>
@@ -538,10 +543,10 @@ const CATEGORY_LABELS = {
 function renderServiceMenu() {
   const menu = stylist.serviceMenu || [];
   const active = menu.filter(s => s.is_active !== false);
-  const section = document.getElementById('serviceMenuSection');
-  const body = document.getElementById('serviceMenuBody');
+  const section = document.getElementById('serviceMenuBottom');
+  const body = document.getElementById('serviceMenuBodyBottom');
 
-  if (!active.length) { section.style.display = 'none'; return; }
+  if (!active.length || !section || !body) return;
 
   section.style.display = 'block';
   body.innerHTML = '';
@@ -586,7 +591,7 @@ function renderServiceMenu() {
         const msg = `I'd like to book a ${svc.name}`;
         document.getElementById('chatInput').value = msg;
         document.getElementById('chatInput').focus();
-        document.querySelector('.chat-panel').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('chatInput').scrollIntoView({ behavior: 'smooth', block: 'center' });
       };
 
       body.appendChild(item);
