@@ -995,8 +995,14 @@ footer {
 
 /* ── RESPONSIVE ───────────────────────────────────────────── */
 @media (max-width: 960px) {
-  nav { padding: 0 24px; }
+  nav { padding: 0 16px; height: 64px; }
   .nav-links { display: none; }
+  .nav-brand { font-size: 1.1rem; gap: 6px; }
+  .nav-brand-icon { width: 44px !important; height: 44px !important; }
+  .nav-brand-icon img { width: 44px !important; height: 44px !important; }
+  .nav-right .btn { display: none; }
+  .nav-right { gap: 8px; }
+  .nav-signin { font-size: 0.82rem; white-space: nowrap; }
   .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 48px; }
   .hero-visual { display: none; }
   .section { padding: 60px 24px; }
