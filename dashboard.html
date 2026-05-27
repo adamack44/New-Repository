@@ -157,6 +157,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
 /* TOAST */
+/* APPOINTMENTS TABLE */
+.appt-table { width: 100%; border-collapse: collapse; }
+.appt-table th { padding: 10px 16px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-light); font-weight: 600; border-bottom: 1px solid var(--border); background: var(--cream); }
+.appt-table td { padding: 12px 16px; font-size: 0.82rem; color: var(--ink); border-bottom: 1px solid rgba(224,204,184,0.4); vertical-align: middle; }
+.appt-table tr:last-child td { border-bottom: none; }
+.appt-table tr:hover td { background: var(--cream); }
+.appt-table tr.selected td { background: var(--rust-pale); }
+.appt-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: var(--rust); }
+.appt-action-btn { padding: 4px 10px; border-radius: 6px; font-size: 0.72rem; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; color: var(--ink-light); margin-left: 4px; transition: all 0.12s; }
+.appt-action-btn:hover { border-color: var(--rust); color: var(--rust); background: var(--rust-pale); }
+.appt-action-btn.danger:hover { border-color: #e74c3c; color: #e74c3c; background: #fdecea; }
+
 /* PROFILE PHOTO */
 .photo-preview { width:88px;height:88px;border-radius:50%;overflow:hidden;flex-shrink:0; }
 
@@ -297,10 +309,41 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
     <!-- ALL APPOINTMENTS -->
     <div class="page-section" id="page-appointments">
+
+      <!-- FILTER + SEARCH BAR -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <input type="text" id="apptSearch" placeholder="Search by name, service…" oninput="filterAppointments()"
+          style="flex:1;min-width:180px;padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--ink);background:var(--cream);outline:none;">
+        <select id="apptStatusFilter" onchange="filterAppointments()"
+          style="padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--ink);background:var(--cream);outline:none;cursor:pointer;">
+          <option value="all">All statuses</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="pending">Pending</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <select id="apptTimeFilter" onchange="filterAppointments()"
+          style="padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--ink);background:var(--cream);outline:none;cursor:pointer;">
+          <option value="all">All time</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="today">Today</option>
+          <option value="past">Past</option>
+          <option value="thisweek">This week</option>
+        </select>
+        <button class="btn btn-ghost" style="font-size:0.78rem;" onclick="clearApptFilters()">Clear</button>
+        <span id="apptCount" style="font-size:0.78rem;color:var(--ink-light);white-space:nowrap;"></span>
+      </div>
+
+      <!-- BULK ACTIONS -->
+      <div id="bulkActions" style="display:none;background:var(--rust-pale);border:1px solid var(--rust-light);border-radius:10px;padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+        <span id="selectedCount" style="font-size:0.82rem;color:var(--rust);font-weight:500;flex:1;"></span>
+        <button class="btn btn-ghost" style="font-size:0.78rem;" onclick="bulkCancel()">Cancel Selected</button>
+        <button class="btn btn-ghost" style="font-size:0.78rem;color:#e74c3c;border-color:#f5c6c6;" onclick="bulkDelete()">Delete Selected</button>
+        <button class="btn btn-ghost" style="font-size:0.78rem;" onclick="clearSelection()">✕ Clear</button>
+      </div>
+
       <div class="card">
-        <div class="card-head"><h2>All Appointments</h2></div>
-        <div class="card-body">
-          <div class="appt-list" id="allApptList"><div class="empty-state">Loading…</div></div>
+        <div class="card-body" style="padding:0;">
+          <div id="allApptList"><div class="empty-state" style="padding:32px;">Loading…</div></div>
         </div>
       </div>
     </div>
@@ -697,7 +740,7 @@ async function loadAppointments() {
     .order('date', { ascending: true })
     .order('time', { ascending: true });
 
-  if (!error) appointments = data || [];
+  if (!error) { appointments = data || []; filteredAppointments = [...appointments]; }
   document.getElementById('apptBadge').textContent = appointments.filter(a => a.status !== 'cancelled').length;
 }
 
@@ -744,41 +787,193 @@ function renderTodayAppointments() {
   todayAppts.forEach(a => el.appendChild(buildApptItem(a)));
 }
 
-function renderAllAppointments() {
-  const el = document.getElementById('allApptList');
-  if (!appointments.length) { el.innerHTML = '<div class="empty-state">No appointments yet</div>'; return; }
-  el.innerHTML = '';
-  appointments.forEach(a => el.appendChild(buildApptItem(a)));
-}
-
-function buildApptItem(a) {
-  const div = document.createElement('div');
-  div.className = 'appt-item';
-  div.innerHTML = `
-    <div class="appt-time">${a.time}</div>
-    <div class="appt-divider"></div>
-    <div class="appt-info">
-      <div class="appt-name">${a.customer_name}</div>
-      <div class="appt-service">${a.service || 'Service not specified'} · ${formatDate(a.date)}</div>
-    </div>
-    <span class="appt-status ${a.status}">${a.status}</span>
-    ${a.status !== 'cancelled' ? `<button class="appt-btn" title="Cancel" onclick="cancelAppointment('${a.id}')">✕</button>` : ''}
-  `;
-  return div;
-}
+let selectedApptIds = new Set();
+let filteredAppointments = [];
 
 function formatDate(dateStr) {
   return new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+
+function filterAppointments() {
+  const search = (document.getElementById('apptSearch')?.value || '').toLowerCase();
+  const status = document.getElementById('apptStatusFilter')?.value || 'all';
+  const time = document.getElementById('apptTimeFilter')?.value || 'all';
+  const today = new Date().toISOString().split('T')[0];
+  const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate() + 7);
+  const weekEndStr = weekEnd.toISOString().split('T')[0];
+
+  filteredAppointments = appointments.filter(a => {
+    // Search
+    if (search && !a.customer_name?.toLowerCase().includes(search) &&
+        !a.service?.toLowerCase().includes(search) &&
+        !a.customer_email?.toLowerCase().includes(search)) return false;
+    // Status
+    if (status !== 'all' && a.status !== status) return false;
+    // Time
+    if (time === 'upcoming' && a.date < today) return false;
+    if (time === 'today' && a.date !== today) return false;
+    if (time === 'past' && a.date >= today) return false;
+    if (time === 'thisweek' && (a.date < today || a.date > weekEndStr)) return false;
+    return true;
+  });
+
+  renderAllAppointments();
+}
+
+function clearApptFilters() {
+  document.getElementById('apptSearch').value = '';
+  document.getElementById('apptStatusFilter').value = 'all';
+  document.getElementById('apptTimeFilter').value = 'all';
+  filteredAppointments = [...appointments];
+  renderAllAppointments();
+}
+
+function renderAllAppointments() {
+  const el = document.getElementById('allApptList');
+  const list = filteredAppointments.length > 0 || document.getElementById('apptSearch')?.value
+    ? filteredAppointments : appointments;
+
+  // Update count
+  const countEl = document.getElementById('apptCount');
+  if (countEl) countEl.textContent = list.length + ' appointment' + (list.length !== 1 ? 's' : '');
+
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:32px;">No appointments found</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <table class="appt-table">
+      <thead>
+        <tr>
+          <th style="width:36px;"><input type="checkbox" class="appt-checkbox" onchange="toggleSelectAll(this)"></th>
+          <th>Customer</th>
+          <th>Service</th>
+          <th>Date & Time</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="apptTableBody"></tbody>
+    </table>`;
+
+  const tbody = document.getElementById('apptTableBody');
+  list.forEach(a => {
+    const tr = document.createElement('tr');
+    if (selectedApptIds.has(a.id)) tr.classList.add('selected');
+    tr.innerHTML = `
+      <td><input type="checkbox" class="appt-checkbox" data-id="${a.id}" onchange="toggleSelect('${a.id}', this)" ${selectedApptIds.has(a.id) ? 'checked' : ''}></td>
+      <td>
+        <div style="font-weight:500;">${a.customer_name}</div>
+        <div style="font-size:0.72rem;color:var(--ink-light);">${a.customer_email || a.customer_phone || ''}</div>
+      </td>
+      <td style="color:var(--ink-light);">${a.service || '—'}</td>
+      <td>
+        <div>${formatDate(a.date)}</div>
+        <div style="font-size:0.72rem;color:var(--ink-light);">${a.time}</div>
+      </td>
+      <td><span class="appt-status ${a.status}">${a.status}</span></td>
+      <td>
+        ${a.status !== 'cancelled' ? `<button class="appt-action-btn" onclick="cancelAppointment('${a.id}')">Cancel</button>` : ''}
+        <button class="appt-action-btn danger" onclick="deleteAppointment('${a.id}')">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleSelect(id, checkbox) {
+  if (checkbox.checked) selectedApptIds.add(id);
+  else selectedApptIds.delete(id);
+  updateBulkActions();
+  // Update row highlight
+  const rows = document.querySelectorAll('#apptTableBody tr');
+  rows.forEach(row => {
+    const cb = row.querySelector('.appt-checkbox');
+    if (cb?.dataset.id === id) row.classList.toggle('selected', checkbox.checked);
+  });
+}
+
+function toggleSelectAll(checkbox) {
+  const list = filteredAppointments.length ? filteredAppointments : appointments;
+  list.forEach(a => {
+    if (checkbox.checked) selectedApptIds.add(a.id);
+    else selectedApptIds.delete(a.id);
+  });
+  updateBulkActions();
+  renderAllAppointments();
+}
+
+function updateBulkActions() {
+  const bar = document.getElementById('bulkActions');
+  const countEl = document.getElementById('selectedCount');
+  if (selectedApptIds.size > 0) {
+    bar.style.display = 'flex';
+    countEl.textContent = selectedApptIds.size + ' appointment' + (selectedApptIds.size !== 1 ? 's' : '') + ' selected';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function clearSelection() {
+  selectedApptIds.clear();
+  updateBulkActions();
+  renderAllAppointments();
 }
 
 async function cancelAppointment(id) {
   const { error } = await supabaseClient.from('appointments').update({ status: 'cancelled' }).eq('id', id);
   if (error) { showToast('⚠️ Could not cancel appointment'); return; }
   await loadAppointments();
+  filteredAppointments = filteredAppointments.map(a => a.id === id ? {...a, status: 'cancelled'} : a);
   renderTodayAppointments();
   renderAllAppointments();
   renderStats();
   showToast('❌ Appointment cancelled');
+}
+
+async function deleteAppointment(id) {
+  if (!confirm('Permanently delete this appointment? This cannot be undone.')) return;
+  const { error } = await supabaseClient.from('appointments').delete().eq('id', id);
+  if (error) { showToast('⚠️ Could not delete appointment'); return; }
+  appointments = appointments.filter(a => a.id !== id);
+  filteredAppointments = filteredAppointments.filter(a => a.id !== id);
+  selectedApptIds.delete(id);
+  renderTodayAppointments();
+  renderAllAppointments();
+  renderStats();
+  showToast('🗑️ Appointment deleted');
+}
+
+async function bulkCancel() {
+  if (!selectedApptIds.size) return;
+  if (!confirm(`Cancel ${selectedApptIds.size} appointment(s)?`)) return;
+  for (const id of selectedApptIds) {
+    await supabaseClient.from('appointments').update({ status: 'cancelled' }).eq('id', id);
+  }
+  await loadAppointments();
+  filteredAppointments = [...appointments];
+  selectedApptIds.clear();
+  updateBulkActions();
+  renderTodayAppointments();
+  renderAllAppointments();
+  renderStats();
+  showToast('❌ Appointments cancelled');
+}
+
+async function bulkDelete() {
+  if (!selectedApptIds.size) return;
+  if (!confirm(`Permanently delete ${selectedApptIds.size} appointment(s)? This cannot be undone.`)) return;
+  for (const id of selectedApptIds) {
+    await supabaseClient.from('appointments').delete().eq('id', id);
+  }
+  appointments = appointments.filter(a => !selectedApptIds.has(a.id));
+  filteredAppointments = filteredAppointments.filter(a => !selectedApptIds.has(a.id));
+  selectedApptIds.clear();
+  updateBulkActions();
+  renderTodayAppointments();
+  renderAllAppointments();
+  renderStats();
+  showToast('🗑️ Appointments deleted');
 }
 
 // ── AVAILABILITY UI ───────────────────────────────────────
