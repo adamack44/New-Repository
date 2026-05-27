@@ -1308,7 +1308,7 @@ const DEFAULT_SERVICES = [
 ];
 
 const CATEGORY_ORDER = ['Quick','Standard','Long','Color','Custom'];
-const CATEGORY_LABELS = { Quick:'⚡ Quick (15–45 min)', Standard:'<img src="/logo.png" style="width:24px;height:24px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt=""> Standard (30–60 min)', Long:'💅 Long (45–120 min)', Color:'🎨 Color (1–4+ hrs)', Custom:'⚙️ Custom' };
+const CATEGORY_LABELS = { Quick:'⚡ Quick (15–45 min)', Standard:'✂️ Standard (30–60 min)', Long:'💅 Long (45–120 min)', Color:'🎨 Color (1–4+ hrs)', Custom:'⚙️ Custom' };
 
 let stylistServices = [];
 let editingServiceId = null;
@@ -1353,7 +1353,7 @@ function renderServiceMenu() {
     if (!byCategory[cat]?.length) return;
     const catEl = document.createElement('div');
     catEl.className = 'svc-category';
-    catEl.textContent = CATEGORY_LABELS[cat] || cat;
+    catEl.innerHTML = CATEGORY_LABELS[cat] || cat;
     container.appendChild(catEl);
     byCategory[cat].forEach(svc => container.appendChild(buildServiceRow(svc)));
   });
