@@ -193,10 +193,20 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 .page-footer a { color: var(--terracotta); text-decoration: none; }
 
 @media (max-width: 800px) {
-  .hero-inner { padding: 32px 24px; }
-  .main { padding: 20px 16px 40px; }
+  .hero { padding: 0; }
+  .hero-inner { padding: 24px 20px; flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+  .stylist-avatar { width: 100px; height: 100px; flex-shrink: 0; }
+  .stylist-avatar img { width: 100px; height: 100px; }
+  .hero-text { padding-top: 0; }
+  .hero-text h1 { font-size: 1.6rem; }
+  .hero-salon { font-size: 0.82rem; }
+  .hero-badges { justify-content: center; }
+  .hero-bio { font-size: 0.82rem; max-width: 100%; }
+  .hero-booking-note { font-size: 0.75rem; }
+  .hero-socials { justify-content: center; }
+  .main { padding: 16px 14px 32px; }
   .top-panels { grid-template-columns: 1fr; }
-  .hero-text h1 { font-size: 1.9rem; }
+  .bottom-panels { padding: 0; }
 }
 </style>
 </head>
