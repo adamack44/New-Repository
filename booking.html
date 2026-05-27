@@ -81,7 +81,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
   color: var(--text-mid); font-size: 0.78rem; font-weight: 400;
   padding: 6px 14px; border-radius: 8px; margin-bottom: 12px;
 }
-.hero-address { font-size: 0.78rem; color: var(--text-light); margin-bottom: 10px; }
+.hero-address { font-size: 0.82rem; color: var(--text-mid); margin-bottom: 10px; font-weight: 400; }
 .hero-address a { color: var(--terracotta); text-decoration: none; }
 .hero-socials { display: flex; flex-wrap: wrap; gap: 7px; }
 .hero-socials a {
@@ -372,7 +372,7 @@ function renderHero() {
     if (addrEl) {
       const addr = stylist.full_address || (stylist.city + (stylist.state ? ', ' + stylist.state : ''));
       if (stylist.map_link) {
-        addrEl.innerHTML = `📍 <a href="${stylist.map_link}" target="_blank" style="color:rgba(232,217,200,0.8);text-decoration:underline;">${addr}</a>`;
+        addrEl.innerHTML = `📍 <a href="${stylist.map_link}" target="_blank" style="color:var(--terracotta);text-decoration:underline;font-weight:500;">${addr}</a>`;
       } else {
         addrEl.textContent = '📍 ' + addr;
       }
