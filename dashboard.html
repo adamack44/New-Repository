@@ -587,34 +587,127 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
 <!-- ADD/EDIT CLIENT MODAL -->
 <div class="modal-overlay" id="clientModalOverlay" onclick="if(event.target===this)closeClientModal()">
-  <div class="modal" style="width:460px;">
+  <div class="modal" style="width:520px;max-height:90vh;overflow-y:auto;">
     <h3 id="clientModalTitle">Add Client</h3>
     <p style="font-size:0.83rem;color:var(--ink-light);margin-bottom:20px;">Client profiles are created automatically when someone books, or add them manually here.</p>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-      <div class="form-group" style="margin:0;">
-        <label class="form-label" style="margin-bottom:6px;display:block;">Full Name *</label>
-        <input class="form-input date-input" id="clientName" placeholder="e.g. Sarah Johnson" style="width:100%">
+    <!-- TABS -->
+    <div style="display:flex;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px;">
+      <button class="modal-tab active" id="clientTab1" onclick="switchClientTab(1)">Contact Info</button>
+      <button class="modal-tab" id="clientTab2" onclick="switchClientTab(2)">Hair Profile</button>
+    </div>
+
+    <!-- TAB 1: CONTACT INFO -->
+    <div id="clientTabContent1">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Full Name *</label>
+          <input class="form-input date-input" id="clientName" placeholder="e.g. Sarah Johnson" style="width:100%"></div>
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Phone</label>
+          <input class="form-input date-input" id="clientPhone" placeholder="615-555-0100" style="width:100%"></div>
       </div>
-      <div class="form-group" style="margin:0;">
-        <label class="form-label" style="margin-bottom:6px;display:block;">Phone</label>
-        <input class="form-input date-input" id="clientPhone" placeholder="615-555-0100" style="width:100%">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Email</label>
+          <input class="form-input date-input" id="clientEmail" placeholder="client@email.com" style="width:100%"></div>
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Birthday</label>
+          <input class="form-input date-input" id="clientBirthday" type="date" style="width:100%"></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label class="form-label" style="margin-bottom:6px;display:block;">Referral Source</label>
+        <select class="form-input date-input" id="clientReferral" style="width:100%">
+          <option value="">Select how they found you…</option>
+          <option value="Instagram">Instagram</option>
+          <option value="TikTok">TikTok</option>
+          <option value="Google">Google</option>
+          <option value="Friend/Referral">Friend / Referral</option>
+          <option value="Facebook">Facebook</option>
+          <option value="Walk-in">Walk-in</option>
+          <option value="Returning client">Returning client</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label" style="margin-bottom:6px;display:block;">Notes</label>
+        <textarea class="form-input date-input" id="clientNotes" rows="4"
+          placeholder="General notes about this client…"
+          style="width:100%;resize:vertical;font-family:'DM Sans',sans-serif;"></textarea>
       </div>
     </div>
 
-    <div class="form-group" style="margin-bottom:14px;">
-      <label class="form-label" style="margin-bottom:6px;display:block;">Email</label>
-      <input class="form-input date-input" id="clientEmail" placeholder="client@email.com" style="width:100%">
+    <!-- TAB 2: HAIR PROFILE -->
+    <div id="clientTabContent2" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Hair Type</label>
+          <select class="form-input date-input" id="clientHairType" style="width:100%">
+            <option value="">Select…</option>
+            <option value="Straight (1a-1c)">Straight (1a–1c)</option>
+            <option value="Wavy (2a-2c)">Wavy (2a–2c)</option>
+            <option value="Curly (3a-3c)">Curly (3a–3c)</option>
+            <option value="Coily (4a-4c)">Coily (4a–4c)</option>
+          </select>
+        </div>
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Hair Texture</label>
+          <select class="form-input date-input" id="clientHairTexture" style="width:100%">
+            <option value="">Select…</option>
+            <option value="Fine">Fine</option>
+            <option value="Medium">Medium</option>
+            <option value="Coarse">Coarse</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Natural Color</label>
+          <select class="form-input date-input" id="clientNaturalColor" style="width:100%">
+            <option value="">Select…</option>
+            <option value="Black">Black</option>
+            <option value="Dark Brown">Dark Brown</option>
+            <option value="Medium Brown">Medium Brown</option>
+            <option value="Light Brown">Light Brown</option>
+            <option value="Dark Blonde">Dark Blonde</option>
+            <option value="Medium Blonde">Medium Blonde</option>
+            <option value="Light Blonde">Light Blonde</option>
+            <option value="Red">Red</option>
+            <option value="Gray/Silver">Gray / Silver</option>
+            <option value="White">White</option>
+          </select>
+        </div>
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Current Color</label>
+          <input class="form-input date-input" id="clientCurrentColor" placeholder="e.g. Balayage, level 7" style="width:100%"></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label class="form-label" style="margin-bottom:6px;display:block;">Color Formula <span style="color:var(--ink-light);font-weight:300;text-transform:none;letter-spacing:0;">(for your records)</span></label>
+        <textarea class="form-input date-input" id="clientColorFormula" rows="3"
+          placeholder="e.g. Wella 7/0 + 7/43 equal parts, 20vol, 45min…"
+          style="width:100%;resize:vertical;font-family:'DM Sans',sans-serif;"></textarea>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label class="form-label" style="margin-bottom:6px;display:block;">Allergies & Sensitivities</label>
+        <input class="form-input date-input" id="clientAllergies" placeholder="e.g. Ammonia, fragrance, sulfates…" style="width:100%">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Scalp Condition</label>
+          <select class="form-input date-input" id="clientScalp" style="width:100%">
+            <option value="">Select…</option>
+            <option value="Normal">Normal</option>
+            <option value="Dry">Dry</option>
+            <option value="Oily">Oily</option>
+            <option value="Sensitive">Sensitive</option>
+            <option value="Psoriasis">Psoriasis</option>
+            <option value="Dandruff">Dandruff</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div><label class="form-label" style="margin-bottom:6px;display:block;">Style Preference</label>
+          <select class="form-input date-input" id="clientStylePref" style="width:100%">
+            <option value="">Select…</option>
+            <option value="Prefers chatty conversation">Chatty</option>
+            <option value="Prefers quiet appointments">Quiet</option>
+            <option value="No preference">No preference</option>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group" style="margin-bottom:20px;">
-      <label class="form-label" style="margin-bottom:6px;display:block;">Notes</label>
-      <textarea class="form-input date-input" id="clientNotes" rows="5"
-        placeholder="e.g. Prefers balayage, allergic to ammonia-based dye, likes to go darker in winter, has 3c curls, always books 2hrs for color…"
-        style="width:100%;resize:vertical;font-family:'DM Sans',sans-serif;"></textarea>
-    </div>
-
-    <div class="modal-actions">
+    <div class="modal-actions" style="margin-top:20px;">
       <button class="btn btn-ghost" onclick="closeClientModal()">Cancel</button>
       <button class="btn btn-primary" id="saveClientBtn" onclick="saveClient()">Save Client</button>
     </div>
@@ -1093,13 +1186,16 @@ function renderClientsTable() {
     row.className = 'client-row';
     const initials = c.name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
     const contact = [c.email, c.phone].filter(Boolean).join(' · ');
+    const hairInfo = [c.hair_type, c.natural_color].filter(Boolean).join(' · ');
     const lastVisit = c.last_visited ? 'Last visit ' + formatDate(c.last_visited) : 'No visits yet';
     row.innerHTML = `
       <div class="client-avatar">${initials}</div>
       <div class="client-info">
         <div class="client-name">${c.name}</div>
         <div class="client-contact">${contact || 'No contact info'}</div>
-        ${c.notes ? `<div class="client-notes-preview">${c.notes}</div>` : ''}
+        ${hairInfo ? `<div class="client-notes-preview">💇 ${hairInfo}</div>` : ''}
+        ${c.allergies ? `<div class="client-notes-preview" style="color:#c0392b;">⚠️ ${c.allergies}</div>` : ''}
+        ${c.notes && !hairInfo ? `<div class="client-notes-preview">${c.notes}</div>` : ''}
       </div>
       <div class="client-meta">
         <span class="client-visits">${c.visit_count || 0} visit${c.visit_count !== 1 ? 's' : ''}</span>
@@ -1115,13 +1211,23 @@ function renderClientsTable() {
 }
 
 // ── CLIENT MODAL ──────────────────────────────────────────
+function switchClientTab(n) {
+  document.getElementById('clientTabContent1').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('clientTabContent2').style.display = n === 2 ? 'block' : 'none';
+  document.getElementById('clientTab1').classList.toggle('active', n === 1);
+  document.getElementById('clientTab2').classList.toggle('active', n === 2);
+}
+
 function openAddClientModal() {
   editingClientId = null;
+  switchClientTab(1);
   document.getElementById('clientModalTitle').textContent = 'Add Client';
-  document.getElementById('clientName').value = '';
-  document.getElementById('clientPhone').value = '';
-  document.getElementById('clientEmail').value = '';
-  document.getElementById('clientNotes').value = '';
+  ['clientName','clientPhone','clientEmail','clientNotes','clientCurrentColor','clientColorFormula','clientAllergies'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  ['clientBirthday','clientReferral','clientHairType','clientHairTexture','clientNaturalColor','clientScalp','clientStylePref'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
   document.getElementById('saveClientBtn').textContent = 'Add Client';
   document.getElementById('clientModalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('clientName').focus(), 100);
@@ -1131,11 +1237,23 @@ function openEditClientModal(id) {
   const c = clients.find(x => x.id === id);
   if (!c) return;
   editingClientId = id;
+  switchClientTab(1);
   document.getElementById('clientModalTitle').textContent = c.name;
   document.getElementById('clientName').value = c.name || '';
   document.getElementById('clientPhone').value = c.phone || '';
   document.getElementById('clientEmail').value = c.email || '';
   document.getElementById('clientNotes').value = c.notes || '';
+  document.getElementById('clientBirthday').value = c.birthday || '';
+  document.getElementById('clientReferral').value = c.referral_source || '';
+  // Hair profile tab
+  document.getElementById('clientHairType').value = c.hair_type || '';
+  document.getElementById('clientHairTexture').value = c.hair_texture || '';
+  document.getElementById('clientNaturalColor').value = c.natural_color || '';
+  document.getElementById('clientCurrentColor').value = c.current_color || '';
+  document.getElementById('clientColorFormula').value = c.color_formula || '';
+  document.getElementById('clientAllergies').value = c.allergies || '';
+  document.getElementById('clientScalp').value = c.scalp_condition || '';
+  document.getElementById('clientStylePref').value = c.style_preference || '';
   document.getElementById('saveClientBtn').textContent = 'Save Changes';
   document.getElementById('clientModalOverlay').classList.add('open');
 }
@@ -1159,6 +1277,16 @@ async function saveClient() {
     phone: document.getElementById('clientPhone').value.trim() || null,
     email: document.getElementById('clientEmail').value.trim() || null,
     notes: document.getElementById('clientNotes').value.trim() || null,
+    birthday: document.getElementById('clientBirthday').value || null,
+    referral_source: document.getElementById('clientReferral').value || null,
+    hair_type: document.getElementById('clientHairType').value || null,
+    hair_texture: document.getElementById('clientHairTexture').value || null,
+    natural_color: document.getElementById('clientNaturalColor').value || null,
+    current_color: document.getElementById('clientCurrentColor').value.trim() || null,
+    color_formula: document.getElementById('clientColorFormula').value.trim() || null,
+    allergies: document.getElementById('clientAllergies').value.trim() || null,
+    scalp_condition: document.getElementById('clientScalp').value || null,
+    style_preference: document.getElementById('clientStylePref').value || null,
     updated_at: new Date().toISOString()
   };
 
