@@ -324,6 +324,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     <!-- ALL APPOINTMENTS -->
     <div class="page-section" id="page-appointments">
 
+      <!-- NEW BOOKING BUTTON -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button class="btn btn-primary" onclick="openBookForClientModal()">+ New Booking</button>
+      </div>
+
       <!-- FILTER + SEARCH BAR -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
         <input type="text" id="apptSearch" placeholder="Search by name, service…" oninput="filterAppointments()"
@@ -581,6 +586,83 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" id="confirmSlotBtn" onclick="confirmAddSlots()">Add Slots</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOOK FOR CLIENT MODAL -->
+<div class="modal-overlay" id="bookForClientOverlay" onclick="if(event.target===this)closeBookForClientModal()">
+  <div class="modal" style="width:500px;max-height:90vh;overflow-y:auto;">
+    <h3>New Booking</h3>
+    <p style="font-size:0.83rem;color:var(--ink-light);margin-bottom:20px;">Book an appointment on behalf of a client.</p>
+
+    <!-- CLIENT SELECTION -->
+    <div style="margin-bottom:16px;">
+      <label class="form-label" style="margin-bottom:6px;display:block;">Client</label>
+      <div style="position:relative;">
+        <input class="form-input date-input" id="bookClientSearch" placeholder="Search existing clients by name…"
+          oninput="searchClientsForBooking(this.value)" autocomplete="off" style="width:100%;">
+        <div id="bookClientDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);z-index:100;max-height:180px;overflow-y:auto;margin-top:4px;"></div>
+      </div>
+      <div id="bookClientSelected" style="display:none;background:var(--sage-pale);border:1px solid rgba(94,122,100,0.3);border-radius:9px;padding:10px 14px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div id="bookClientName" style="font-weight:600;font-size:0.85rem;color:var(--ink);"></div>
+          <div id="bookClientContact" style="font-size:0.72rem;color:var(--ink-light);margin-top:2px;"></div>
+        </div>
+        <button onclick="clearBookingClient()" style="background:none;border:none;cursor:pointer;color:var(--ink-light);font-size:16px;">✕</button>
+      </div>
+    </div>
+
+    <!-- OR NEW CLIENT INLINE -->
+    <div id="bookNewClientSection">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="font-size:0.72rem;color:var(--ink-light);white-space:nowrap;">or enter new client</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div><label class="form-label" style="margin-bottom:4px;display:block;">Name</label>
+          <input class="form-input date-input" id="bookNewName" placeholder="Client name" style="width:100%;font-size:0.82rem;padding:8px 12px;"></div>
+        <div><label class="form-label" style="margin-bottom:4px;display:block;">Phone</label>
+          <input class="form-input date-input" id="bookNewPhone" placeholder="615-555-0100" style="width:100%;font-size:0.82rem;padding:8px 12px;"></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label class="form-label" style="margin-bottom:4px;display:block;">Email</label>
+        <input class="form-input date-input" id="bookNewEmail" placeholder="client@email.com" style="width:100%;font-size:0.82rem;padding:8px 12px;">
+      </div>
+    </div>
+
+    <!-- SERVICE -->
+    <div style="margin-bottom:14px;">
+      <label class="form-label" style="margin-bottom:6px;display:block;">Service</label>
+      <select class="form-input date-input" id="bookService" style="width:100%">
+        <option value="">Select a service…</option>
+      </select>
+    </div>
+
+    <!-- DATE + TIME -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div>
+        <label class="form-label" style="margin-bottom:6px;display:block;">Date</label>
+        <input type="date" class="date-input" id="bookDate" style="width:100%;" oninput="updateBookingTimes()">
+      </div>
+      <div>
+        <label class="form-label" style="margin-bottom:6px;display:block;">Time</label>
+        <select class="date-input" id="bookTime" style="width:100%">
+          <option value="">Select date first…</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div style="margin-bottom:20px;">
+      <label class="form-label" style="margin-bottom:6px;display:block;">Appointment Notes <span style="font-weight:300;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <input class="form-input date-input" id="bookNotes" placeholder="Any special requests or notes…" style="width:100%;">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeBookForClientModal()">Cancel</button>
+      <button class="btn btn-primary" id="confirmBookBtn" onclick="confirmBookForClient()">Confirm Booking</button>
     </div>
   </div>
 </div>
@@ -1135,6 +1217,212 @@ async function bulkDelete() {
 }
 
 // ── AVAILABILITY UI ───────────────────────────────────────
+// ── BOOK FOR CLIENT ──────────────────────────────────────
+let bookingSelectedClient = null;
+
+function openBookForClientModal(clientId = null) {
+  bookingSelectedClient = null;
+  clearBookingClient();
+  document.getElementById('bookNewName').value = '';
+  document.getElementById('bookNewPhone').value = '';
+  document.getElementById('bookNewEmail').value = '';
+  document.getElementById('bookNotes').value = '';
+  document.getElementById('bookDate').value = '';
+  document.getElementById('bookDate').min = new Date().toISOString().split('T')[0];
+  document.getElementById('bookTime').innerHTML = '<option value="">Select date first…</option>';
+
+  // Populate service dropdown
+  const svcSel = document.getElementById('bookService');
+  svcSel.innerHTML = '<option value="">Select a service…</option>';
+  stylistServices.filter(s => s.is_active).forEach(s => {
+    const dur = s.duration_minutes >= 60
+      ? Math.floor(s.duration_minutes/60)+'hr'+(s.duration_minutes%60 ? s.duration_minutes%60+'min':'')
+      : s.duration_minutes+'min';
+    const price = s.price_cents ? ' — $'+(s.price_cents/100).toFixed(0) : '';
+    const opt = document.createElement('option');
+    opt.value = s.name;
+    opt.textContent = s.name + ' (' + dur + price + ')';
+    svcSel.appendChild(opt);
+  });
+
+  // Pre-select client if coming from client row
+  if (clientId) {
+    const c = clients.find(x => x.id === clientId);
+    if (c) selectBookingClient(c);
+  }
+
+  document.getElementById('bookForClientOverlay').classList.add('open');
+}
+
+function closeBookForClientModal() {
+  document.getElementById('bookForClientOverlay').classList.remove('open');
+  bookingSelectedClient = null;
+}
+
+function searchClientsForBooking(q) {
+  const dropdown = document.getElementById('bookClientDropdown');
+  if (!q.trim()) { dropdown.style.display = 'none'; return; }
+
+  const matches = clients.filter(c =>
+    c.name.toLowerCase().includes(q.toLowerCase()) ||
+    (c.phone || '').includes(q) ||
+    (c.email || '').toLowerCase().includes(q.toLowerCase())
+  ).slice(0, 6);
+
+  if (!matches.length) { dropdown.style.display = 'none'; return; }
+
+  dropdown.innerHTML = '';
+  matches.forEach(c => {
+    const item = document.createElement('div');
+    item.style.cssText = 'padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:0.82rem;';
+    item.innerHTML = `<div style="font-weight:500;">${c.name}</div><div style="font-size:0.72rem;color:var(--ink-light);">${[c.phone,c.email].filter(Boolean).join(' · ')}</div>`;
+    item.onmouseover = () => item.style.background = 'var(--cream)';
+    item.onmouseout = () => item.style.background = '#fff';
+    item.onclick = () => selectBookingClient(c);
+    dropdown.appendChild(item);
+  });
+  dropdown.style.display = 'block';
+}
+
+function selectBookingClient(c) {
+  bookingSelectedClient = c;
+  document.getElementById('bookClientSearch').value = '';
+  document.getElementById('bookClientDropdown').style.display = 'none';
+  document.getElementById('bookClientSelected').style.display = 'flex';
+  document.getElementById('bookClientName').textContent = c.name;
+  document.getElementById('bookClientContact').textContent = [c.phone, c.email].filter(Boolean).join(' · ');
+  // Hide new client fields when existing client selected
+  document.getElementById('bookNewClientSection').style.display = 'none';
+  document.getElementById('bookNewName').value = '';
+  document.getElementById('bookNewPhone').value = '';
+  document.getElementById('bookNewEmail').value = '';
+}
+
+function clearBookingClient() {
+  bookingSelectedClient = null;
+  document.getElementById('bookClientSelected').style.display = 'none';
+  document.getElementById('bookNewClientSection').style.display = 'block';
+  document.getElementById('bookClientSearch').value = '';
+  document.getElementById('bookClientDropdown').style.display = 'none';
+}
+
+function updateBookingTimes() {
+  const dateStr = document.getElementById('bookDate').value;
+  const timeSel = document.getElementById('bookTime');
+  timeSel.innerHTML = '<option value="">Loading…</option>';
+
+  const slots = availability.filter(a => a.date === dateStr && !a.is_booked);
+  if (!slots.length) {
+    timeSel.innerHTML = '<option value="">No open slots on this date</option>';
+    return;
+  }
+  timeSel.innerHTML = '<option value="">Select a time…</option>';
+  slots.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.time;
+    opt.dataset.time = s.time;
+    timeSel.appendChild(opt);
+  });
+}
+
+async function confirmBookForClient() {
+  const btn = document.getElementById('confirmBookBtn');
+  const service = document.getElementById('bookService').value;
+  const dateStr = document.getElementById('bookDate').value;
+  const slotOption = document.getElementById('bookTime');
+  const slotId = slotOption.value;
+  const slotTime = slotOption.options[slotOption.selectedIndex]?.dataset.time;
+
+  if (!dateStr) { showToast('⚠️ Please select a date'); return; }
+  if (!slotId) { showToast('⚠️ Please select a time'); return; }
+
+  // Determine customer info
+  let customerName, customerPhone, customerEmail, clientId;
+  if (bookingSelectedClient) {
+    customerName = bookingSelectedClient.name;
+    customerPhone = bookingSelectedClient.phone;
+    customerEmail = bookingSelectedClient.email;
+    clientId = bookingSelectedClient.id;
+  } else {
+    customerName = document.getElementById('bookNewName').value.trim();
+    customerPhone = document.getElementById('bookNewPhone').value.trim();
+    customerEmail = document.getElementById('bookNewEmail').value.trim();
+    if (!customerName) { showToast('⚠️ Please enter a client name'); return; }
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Booking…';
+
+  try {
+    // Create appointment
+    const { error: apptErr } = await supabaseClient.from('appointments').insert({
+      stylist_id: stylist.id,
+      availability_id: slotId,
+      customer_name: customerName,
+      customer_phone: customerPhone || null,
+      customer_email: customerEmail || null,
+      service: service || null,
+      date: dateStr,
+      time: slotTime,
+      status: 'confirmed',
+      reminder_sent: false,
+      notes: document.getElementById('bookNotes').value.trim() || null
+    });
+
+    if (apptErr) throw apptErr;
+
+    // Mark slot as booked
+    await supabaseClient.from('availability').update({ is_booked: true }).eq('id', slotId);
+
+    // Create/update client record if new
+    if (!bookingSelectedClient && customerName) {
+      const { data: existingClient } = await supabaseClient
+        .from('clients').select('id,visit_count').eq('stylist_id', stylist.id)
+        .ilike('name', customerName).maybeSingle();
+
+      if (existingClient) {
+        await supabaseClient.from('clients').update({
+          visit_count: (existingClient.visit_count || 0) + 1,
+          last_visited: dateStr,
+          phone: customerPhone || null,
+          email: customerEmail || null
+        }).eq('id', existingClient.id);
+      } else {
+        await supabaseClient.from('clients').insert({
+          stylist_id: stylist.id,
+          name: customerName,
+          phone: customerPhone || null,
+          email: customerEmail || null,
+          visit_count: 1,
+          last_visited: dateStr
+        });
+      }
+    } else if (bookingSelectedClient) {
+      await supabaseClient.from('clients').update({
+        visit_count: (bookingSelectedClient.visit_count || 0) + 1,
+        last_visited: dateStr
+      }).eq('id', bookingSelectedClient.id);
+    }
+
+    // Reload data
+    await Promise.all([loadAppointments(), loadAvailability(), loadClients()]);
+    filteredAppointments = [...appointments];
+    renderStats();
+    renderTodayAppointments();
+    renderAllAppointments();
+
+    closeBookForClientModal();
+    showToast('✅ Booking confirmed for ' + customerName);
+
+  } catch(err) {
+    showToast('⚠️ Error: ' + err.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Confirm Booking';
+}
+
 // ── CLIENTS ──────────────────────────────────────────────
 let clients = [];
 let filteredClients = [];
@@ -1201,6 +1489,7 @@ function renderClientsTable() {
         <span class="client-visits">${c.visit_count || 0} visit${c.visit_count !== 1 ? 's' : ''}</span>
         <span class="client-last">${lastVisit}</span>
         <div style="display:flex;gap:6px;margin-top:4px;">
+          <button class="appt-action-btn primary" style="background:var(--rust);color:#fff;border-color:var(--rust);" onclick="event.stopPropagation();openBookForClientModal('${c.id}')">Book</button>
           <button class="appt-action-btn" onclick="event.stopPropagation();openEditClientModal('${c.id}')">Edit</button>
           <button class="appt-action-btn danger" onclick="event.stopPropagation();deleteClient('${c.id}','${c.name.replace(/'/g,"\'")}')">Delete</button>
         </div>
