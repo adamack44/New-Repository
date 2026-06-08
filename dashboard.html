@@ -157,6 +157,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
 /* TOAST */
+/* BRANDING */
+.theme-preset-btn { display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 14px;border:2px solid var(--border);border-radius:12px;background:var(--cream);cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;font-size:0.72rem;color:var(--ink-light); }
+.theme-preset-btn:hover { border-color:var(--rust);color:var(--ink); }
+.theme-preset-btn.active { border-color:var(--rust);background:var(--rust-pale);color:var(--rust);font-weight:600; }
+
 /* CLIENTS TABLE */
 .client-row { display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid rgba(224,204,184,0.4);cursor:pointer;transition:background 0.12s; }
 .client-row:last-child { border-bottom:none; }
@@ -476,6 +481,96 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
           <div style="display:flex;gap:10px;justify-content:flex-end;">
             <button class="btn btn-ghost" onclick="loadProfile()">Discard</button>
             <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Page Branding -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-head"><h2>Booking Page Branding</h2></div>
+        <div class="card-body">
+
+          <!-- LOGO UPLOAD -->
+          <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border);">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">Salon Logo</div>
+            <div style="display:flex;align-items:center;gap:20px;">
+              <div id="brandLogoPreview" style="width:80px;height:80px;border-radius:12px;border:2px dashed var(--border);background:var(--cream);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                <span id="brandLogoPlaceholder" style="font-size:24px;">🖼️</span>
+                <img id="brandLogoImg" style="width:100%;height:100%;object-fit:contain;display:none;" src="" alt="Logo">
+              </div>
+              <div>
+                <div style="font-size:0.78rem;color:var(--ink-light);font-weight:300;margin-bottom:10px;">Shown on your booking page and emails. Works best with a transparent background PNG.</div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <label style="padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);font-size:0.78rem;font-weight:500;color:var(--ink);cursor:pointer;" onmouseover="this.style.borderColor='var(--rust)'" onmouseout="this.style.borderColor='var(--border)'">
+                    📷 Upload Logo
+                    <input type="file" id="brandLogoUpload" accept="image/*" style="display:none;" onchange="handleBrandLogoUpload(this)">
+                  </label>
+                  <button id="removeBrandLogoBtn" class="btn btn-ghost" style="font-size:0.78rem;display:none;" onclick="removeBrandLogo()">Remove</button>
+                </div>
+                <div id="brandLogoStatus" style="font-size:0.72rem;margin-top:6px;color:var(--ink-light);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- THEME PRESETS -->
+          <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border);">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">Color Theme</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;" id="themePresets">
+              <button class="theme-preset-btn" data-theme="classic" onclick="selectTheme('classic',this)" title="Classic Terracotta">
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c4714a,#5c4033);"></div>
+                <span>Classic</span>
+              </button>
+              <button class="theme-preset-btn" data-theme="rose" onclick="selectTheme('rose',this)" title="Rose Gold">
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c4796e,#8b3a3a);"></div>
+                <span>Rose</span>
+              </button>
+              <button class="theme-preset-btn" data-theme="sage" onclick="selectTheme('sage',this)" title="Sage Green">
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6b9e7a,#2d5a3d);"></div>
+                <span>Sage</span>
+              </button>
+              <button class="theme-preset-btn" data-theme="midnight" onclick="selectTheme('midnight',this)" title="Midnight">
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5b6abf,#1a1f4a);"></div>
+                <span>Midnight</span>
+              </button>
+              <button class="theme-preset-btn" data-theme="gold" onclick="selectTheme('gold',this)" title="Gold Glam">
+                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c9a84c,#7a5c10);"></div>
+                <span>Gold</span>
+              </button>
+              <button class="theme-preset-btn" data-theme="custom" onclick="selectTheme('custom',this)" title="Custom Color">
+                <div style="width:32px;height:32px;border-radius:50%;background:conic-gradient(red,yellow,green,blue,red);"></div>
+                <span>Custom</span>
+              </button>
+            </div>
+            <div id="customColorRow" style="display:none;align-items:center;gap:12px;">
+              <label class="form-label" style="margin:0;">Accent Color</label>
+              <input type="color" id="brandAccentColor" value="#c4714a"
+                style="width:44px;height:36px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;padding:2px;">
+              <input type="text" id="brandAccentHex" placeholder="#c4714a"
+                style="width:100px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;"
+                oninput="syncColorFromHex(this.value)">
+              <span style="font-size:0.78rem;color:var(--ink-light);">Enter any hex color</span>
+            </div>
+          </div>
+
+          <!-- PREVIEW -->
+          <div>
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:12px;">Preview</div>
+            <div id="brandPreview" style="border-radius:12px;overflow:hidden;border:1px solid var(--border);">
+              <div id="previewHeader" style="padding:20px 24px;display:flex;align-items:center;gap:14px;">
+                <div id="previewAvatar" style="width:52px;height:52px;border-radius:10px;background:#c4714a;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;overflow:hidden;flex-shrink:0;"></div>
+                <div>
+                  <div id="previewName" style="font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:400;"></div>
+                  <div style="font-size:0.75rem;opacity:0.7;margin-top:2px;">Independent Hair Stylist</div>
+                </div>
+              </div>
+              <div style="padding:14px 24px;background:#fff;">
+                <div id="previewBtn" style="display:inline-block;padding:10px 20px;border-radius:8px;color:#fff;font-size:0.82rem;font-weight:500;">Book Appointment</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+            <button class="btn btn-primary" onclick="saveBranding()">Save Branding</button>
           </div>
         </div>
       </div>
@@ -907,6 +1002,7 @@ window.addEventListener('load', async () => {
 
   await loadStylistProfile(user);
   await Promise.all([loadAppointments(), loadAvailability(), loadServices(), loadClients()]);
+  loadBranding();
 
   document.getElementById('topbarDate').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
@@ -1223,6 +1319,170 @@ async function bulkDelete() {
 }
 
 // ── AVAILABILITY UI ───────────────────────────────────────
+// ── BRANDING ─────────────────────────────────────────────
+const THEMES = {
+  classic:  { accent:'#c4714a', bg:'linear-gradient(180deg,#f5ede4 0%,#eedfd2 100%)', header:'linear-gradient(135deg,#c4714a 0%,#5c4033 100%)' },
+  rose:     { accent:'#c4796e', bg:'linear-gradient(180deg,#fdf0ef 0%,#f5dedd 100%)', header:'linear-gradient(135deg,#c4796e 0%,#8b3a3a 100%)' },
+  sage:     { accent:'#6b9e7a', bg:'linear-gradient(180deg,#eef5f0 0%,#dceee2 100%)', header:'linear-gradient(135deg,#6b9e7a 0%,#2d5a3d 100%)' },
+  midnight: { accent:'#5b6abf', bg:'linear-gradient(180deg,#eef0fa 0%,#dde1f5 100%)', header:'linear-gradient(135deg,#5b6abf 0%,#1a1f4a 100%)' },
+  gold:     { accent:'#c9a84c', bg:'linear-gradient(180deg,#fdf5e4 0%,#f5e8c8 100%)', header:'linear-gradient(135deg,#c9a84c 0%,#7a5c10 100%)' },
+  custom:   { accent:'#c4714a', bg:'linear-gradient(180deg,#f5ede4 0%,#eedfd2 100%)', header:'linear-gradient(135deg,#c4714a 0%,#5c4033 100%)' },
+};
+
+let currentTheme = 'classic';
+let currentAccent = '#c4714a';
+
+function loadBranding() {
+  if (!stylist) return;
+  currentTheme = stylist.brand_theme || 'classic';
+  currentAccent = stylist.brand_accent || '#c4714a';
+
+  // Set active theme button
+  document.querySelectorAll('.theme-preset-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === currentTheme);
+  });
+
+  // Show custom color row if custom
+  const customRow = document.getElementById('customColorRow');
+  if (customRow) customRow.style.display = currentTheme === 'custom' ? 'flex' : 'none';
+
+  // Set color picker value
+  const colorPicker = document.getElementById('brandAccentColor');
+  const hexInput = document.getElementById('brandAccentHex');
+  if (colorPicker) colorPicker.value = currentAccent;
+  if (hexInput) hexInput.value = currentAccent;
+
+  // Logo
+  if (stylist.brand_logo_url) {
+    document.getElementById('brandLogoImg').src = stylist.brand_logo_url;
+    document.getElementById('brandLogoImg').style.display = 'block';
+    document.getElementById('brandLogoPlaceholder').style.display = 'none';
+    document.getElementById('removeBrandLogoBtn').style.display = 'inline-block';
+  }
+
+  updateBrandPreview();
+}
+
+function selectTheme(theme, btn) {
+  currentTheme = theme;
+  document.querySelectorAll('.theme-preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const customRow = document.getElementById('customColorRow');
+  if (customRow) customRow.style.display = theme === 'custom' ? 'flex' : 'none';
+  if (theme !== 'custom') currentAccent = THEMES[theme]?.accent || '#c4714a';
+  updateBrandPreview();
+}
+
+function syncColorFromHex(val) {
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+    currentAccent = val;
+    document.getElementById('brandAccentColor').value = val;
+    THEMES.custom.accent = val;
+    THEMES.custom.header = 'linear-gradient(135deg,' + val + ' 0%,' + shadeColor(val, -40) + ' 100%)';
+    updateBrandPreview();
+  }
+}
+
+document.getElementById('brandAccentColor')?.addEventListener('input', function() {
+  currentAccent = this.value;
+  document.getElementById('brandAccentHex').value = this.value;
+  THEMES.custom.accent = this.value;
+  THEMES.custom.header = 'linear-gradient(135deg,' + this.value + ' 0%,' + shadeColor(this.value, -40) + ' 100%)';
+  updateBrandPreview();
+});
+
+function shadeColor(hex, percent) {
+  const num = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, Math.max(0, (num >> 16) + percent));
+  const g = Math.min(255, Math.max(0, (num >> 8 & 0xff) + percent));
+  const b = Math.min(255, Math.max(0, (num & 0xff) + percent));
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+function updateBrandPreview() {
+  const theme = THEMES[currentTheme] || THEMES.classic;
+  const accent = currentTheme === 'custom' ? currentAccent : theme.accent;
+
+  const header = document.getElementById('previewHeader');
+  const avatar = document.getElementById('previewAvatar');
+  const btn = document.getElementById('previewBtn');
+  const nameEl = document.getElementById('previewName');
+  const preview = document.getElementById('brandPreview');
+
+  if (!header) return;
+
+  preview.style.background = theme.bg;
+  header.style.background = theme.header;
+  header.style.color = '#fff';
+  nameEl.style.color = '#fff';
+  nameEl.textContent = stylist?.name || 'Your Name';
+
+  // Show logo or initial in preview
+  if (stylist?.brand_logo_url) {
+    avatar.innerHTML = '<img src="' + stylist.brand_logo_url + '" style="width:100%;height:100%;object-fit:contain;">';
+    avatar.style.background = 'rgba(255,255,255,0.15)';
+    avatar.style.padding = '6px';
+  } else if (stylist?.photo_url) {
+    avatar.innerHTML = '<img src="' + stylist.photo_url + '" style="width:100%;height:100%;object-fit:cover;">';
+    avatar.style.background = accent;
+    avatar.style.padding = '0';
+  } else {
+    avatar.innerHTML = stylist?.name?.[0] || '✂';
+    avatar.style.background = accent;
+    avatar.style.padding = '0';
+  }
+
+  btn.style.background = accent;
+}
+
+async function handleBrandLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('⚠️ Logo must be under 5MB'); return; }
+  const status = document.getElementById('brandLogoStatus');
+  status.textContent = 'Uploading…';
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const ext = file.name.split('.').pop();
+    const path = user.id + '/brand-logo.' + ext;
+    const { error: upErr } = await supabaseClient.storage.from('stylist-photos').upload(path, file, { upsert: true });
+    if (upErr) throw upErr;
+    const { data: urlData } = supabaseClient.storage.from('stylist-photos').getPublicUrl(path);
+    const logoUrl = urlData.publicUrl + '?t=' + Date.now();
+    await supabaseClient.from('stylists').update({ brand_logo_url: logoUrl }).eq('id', stylist.id);
+    stylist.brand_logo_url = logoUrl;
+    document.getElementById('brandLogoImg').src = logoUrl;
+    document.getElementById('brandLogoImg').style.display = 'block';
+    document.getElementById('brandLogoPlaceholder').style.display = 'none';
+    document.getElementById('removeBrandLogoBtn').style.display = 'inline-block';
+    status.textContent = '✅ Logo uploaded!';
+    setTimeout(() => status.textContent = '', 3000);
+    updateBrandPreview();
+  } catch(err) { status.textContent = '⚠️ Upload failed: ' + err.message; }
+}
+
+async function removeBrandLogo() {
+  await supabaseClient.from('stylists').update({ brand_logo_url: null }).eq('id', stylist.id);
+  stylist.brand_logo_url = null;
+  document.getElementById('brandLogoImg').style.display = 'none';
+  document.getElementById('brandLogoPlaceholder').style.display = 'block';
+  document.getElementById('removeBrandLogoBtn').style.display = 'none';
+  updateBrandPreview();
+  showToast('🗑️ Logo removed');
+}
+
+async function saveBranding() {
+  const accent = currentTheme === 'custom' ? currentAccent : (THEMES[currentTheme]?.accent || '#c4714a');
+  const { error } = await supabaseClient.from('stylists').update({
+    brand_theme: currentTheme,
+    brand_accent: accent
+  }).eq('id', stylist.id);
+  if (error) { showToast('⚠️ Could not save branding: ' + error.message); return; }
+  stylist.brand_theme = currentTheme;
+  stylist.brand_accent = accent;
+  showToast('✅ Branding saved!');
+}
+
 // ── BOOK FOR CLIENT ──────────────────────────────────────
 let bookingSelectedClient = null;
 
@@ -2356,7 +2616,7 @@ function showPage(id, el) {
   if (id === 'availability') { if (!stylistServices.length) loadServices().then(renderAvailability); else renderAvailability(); }
   if (id === 'appointments') renderAllAppointments();
   if (id === 'clients') loadClients();
-  if (id === 'profile') loadServices();
+  if (id === 'profile') { loadServices(); loadBranding(); }
 }
 
 // ── CALENDAR ──────────────────────────────────────────────
