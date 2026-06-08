@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -215,11 +215,6 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 <div id="loadingScreen"><div class="spinner"></div><p>Loading booking page…</p></div>
 
 <div class="hero">
-  <!-- Brand logo in top-right of hero if set -->
-  <div id="heroBrandLogo" style="display:none;position:absolute;top:20px;right:32px;z-index:2;">
-    <img id="heroBrandLogoImg" src="" alt="" style="height:64px;max-width:160px;object-fit:contain;">
-  </div>
-
   <div class="hero-inner">
     <div class="stylist-avatar" id="heroInitial"><img src="/logo.png" style="width:80%;height:80%;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt=""></div>
     <div class="hero-text">
@@ -436,15 +431,7 @@ function applyBranding() {
   document.head.appendChild(style);
 
   // Apply brand logo if set
-  // Show brand logo in hero banner
-  if (stylist.brand_logo_url) {
-    const logoBanner = document.getElementById('heroBrandLogo');
-    const logoImg = document.getElementById('heroBrandLogoImg');
-    if (logoBanner && logoImg) {
-      logoImg.src = stylist.brand_logo_url;
-      logoBanner.style.display = 'block';
-    }
-  }
+  // Hero image handled in renderHero (logo > photo > initial)
 }
 
 function lightenColor(hex, amount) {
@@ -463,12 +450,21 @@ function darkenColor(hex, amount) {
 function renderHero() {
   if (!stylist) return;
 
-  // Photo or initial
-  if (stylist.photo_url) {
-    document.getElementById('heroInitial').innerHTML =
-      `<img src="${stylist.photo_url}" style="width:192px;height:192px;object-fit:cover;object-position:center top;border-radius:16px;display:block;" alt="${stylist.name}">`;
+  // Brand logo takes priority — otherwise use profile photo — otherwise initial
+  const heroEl = document.getElementById('heroInitial');
+  if (stylist.brand_logo_url) {
+    heroEl.style.background = 'transparent';
+    heroEl.style.border = 'none';
+    heroEl.style.boxShadow = 'none';
+    heroEl.style.width = '200px';
+    heroEl.style.height = '200px';
+    heroEl.innerHTML = `<img src="${stylist.brand_logo_url}" style="width:200px;height:200px;object-fit:contain;display:block;" alt="${stylist.name}">`;
+  } else if (stylist.photo_url) {
+    heroEl.style.width = '192px';
+    heroEl.style.height = '192px';
+    heroEl.innerHTML = `<img src="${stylist.photo_url}" style="width:192px;height:192px;object-fit:cover;object-position:center top;border-radius:16px;display:block;" alt="${stylist.name}">`;
   } else {
-    document.getElementById('heroInitial').textContent = stylist.name[0];
+    heroEl.textContent = stylist.name[0];
   }
 
   document.getElementById('heroName').textContent = stylist.name;
