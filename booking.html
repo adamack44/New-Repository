@@ -651,6 +651,9 @@ function buildSystemPrompt() {
   const bioPart = stylist.bio ? 'ABOUT ' + stylistName.toUpperCase() + ': ' + stylist.bio + '\n\n' : '';
   const dateStr2 = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
 
+  // Look up returning client notes
+  const clientNote = window._clientNote || '';
+
   return 'You are a warm, professional booking assistant for ' + stylistName + ', an independent hairstylist' + salonPart + '.\n\n' +
     'TODAY\'S DATE: ' + dateStr2 + '.\n\n' +
     bioPart +
@@ -694,6 +697,26 @@ async function callClaude(userMessage) {
 }
 
 // ── PROCESS BOOKING CONFIRMATION ─────────────────────────
+async function lookupClientNotes(name, phone, email) {
+  if (!stylist?.id) return;
+  try {
+    let client = null;
+    if (email) {
+      const { data } = await supabaseClient.from('clients').select('notes,visit_count').eq('stylist_id', stylist.id).ilike('email', email).maybeSingle();
+      client = data;
+    }
+    if (!client && phone) {
+      const digits = phone.replace(/\D/g,'').slice(-10);
+      const { data } = await supabaseClient.from('clients').select('notes,visit_count').eq('stylist_id', stylist.id).ilike('phone', '%' + digits + '%').maybeSingle();
+      client = data;
+    }
+    if (client?.notes) {
+      window._clientNote = client.notes;
+      if (client.visit_count > 0) window._clientNote += ` (returning client, ${client.visit_count} previous visit${client.visit_count !== 1 ? 's' : ''})`;
+    }
+  } catch(e) { console.error('Client lookup error:', e); }
+}
+
 async function processBookingIfConfirmed(reply) {
   if (!reply.includes('BOOKING_CONFIRMED:')) return;
   try {
@@ -880,6 +903,14 @@ async function sendMessage() {
   btn.disabled = true;
   appendMessage('user', text);
   showTyping();
+  // Try to extract phone/email from message and look up client notes
+  if (!window._clientNote) {
+    const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    const phoneMatch = text.match(/[\d\s\-().+]{10,}/);
+    if (emailMatch || phoneMatch) {
+      await lookupClientNotes('', phoneMatch?.[0] || '', emailMatch?.[0] || '');
+    }
+  }
 
   try {
     const reply = await callClaude(text);
