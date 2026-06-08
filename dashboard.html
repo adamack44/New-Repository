@@ -1085,10 +1085,10 @@ function renderClientsTable() {
   if (countEl) countEl.textContent = filteredClients.length + ' client' + (filteredClients.length !== 1 ? 's' : '');
 
   if (!filteredClients.length) {
-    el.innerHTML = `<div class="empty-state" style="padding:40px;">
-      <p style="margin-bottom:14px;">${clients.length ? 'No clients match your search' : 'No clients yet — they'll be added automatically when someone books'}</p>
-      <button class="btn btn-primary" onclick="openAddClientModal()">+ Add Client Manually</button>
-    </div>`;
+    el.innerHTML = '<div class="empty-state" style="padding:40px;">' +
+      '<p style="margin-bottom:14px;">' + (clients.length ? 'No clients match your search' : "No clients yet — they'll be added automatically when someone books") + '</p>' +
+      '<button class="btn btn-primary" onclick="openAddClientModal()">+ Add Client Manually</button>' +
+      '</div>';
     return;
   }
 
