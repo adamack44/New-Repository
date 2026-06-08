@@ -157,6 +157,19 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
 /* TOAST */
+/* CLIENTS TABLE */
+.client-row { display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid rgba(224,204,184,0.4);cursor:pointer;transition:background 0.12s; }
+.client-row:last-child { border-bottom:none; }
+.client-row:hover { background:var(--cream); }
+.client-avatar { width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--rust) 0%,#6b2e10 100%);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;color:var(--cream);flex-shrink:0; }
+.client-info { flex:1;min-width:0; }
+.client-name { font-weight:600;font-size:0.875rem;color:var(--ink); }
+.client-contact { font-size:0.72rem;color:var(--ink-light);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.client-meta { display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0; }
+.client-visits { font-size:0.72rem;color:var(--ink-light); }
+.client-last { font-size:0.72rem;color:var(--ink-light); }
+.client-notes-preview { font-size:0.72rem;color:var(--text-muted,#8a6a56);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px;font-style:italic; }
+
 /* APPOINTMENTS TABLE */
 .appt-table { width: 100%; border-collapse: collapse; }
 .appt-table th { padding: 10px 16px; text-align: left; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink-light); font-weight: 600; border-bottom: 1px solid var(--border); background: var(--cream); }
@@ -246,6 +259,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     <div class="nav-item active" onclick="showPage('overview', this)"><span class="nav-icon">🏠</span> Overview</div>
     <div class="nav-item" onclick="showPage('appointments', this)"><span class="nav-icon">📅</span> Appointments <span class="nav-badge" id="apptBadge">0</span></div>
     <div class="nav-item" onclick="showPage('availability', this)"><span class="nav-icon">🕐</span> Availability</div>
+    <div class="nav-item" onclick="showPage('clients', this)"><span class="nav-icon">👥</span> Clients <span class="nav-badge" id="clientsBadge">0</span></div>
     <div class="nav-item" onclick="showPage('profile', this)"><span class="nav-icon">👤</span> My Profile</div>
   </div>
   <div class="sidebar-footer">
@@ -376,6 +390,26 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
     <!-- PROFILE -->
     <div class="page-section" id="page-profile">
+
+    <!-- CLIENTS PAGE -->
+    <div class="page-section" id="page-clients">
+
+      <!-- Search + Add bar -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <input type="text" id="clientSearch" placeholder="Search clients by name, email, phone…" oninput="filterClients()"
+          style="flex:1;min-width:200px;padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--ink);background:var(--cream);outline:none;">
+        <button class="btn btn-primary" onclick="openAddClientModal()">+ Add Client</button>
+        <span id="clientCount" style="font-size:0.78rem;color:var(--ink-light);white-space:nowrap;"></span>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div id="clientsTable"><div class="empty-state" style="padding:32px;">Loading clients…</div></div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- close page-sections wrapper -->
 
       <!-- Profile info card -->
       <div class="card" style="margin-bottom:20px;">
@@ -556,6 +590,42 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   </div>
 </div>
 
+<!-- ADD/EDIT CLIENT MODAL -->
+<div class="modal-overlay" id="clientModalOverlay" onclick="if(event.target===this)closeClientModal()">
+  <div class="modal" style="width:460px;">
+    <h3 id="clientModalTitle">Add Client</h3>
+    <p style="font-size:0.83rem;color:var(--ink-light);margin-bottom:20px;">Client profiles are created automatically when someone books, or add them manually here.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div class="form-group" style="margin:0;">
+        <label class="form-label" style="margin-bottom:6px;display:block;">Full Name *</label>
+        <input class="form-input date-input" id="clientName" placeholder="e.g. Sarah Johnson" style="width:100%">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label" style="margin-bottom:6px;display:block;">Phone</label>
+        <input class="form-input date-input" id="clientPhone" placeholder="615-555-0100" style="width:100%">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:14px;">
+      <label class="form-label" style="margin-bottom:6px;display:block;">Email</label>
+      <input class="form-input date-input" id="clientEmail" placeholder="client@email.com" style="width:100%">
+    </div>
+
+    <div class="form-group" style="margin-bottom:20px;">
+      <label class="form-label" style="margin-bottom:6px;display:block;">Notes</label>
+      <textarea class="form-input date-input" id="clientNotes" rows="5"
+        placeholder="e.g. Prefers balayage, allergic to ammonia-based dye, likes to go darker in winter, has 3c curls, always books 2hrs for color…"
+        style="width:100%;resize:vertical;font-family:'DM Sans',sans-serif;"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeClientModal()">Cancel</button>
+      <button class="btn btn-primary" id="saveClientBtn" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
 <!-- ADD/EDIT SERVICE MODAL -->
 <div class="modal-overlay" id="serviceModalOverlay" onclick="if(event.target===this)closeServiceModal()">
   <div class="modal add-svc-modal">
@@ -660,7 +730,7 @@ window.addEventListener('load', async () => {
   }
 
   await loadStylistProfile(user);
-  await Promise.all([loadAppointments(), loadAvailability(), loadServices()]);
+  await Promise.all([loadAppointments(), loadAvailability(), loadServices(), loadClients()]);
 
   document.getElementById('topbarDate').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
@@ -977,6 +1047,191 @@ async function bulkDelete() {
 }
 
 // ── AVAILABILITY UI ───────────────────────────────────────
+// ── CLIENTS ──────────────────────────────────────────────
+let clients = [];
+let filteredClients = [];
+let editingClientId = null;
+
+async function loadClients() {
+  if (!stylist) return;
+  const { data, error } = await supabaseClient
+    .from('clients')
+    .select('*')
+    .eq('stylist_id', stylist.id)
+    .order('name');
+  if (!error) {
+    clients = data || [];
+    filteredClients = [...clients];
+  }
+  document.getElementById('clientsBadge').textContent = clients.length;
+  renderClientsTable();
+}
+
+function filterClients() {
+  const q = (document.getElementById('clientSearch')?.value || '').toLowerCase();
+  filteredClients = q
+    ? clients.filter(c =>
+        c.name?.toLowerCase().includes(q) ||
+        c.email?.toLowerCase().includes(q) ||
+        c.phone?.toLowerCase().includes(q) ||
+        c.notes?.toLowerCase().includes(q))
+    : [...clients];
+  renderClientsTable();
+}
+
+function renderClientsTable() {
+  const el = document.getElementById('clientsTable');
+  const countEl = document.getElementById('clientCount');
+  if (countEl) countEl.textContent = filteredClients.length + ' client' + (filteredClients.length !== 1 ? 's' : '');
+
+  if (!filteredClients.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:40px;">
+      <p style="margin-bottom:14px;">${clients.length ? 'No clients match your search' : 'No clients yet — they'll be added automatically when someone books'}</p>
+      <button class="btn btn-primary" onclick="openAddClientModal()">+ Add Client Manually</button>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = '';
+  filteredClients.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'client-row';
+    const initials = c.name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+    const contact = [c.email, c.phone].filter(Boolean).join(' · ');
+    const lastVisit = c.last_visited ? 'Last visit ' + formatDate(c.last_visited) : 'No visits yet';
+    row.innerHTML = `
+      <div class="client-avatar">${initials}</div>
+      <div class="client-info">
+        <div class="client-name">${c.name}</div>
+        <div class="client-contact">${contact || 'No contact info'}</div>
+        ${c.notes ? `<div class="client-notes-preview">${c.notes}</div>` : ''}
+      </div>
+      <div class="client-meta">
+        <span class="client-visits">${c.visit_count || 0} visit${c.visit_count !== 1 ? 's' : ''}</span>
+        <span class="client-last">${lastVisit}</span>
+        <div style="display:flex;gap:6px;margin-top:4px;">
+          <button class="appt-action-btn" onclick="event.stopPropagation();openEditClientModal('${c.id}')">Edit</button>
+          <button class="appt-action-btn danger" onclick="event.stopPropagation();deleteClient('${c.id}','${c.name.replace(/'/g,"\'")}')">Delete</button>
+        </div>
+      </div>`;
+    row.onclick = () => openEditClientModal(c.id);
+    el.appendChild(row);
+  });
+}
+
+// ── CLIENT MODAL ──────────────────────────────────────────
+function openAddClientModal() {
+  editingClientId = null;
+  document.getElementById('clientModalTitle').textContent = 'Add Client';
+  document.getElementById('clientName').value = '';
+  document.getElementById('clientPhone').value = '';
+  document.getElementById('clientEmail').value = '';
+  document.getElementById('clientNotes').value = '';
+  document.getElementById('saveClientBtn').textContent = 'Add Client';
+  document.getElementById('clientModalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('clientName').focus(), 100);
+}
+
+function openEditClientModal(id) {
+  const c = clients.find(x => x.id === id);
+  if (!c) return;
+  editingClientId = id;
+  document.getElementById('clientModalTitle').textContent = c.name;
+  document.getElementById('clientName').value = c.name || '';
+  document.getElementById('clientPhone').value = c.phone || '';
+  document.getElementById('clientEmail').value = c.email || '';
+  document.getElementById('clientNotes').value = c.notes || '';
+  document.getElementById('saveClientBtn').textContent = 'Save Changes';
+  document.getElementById('clientModalOverlay').classList.add('open');
+}
+
+function closeClientModal() {
+  document.getElementById('clientModalOverlay').classList.remove('open');
+  editingClientId = null;
+}
+
+async function saveClient() {
+  const btn = document.getElementById('saveClientBtn');
+  const name = document.getElementById('clientName').value.trim();
+  if (!name) { showToast('⚠️ Please enter a client name'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const row = {
+    stylist_id: stylist.id,
+    name,
+    phone: document.getElementById('clientPhone').value.trim() || null,
+    email: document.getElementById('clientEmail').value.trim() || null,
+    notes: document.getElementById('clientNotes').value.trim() || null,
+    updated_at: new Date().toISOString()
+  };
+
+  let error;
+  if (editingClientId) {
+    ({ error } = await supabaseClient.from('clients').update(row).eq('id', editingClientId));
+  } else {
+    ({ error } = await supabaseClient.from('clients').insert(row));
+  }
+
+  btn.disabled = false;
+  btn.textContent = editingClientId ? 'Save Changes' : 'Add Client';
+
+  if (error) { showToast('⚠️ Could not save: ' + error.message); return; }
+  closeClientModal();
+  await loadClients();
+  showToast(editingClientId ? '✅ Client updated' : '✅ Client added');
+}
+
+async function deleteClient(id, name) {
+  if (!confirm(`Delete ${name} from your client list? Their appointment history will remain.`)) return;
+  const { error } = await supabaseClient.from('clients').delete().eq('id', id);
+  if (error) { showToast('⚠️ Could not delete client'); return; }
+  await loadClients();
+  showToast('🗑️ Client removed');
+}
+
+// ── AUTO-CREATE CLIENT ON BOOKING ─────────────────────────
+async function upsertClient(customerName, customerEmail, customerPhone, serviceDate) {
+  if (!stylist?.id || !customerName) return;
+  try {
+    // Check if client already exists by email or phone
+    let existing = null;
+    if (customerEmail) {
+      const { data } = await supabaseClient.from('clients').select('*').eq('stylist_id', stylist.id).ilike('email', customerEmail).single();
+      existing = data;
+    }
+    if (!existing && customerPhone) {
+      const digits = customerPhone.replace(/\D/g,'').slice(-10);
+      const { data } = await supabaseClient.from('clients').select('*').eq('stylist_id', stylist.id).ilike('phone', '%' + digits + '%').maybeSingle();
+      existing = data;
+    }
+
+    if (existing) {
+      // Update visit count and last visited
+      await supabaseClient.from('clients').update({
+        visit_count: (existing.visit_count || 0) + 1,
+        last_visited: serviceDate,
+        updated_at: new Date().toISOString(),
+        email: existing.email || customerEmail || null,
+        phone: existing.phone || customerPhone || null,
+      }).eq('id', existing.id);
+    } else {
+      // Create new client
+      await supabaseClient.from('clients').insert({
+        stylist_id: stylist.id,
+        name: customerName,
+        email: customerEmail || null,
+        phone: customerPhone || null,
+        visit_count: 1,
+        last_visited: serviceDate,
+      });
+    }
+  } catch(e) {
+    console.error('Client upsert error:', e);
+  }
+}
+
 // ── AVAILABILITY ─────────────────────────────────────────
 const DEFAULT_DURATIONS = { 'Color': 120, 'Highlights': 150, 'Silk Press': 90, 'Braids': 180, 'Locs': 120, 'Natural Hair': 90, 'Cuts': 45, 'Extensions': 180, 'Wigs': 120, 'Blowout': 60 };
 const DURATION_OPTIONS = [15,30,45,60,90,120,150,180,240];
@@ -1682,6 +1937,7 @@ function showPage(id, el) {
   document.getElementById('pageTitle').textContent = titles[id] || id;
   if (id === 'availability') { if (!stylistServices.length) loadServices().then(renderAvailability); else renderAvailability(); }
   if (id === 'appointments') renderAllAppointments();
+  if (id === 'clients') loadClients();
   if (id === 'profile') loadServices();
 }
 
