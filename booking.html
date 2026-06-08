@@ -327,6 +327,7 @@ window.addEventListener('load', async () => {
   await loadAvailability();
 
   renderHero();
+  applyBranding();
   renderServiceMenu();
   renderAvailabilityPanel();
   renderWelcomeMessage();
@@ -374,6 +375,80 @@ async function loadAvailability() {
     .order('date').order('time');
 
   if (!error) availabilityData = data || [];
+}
+
+// ── APPLY BRANDING ───────────────────────────────────────
+const THEMES = {
+  classic:  { accent:'#c4714a', bg:'linear-gradient(180deg,#f5ede4 0%,#eedfd2 100%)', header:'linear-gradient(135deg,#c4714a 0%,#5c4033 100%)' },
+  rose:     { accent:'#c4796e', bg:'linear-gradient(180deg,#fdf0ef 0%,#f5dedd 100%)', header:'linear-gradient(135deg,#c4796e 0%,#8b3a3a 100%)' },
+  sage:     { accent:'#6b9e7a', bg:'linear-gradient(180deg,#eef5f0 0%,#dceee2 100%)', header:'linear-gradient(135deg,#6b9e7a 0%,#2d5a3d 100%)' },
+  midnight: { accent:'#5b6abf', bg:'linear-gradient(180deg,#eef0fa 0%,#dde1f5 100%)', header:'linear-gradient(135deg,#5b6abf 0%,#1a1f4a 100%)' },
+  gold:     { accent:'#c9a84c', bg:'linear-gradient(180deg,#fdf5e4 0%,#f5e8c8 100%)', header:'linear-gradient(135deg,#c9a84c 0%,#7a5c10 100%)' },
+};
+
+function applyBranding() {
+  if (!stylist) return;
+  const themeName = stylist.brand_theme || 'classic';
+  const theme = THEMES[themeName] || THEMES.classic;
+  const accent = stylist.brand_accent || theme.accent;
+
+  // Build CSS variables
+  const root = document.documentElement;
+  root.style.setProperty('--terracotta', accent);
+  root.style.setProperty('--terracotta-light', lightenColor(accent, 30));
+
+  // Hero background
+  const hero = document.querySelector('.hero');
+  if (hero) hero.style.background = theme.bg;
+
+  // Chat header
+  const chatHeader = document.querySelector('.chat-header');
+  if (chatHeader) chatHeader.style.background = theme.header;
+
+  // Send button
+  const sendBtn = document.querySelector('.send-btn');
+  if (sendBtn) sendBtn.style.background = theme.header;
+
+  // Service item hover + badges via CSS var (already using --terracotta)
+  // Panel header
+  const panelHeaders = document.querySelectorAll('.panel-header, .services-header');
+  panelHeaders.forEach(el => {
+    el.style.background = 'linear-gradient(135deg,' + lightenColor(accent, 60) + ' 0%,' + lightenColor(accent, 40) + ' 100%)';
+  });
+
+  // User chat bubble
+  const style = document.createElement('style');
+  style.textContent = `
+    .message.user .msg-bubble { background: linear-gradient(135deg, ${accent} 0%, ${darkenColor(accent, 20)} 100%); }
+    .send-btn { background: linear-gradient(135deg, ${accent} 0%, ${darkenColor(accent, 20)} 100%) !important; }
+    .quick-prompt:hover { border-color: ${accent}; color: ${accent}; }
+    .chat-input:focus { border-color: ${accent}; }
+    .slot.open { color: ${accent}; border-color: ${accent}40; background: ${accent}18; }
+    .badge { background: ${accent}18; border-color: ${accent}40; color: ${accent}; }
+    .service-item:hover { border-color: ${accent}; }
+    .hero-booking-note { background: ${accent}12; border-color: ${accent}30; }
+  `;
+  document.head.appendChild(style);
+
+  // Apply brand logo if set
+  if (stylist.brand_logo_url) {
+    const chatAvatar = document.querySelector('.chat-avatar');
+    if (chatAvatar) chatAvatar.innerHTML = '<img src="' + stylist.brand_logo_url + '" style="width:100%;height:100%;object-fit:contain;padding:4px;">';
+    const msgAvatars = document.querySelectorAll('.message.ai .msg-avatar img');
+    msgAvatars.forEach(img => img.src = stylist.brand_logo_url);
+  }
+}
+
+function lightenColor(hex, amount) {
+  const num = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, (num >> 16) + amount);
+  const g = Math.min(255, (num >> 8 & 0xff) + amount);
+  const b = Math.min(255, (num & 0xff) + amount);
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+function darkenColor(hex, amount) {
+  return lightenColor(hex, -amount);
 }
 
 // ── RENDER HERO ──────────────────────────────────────────
@@ -755,14 +830,14 @@ async function processBookingIfConfirmed(reply) {
   .card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,.08); }
   .header { background: #ffffff; padding: 32px; text-align: center; border-bottom: 2px solid #e0ccb8; }
   .header img { width: 108px; height: 108px; object-fit: contain; display: block; margin: 0 auto 12px; }
-  .header h1 { color: #b85c38; font-size: 1.4rem; margin: 0; font-weight: 400; }
+  .header h1 { color: ${stylist.brand_accent || '#b85c38'}; font-size: 1.4rem; margin: 0; font-weight: 400; }
   .body { padding: 32px; }
   .appt-box { background: #faf6f1; border: 1px solid #e0ccb8; border-radius: 12px; padding: 0 20px; margin: 20px 0; }
   .appt-row { display: table; width: 100%; padding: 14px 0; border-bottom: 1px solid #e0ccb8; font-size: .9rem; }
   .appt-row:last-child { border-bottom: none; }
   .appt-label { display: table-cell; color: #7a5c4a; font-weight: 400; width: 40%; padding-right: 16px; }
   .appt-value { display: table-cell; color: #2d1f18; font-weight: 600; }
-  .btn { display: inline-block; background: linear-gradient(135deg, #b85c38 0%, #8b3a1e 100%); color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: .9rem; margin: 20px 0; }
+  .btn { display: inline-block; background: ${stylist.brand_accent || '#b85c38'}; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: .9rem; margin: 20px 0; }
   .footer { text-align: center; padding: 20px 32px; color: #9c7a6a; font-size: .78rem; border-top: 1px solid #e0ccb8; }
 </style>
 </head>
@@ -770,7 +845,7 @@ async function processBookingIfConfirmed(reply) {
 <div class="wrapper">
   <div class="card">
     <div class="header">
-      <img src="https://www.salonassistcx.com/logo.png" alt="Salon Assist CX">
+      <img src="${stylist.brand_logo_url || 'https://www.salonassistcx.com/logo.png'}" alt="${stylist.name}">
       <h1>Booking Confirmed!</h1>
     </div>
     <div class="body">
@@ -815,7 +890,7 @@ async function processBookingIfConfirmed(reply) {
   .card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,.08); }
   .header { background: #ffffff; padding: 32px; text-align: center; border-bottom: 2px solid #e0ccb8; }
   .header img { width: 108px; height: 108px; object-fit: contain; display: block; margin: 0 auto 12px; }
-  .header h1 { color: #b85c38; font-size: 1.4rem; margin: 0; font-weight: 400; }
+  .header h1 { color: ${stylist.brand_accent || '#b85c38'}; font-size: 1.4rem; margin: 0; font-weight: 400; }
   .header p { color: #9c7a6a; font-size: .85rem; margin: 6px 0 0; }
   .body { padding: 32px; }
   .appt-box { background: #faf6f1; border: 1px solid #e0ccb8; border-radius: 12px; padding: 0 20px; margin: 20px 0; }
@@ -823,7 +898,7 @@ async function processBookingIfConfirmed(reply) {
   .appt-row:last-child { border-bottom: none; }
   .appt-label { display: table-cell; color: #7a5c4a; font-weight: 400; width: 40%; padding-right: 16px; }
   .appt-value { display: table-cell; color: #2d1f18; font-weight: 600; }
-  .btn { display: inline-block; background: linear-gradient(135deg, #b85c38 0%, #8b3a1e 100%); color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: .9rem; margin: 20px 0; }
+  .btn { display: inline-block; background: ${stylist.brand_accent || '#b85c38'}; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: .9rem; margin: 20px 0; }
   .footer { text-align: center; padding: 20px 32px; color: #9c7a6a; font-size: .78rem; border-top: 1px solid #e0ccb8; }
 </style>
 </head>
@@ -831,7 +906,7 @@ async function processBookingIfConfirmed(reply) {
 <div class="wrapper">
   <div class="card">
     <div class="header">
-      <img src="https://www.salonassistcx.com/logo.png" alt="Salon Assist CX">
+      <img src="${stylist.brand_logo_url || 'https://www.salonassistcx.com/logo.png'}" alt="${stylist.name}">
       <h1>New Booking!</h1>
       <p>You have a new appointment</p>
     </div>
