@@ -388,20 +388,14 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       </div>
     </div>
 
-    <!-- PROFILE -->
-    <div class="page-section" id="page-profile">
-
     <!-- CLIENTS PAGE -->
     <div class="page-section" id="page-clients">
-
-      <!-- Search + Add bar -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
         <input type="text" id="clientSearch" placeholder="Search clients by name, email, phone…" oninput="filterClients()"
           style="flex:1;min-width:200px;padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--ink);background:var(--cream);outline:none;">
         <button class="btn btn-primary" onclick="openAddClientModal()">+ Add Client</button>
         <span id="clientCount" style="font-size:0.78rem;color:var(--ink-light);white-space:nowrap;"></span>
       </div>
-
       <div class="card">
         <div class="card-body" style="padding:0;">
           <div id="clientsTable"><div class="empty-state" style="padding:32px;">Loading clients…</div></div>
@@ -409,7 +403,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       </div>
     </div>
 
-    </div><!-- close page-sections wrapper -->
+    <!-- PROFILE -->
+    <div class="page-section" id="page-profile">
 
       <!-- Profile info card -->
       <div class="card" style="margin-bottom:20px;">
