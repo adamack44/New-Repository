@@ -4,5 +4,11 @@
       "path": "/api/send-email-reminders",
       "schedule": "0 10 * * *"
     }
+  ],
+  "routes": [
+    {
+      "src": "/about",
+      "dest": "/about.html"
+    }
   ]
 }
