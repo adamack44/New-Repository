@@ -215,6 +215,11 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 <div id="loadingScreen"><div class="spinner"></div><p>Loading booking page…</p></div>
 
 <div class="hero">
+  <!-- Brand logo in top-right of hero if set -->
+  <div id="heroBrandLogo" style="display:none;position:absolute;top:20px;right:32px;z-index:2;">
+    <img id="heroBrandLogoImg" src="" alt="" style="height:64px;max-width:160px;object-fit:contain;">
+  </div>
+
   <div class="hero-inner">
     <div class="stylist-avatar" id="heroInitial"><img src="/logo.png" style="width:80%;height:80%;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt=""></div>
     <div class="hero-text">
@@ -431,11 +436,14 @@ function applyBranding() {
   document.head.appendChild(style);
 
   // Apply brand logo if set
+  // Show brand logo in hero banner
   if (stylist.brand_logo_url) {
-    const chatAvatar = document.querySelector('.chat-avatar');
-    if (chatAvatar) chatAvatar.innerHTML = '<img src="' + stylist.brand_logo_url + '" style="width:100%;height:100%;object-fit:contain;padding:4px;">';
-    const msgAvatars = document.querySelectorAll('.message.ai .msg-avatar img');
-    msgAvatars.forEach(img => img.src = stylist.brand_logo_url);
+    const logoBanner = document.getElementById('heroBrandLogo');
+    const logoImg = document.getElementById('heroBrandLogoImg');
+    if (logoBanner && logoImg) {
+      logoImg.src = stylist.brand_logo_url;
+      logoBanner.style.display = 'block';
+    }
   }
 }
 
