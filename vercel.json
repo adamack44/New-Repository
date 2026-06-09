@@ -86,6 +86,14 @@
       "handle": "filesystem"
     },
     {
+      "src": "/terms.html",
+      "dest": "/terms.html"
+    },
+    {
+      "src": "/terms",
+      "dest": "/terms.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/404.html"
     }
