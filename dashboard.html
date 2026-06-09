@@ -245,6 +245,69 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   <p>Loading your dashboard…</p>
 </div>
 
+<!-- TERMS GATE OVERLAY -->
+<div id="termsGate" style="display:none;position:fixed;inset:0;background:rgba(22,16,12,0.85);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:24px;width:100%;max-width:620px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.3);">
+
+    <!-- Header -->
+    <div style="padding:28px 32px 20px;border-bottom:1px solid var(--border,#e0ccb4);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <img src="/logo.png" style="width:36px;height:36px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt="">
+        <span style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:#16100c;">Salon Assist <em style="color:#b85c38;font-style:italic;">CX</em></span>
+      </div>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.5rem;font-weight:400;color:#16100c;margin-bottom:6px;">Before you get started</h2>
+      <p style="font-size:0.82rem;color:#8a6a56;font-weight:300;line-height:1.6;">Please review and agree to our Terms of Service. This only takes a moment.</p>
+    </div>
+
+    <!-- Scrollable terms summary -->
+    <div style="flex:1;overflow-y:auto;padding:24px 32px;">
+      <div style="font-size:0.82rem;color:#5c3d2a;line-height:1.8;">
+
+        <div style="background:#faf5ee;border-radius:10px;padding:16px 20px;margin-bottom:20px;border:1px solid #e0ccb4;">
+          <p style="font-weight:500;color:#16100c;margin-bottom:4px;">📋 Summary of Key Terms</p>
+          <p style="font-size:0.78rem;color:#8a6a56;font-weight:300;">Read the full terms below or <a href="terms.html" target="_blank" style="color:#b85c38;">open in a new tab</a>.</p>
+        </div>
+
+        <p style="font-weight:600;color:#16100c;margin-bottom:6px;">💳 Subscription & Billing</p>
+        <p style="margin-bottom:16px;">Salon Assist CX is $30/month, billed automatically each month. Cancellation stops future charges but past payments are non-refundable. Accounts may be suspended for non-payment.</p>
+
+        <p style="font-weight:600;color:#16100c;margin-bottom:6px;">📊 No Business Guarantees</p>
+        <p style="margin-bottom:16px;">Salon Assist CX is a scheduling and communication tool only. We make no representations or guarantees regarding your business outcomes, revenue, client retention, booking volume, or commercial success. Results vary and are entirely your responsibility.</p>
+
+        <p style="font-weight:600;color:#16100c;margin-bottom:6px;">⚖️ Limitation of Liability</p>
+        <p style="margin-bottom:16px;">We are not liable for missed appointments, lost bookings, client disputes, lost revenue, or any indirect damages arising from your use of the platform. Our total liability shall not exceed three months of subscription fees paid.</p>
+
+        <p style="font-weight:600;color:#16100c;margin-bottom:6px;">✂️ Your Responsibilities</p>
+        <p style="margin-bottom:16px;">You are an independent business operator. You are solely responsible for your services, professional licensing, client communications, and complying with applicable laws. Salon Assist CX is not your employer or business partner.</p>
+
+        <p style="font-weight:600;color:#16100c;margin-bottom:6px;">🔒 Your Data</p>
+        <p style="margin-bottom:16px;">You own your client data. We store it securely to provide the Service. Upon cancellation, you may request a data export within 30 days.</p>
+
+        <p style="font-weight:600;color:#16100c;margin-bottom:6px;">📍 Governing Law</p>
+        <p style="margin-bottom:0;">These Terms are governed by the laws of the State of Tennessee. Disputes shall be resolved through binding arbitration in Nashville, TN.</p>
+      </div>
+    </div>
+
+    <!-- Agree section -->
+    <div style="padding:20px 32px 28px;border-top:1px solid var(--border,#e0ccb4);background:#faf5ee;">
+      <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
+        <input type="checkbox" id="termsAgreeCheckbox"
+          style="margin-top:3px;width:18px;height:18px;flex-shrink:0;accent-color:#b85c38;cursor:pointer;"
+          onchange="const btn=document.getElementById('termsAgreeBtn');btn.disabled=!this.checked;btn.style.opacity=this.checked?'1':'0.5';btn.style.cursor=this.checked?'pointer':'not-allowed';">
+        <span style="font-size:0.82rem;color:#16100c;line-height:1.6;">I have read and agree to the <a href="terms.html" target="_blank" style="color:#b85c38;font-weight:500;">Terms of Service</a>. I understand that Salon Assist CX is a scheduling tool with no guarantee of business results, and I authorize recurring monthly billing of $30/mo.</span>
+      </label>
+      <button id="termsAgreeBtn" disabled onclick="acceptTerms()"
+        style="width:100%;padding:14px;background:linear-gradient(135deg,#b85c38 0%,#942a0e 100%);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:500;cursor:pointer;opacity:0.5;transition:opacity 0.2s;"
+        onmouseover="if(!this.disabled)this.style.filter='brightness(1.08)'"
+        onmouseout="this.style.filter='none'">
+        I Agree — Get Started →
+      </button>
+      <p style="font-size:0.72rem;color:#8a6a56;text-align:center;margin-top:10px;font-weight:300;">By clicking "I Agree" you confirm acceptance of these Terms. Your agreement is recorded with a timestamp.</p>
+    </div>
+
+  </div>
+</div>
+
 <!-- SIDEBAR -->
 <nav class="sidebar">
   <div class="sidebar-brand">
@@ -1319,6 +1382,49 @@ async function bulkDelete() {
 }
 
 // ── AVAILABILITY UI ───────────────────────────────────────
+// ── TERMS ACCEPTANCE ─────────────────────────────────────
+async function acceptTerms() {
+  const btn = document.getElementById('termsAgreeBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const agreedAt = new Date().toISOString();
+  const { error } = await supabaseClient
+    .from('stylists')
+    .update({
+      terms_agreed_at: agreedAt,
+      terms_version: '2026-06-01'
+    })
+    .eq('id', stylist.id);
+
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'I Agree — Get Started →';
+    showToast('⚠️ Could not save agreement. Please try again.');
+    return;
+  }
+
+  // Update local stylist object
+  stylist.terms_agreed_at = agreedAt;
+
+  // Hide the gate and continue loading
+  document.getElementById('termsGate').style.display = 'none';
+
+  // Now check subscription and continue init
+  if (stylist.subscription_status !== 'active') {
+    window.location.href = 'upgrade.html';
+    return;
+  }
+
+  await Promise.all([loadAppointments(), loadAvailability(), loadServices(), loadClients()]);
+  loadBranding();
+  renderStats();
+  renderTodayAppointments();
+  renderAllAppointments();
+  filteredAppointments = [...appointments];
+  showToast('✅ Welcome to Salon Assist CX!');
+}
+
 // ── BRANDING ─────────────────────────────────────────────
 const THEMES = {
   classic:  { accent:'#c4714a', bg:'linear-gradient(180deg,#f5ede4 0%,#eedfd2 100%)', header:'linear-gradient(135deg,#c4714a 0%,#5c4033 100%)' },
