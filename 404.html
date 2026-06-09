@@ -5,24 +5,27 @@
 <title>Salon Assist CX</title>
 <script>
   const path = window.location.pathname.replace(/^\//, '').trim();
-  const systemPaths = ['login','dashboard','upgrade','appointments','reset-password','sacx-admin','admin','booking','api','index.html','404.html','logo.png',''];
 
-  if (path && !systemPaths.includes(path) && !path.includes('.') && !path.startsWith('api/')) {
-    // It's a stylist slug — load booking page content WITHOUT changing the URL
-    // Use fetch to get the booking page then replace the document
+  // Known HTML pages — serve directly
+  const knownPages = ['about.html','contact.html','login.html','dashboard.html','booking.html','upgrade.html','appointments.html','reset-password.html','admin.html'];
+  if (knownPages.includes(path)) {
+    window.location.replace('/' + path);
+  }
+  // System paths — go home
+  else if (!path || path.includes('.') || path.startsWith('api/') || ['login','dashboard','upgrade','appointments','reset-password','sacx-admin','admin','booking','about','contact'].includes(path)) {
+    window.location.replace('/');
+  }
+  // Stylist slug — load booking page keeping clean URL
+  else {
     fetch('/booking.html?stylist=' + encodeURIComponent(path))
       .then(r => r.text())
       .then(html => {
-        // Replace page content but keep the clean URL
         document.open();
         document.write(html);
         document.close();
-        // Update the URL to stay clean
         window.history.replaceState(null, '', '/' + path);
       })
       .catch(() => window.location.replace('/'));
-  } else {
-    window.location.replace('/');
   }
 </script>
 </head>
