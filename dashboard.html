@@ -1051,19 +1051,25 @@ window.addEventListener('load', async () => {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) { window.location.href = 'login.html'; return; }
 
-  // Check subscription — redirect to upgrade page if not active
-  const { data: subCheck } = await supabaseClient
-    .from('stylists')
-    .select('subscription_status')
-    .eq('user_id', user.id)
-    .single();
+  // Load full stylist profile first (needed for terms + subscription checks)
+  await loadStylistProfile(user);
 
-  if (!subCheck || subCheck.subscription_status !== 'active') {
+  if (!stylist) { window.location.href = 'login.html'; return; }
+
+  // Check terms agreement BEFORE subscription check
+  if (!stylist.terms_agreed_at) {
+    document.getElementById('loadingScreen').style.display = 'none';
+    const gate = document.getElementById('termsGate');
+    gate.style.display = 'flex';
+    return;
+  }
+
+  // Check subscription — redirect to upgrade page if not active
+  if (stylist.subscription_status !== 'active') {
     window.location.href = 'upgrade.html';
     return;
   }
 
-  await loadStylistProfile(user);
   await Promise.all([loadAppointments(), loadAvailability(), loadServices(), loadClients()]);
   loadBranding();
 
@@ -1074,6 +1080,7 @@ window.addEventListener('load', async () => {
   renderStats();
   renderTodayAppointments();
   renderAllAppointments();
+  filteredAppointments = [...appointments];
 
   document.getElementById('loadingScreen').style.display = 'none';
 });
