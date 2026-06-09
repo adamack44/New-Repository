@@ -7,12 +7,87 @@
   ],
   "routes": [
     {
+      "src": "/login",
+      "dest": "/login.html"
+    },
+    {
+      "src": "/login.html",
+      "dest": "/login.html"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/dashboard.html"
+    },
+    {
+      "src": "/dashboard.html",
+      "dest": "/dashboard.html"
+    },
+    {
+      "src": "/booking",
+      "dest": "/booking.html"
+    },
+    {
+      "src": "/booking.html",
+      "dest": "/booking.html"
+    },
+    {
+      "src": "/upgrade",
+      "dest": "/upgrade.html"
+    },
+    {
+      "src": "/upgrade.html",
+      "dest": "/upgrade.html"
+    },
+    {
+      "src": "/appointments",
+      "dest": "/appointments.html"
+    },
+    {
+      "src": "/appointments.html",
+      "dest": "/appointments.html"
+    },
+    {
+      "src": "/reset-password",
+      "dest": "/reset-password.html"
+    },
+    {
+      "src": "/reset-password.html",
+      "dest": "/reset-password.html"
+    },
+    {
+      "src": "/sacx-admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/admin.html",
+      "dest": "/admin.html"
+    },
+    {
       "src": "/about",
+      "dest": "/about.html"
+    },
+    {
+      "src": "/about.html",
       "dest": "/about.html"
     },
     {
       "src": "/contact",
       "dest": "/contact.html"
+    },
+    {
+      "src": "/contact.html",
+      "dest": "/contact.html"
+    },
+    {
+      "src": "/logo.png",
+      "dest": "/logo.png"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/404.html"
     }
   ]
 }
