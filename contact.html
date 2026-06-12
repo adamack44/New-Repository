@@ -13,7 +13,6 @@
   --border: #e0ccb4; --text-muted: #8a6a56; --text-mid: #5c3d2a;
 }
 body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); }
-
 nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 60px; height: 68px; display: flex; align-items: center; background: rgba(250,245,238,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
 .nav-brand { display: flex; align-items: center; gap: 10px; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; color: var(--ink); text-decoration: none; }
 .nav-brand em { color: var(--rust); font-style: italic; }
@@ -21,16 +20,12 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 60px;
 .nav-link { font-size: 0.83rem; color: var(--text-muted); text-decoration: none; }
 .nav-link:hover { color: var(--ink); }
 .nav-cta { padding: 8px 18px; background: linear-gradient(135deg, var(--rust) 0%, #942a0e 100%); color: #fff; border-radius: 8px; font-size: 0.83rem; font-weight: 500; text-decoration: none; }
-
 .page-wrap { max-width: 1000px; margin: 0 auto; padding: 120px 60px 80px; }
 .eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--rust); font-weight: 600; margin-bottom: 16px; display: block; }
 h1 { font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 300; color: var(--ink); line-height: 1.2; margin-bottom: 14px; }
 h1 em { color: var(--rust); font-style: italic; }
 .intro { font-size: 0.95rem; color: var(--text-mid); font-weight: 300; line-height: 1.75; max-width: 520px; margin-bottom: 56px; }
-
 .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 48px; align-items: start; }
-
-/* LEFT — contact options */
 .contact-options { display: flex; flex-direction: column; gap: 20px; }
 .contact-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; align-items: flex-start; gap: 16px; transition: border-color 0.15s; }
 .contact-card:hover { border-color: var(--rust); }
@@ -39,8 +34,6 @@ h1 em { color: var(--rust); font-style: italic; }
 .contact-card-desc { font-size: 0.8rem; color: var(--text-muted); font-weight: 300; line-height: 1.6; }
 .contact-card-link { display: inline-block; margin-top: 8px; font-size: 0.8rem; color: var(--rust); text-decoration: none; font-weight: 500; }
 .contact-card-link:hover { text-decoration: underline; }
-
-/* RIGHT — form */
 .contact-form { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 36px; }
 .contact-form h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 400; color: var(--ink); margin-bottom: 6px; }
 .contact-form p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; font-weight: 300; }
@@ -54,7 +47,6 @@ textarea { resize: vertical; min-height: 120px; }
 .submit-btn:hover { filter: brightness(1.08); }
 .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .success-msg { background: #e8f0e9; border: 1px solid #b5d4b8; border-radius: 10px; padding: 16px; text-align: center; color: #2d6a35; font-size: 0.85rem; display: none; margin-top: 16px; }
-
 footer { background: var(--ink); padding: 32px 60px; display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 80px; }
 .footer-brand-sm { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--cream); }
 .footer-brand-sm em { color: var(--rust-light); font-style: italic; }
@@ -62,7 +54,6 @@ footer { background: var(--ink); padding: 32px 60px; display: flex; align-items:
 .footer-links-sm a { font-size: 0.78rem; color: rgba(250,245,238,0.4); text-decoration: none; }
 .footer-links-sm a:hover { color: var(--cream); }
 .footer-copy { font-size: 0.72rem; color: rgba(250,245,238,0.3); }
-
 @media (max-width: 768px) {
   nav { padding: 0 20px; }
   .page-wrap { padding: 100px 20px 60px; }
@@ -95,15 +86,13 @@ footer { background: var(--ink); padding: 32px 60px; display: flex; align-items:
   <p class="intro">Whether you have a question about the platform, need help getting set up, or just want to share feedback — our team is here and happy to help.</p>
 
   <div class="contact-grid">
-
-    <!-- LEFT -->
     <div class="contact-options">
       <div class="contact-card">
         <div class="contact-icon">💬</div>
         <div>
           <div class="contact-card-title">General Support</div>
           <div class="contact-card-desc">Questions about your account, billing, or how the platform works. We typically respond within a few hours.</div>
-          <a href="mailto:support@salonassistcx.com" class="contact-card-link">support@salonassistcx.com →</a>
+          <a href="mailto:adamack44@gmail.com" class="contact-card-link">support@salonassistcx.com →</a>
         </div>
       </div>
       <div class="contact-card">
@@ -111,15 +100,15 @@ footer { background: var(--ink); padding: 32px 60px; display: flex; align-items:
         <div>
           <div class="contact-card-title">Feature Requests</div>
           <div class="contact-card-desc">Have an idea that would make your booking experience better? We genuinely read and consider every suggestion.</div>
-          <a href="mailto:feedback@salonassistcx.com" class="contact-card-link">feedback@salonassistcx.com →</a>
+          <a href="mailto:adamack44@gmail.com" class="contact-card-link">feedback@salonassistcx.com →</a>
         </div>
       </div>
       <div class="contact-card">
         <div class="contact-icon">🤝</div>
         <div>
           <div class="contact-card-title">Partnerships</div>
-          <div class="contact-card-desc">Interested in working with us or integrating with Salon Assist CX? We'd love to explore what's possible.</div>
-          <a href="mailto:hello@salonassistcx.com" class="contact-card-link">hello@salonassistcx.com →</a>
+          <div class="contact-card-desc">Interested in working with us or integrating with Salon Assist CX? We would love to explore what is possible.</div>
+          <a href="mailto:adamack44@gmail.com" class="contact-card-link">hello@salonassistcx.com →</a>
         </div>
       </div>
       <div class="contact-card">
@@ -132,11 +121,9 @@ footer { background: var(--ink); padding: 32px 60px; display: flex; align-items:
       </div>
     </div>
 
-    <!-- RIGHT — FORM -->
     <div class="contact-form">
       <h2>Send us a message</h2>
-      <p>Fill out the form and we'll get back to you as soon as we can.</p>
-
+      <p>Fill out the form and we will get back to you as soon as we can.</p>
       <div class="form-row">
         <div>
           <label>First Name</label>
@@ -154,22 +141,22 @@ footer { background: var(--ink); padding: 32px 60px; display: flex; align-items:
       <div class="form-group">
         <label>Topic</label>
         <select id="contactTopic">
-          <option value="">Select a topic…</option>
+          <option value="">Select a topic...</option>
           <option value="Support">Account / Billing Support</option>
           <option value="Setup">Getting Started / Setup Help</option>
           <option value="Feature">Feature Request</option>
-          <option value="Bug">Something Isn't Working</option>
+          <option value="Bug">Something Is Not Working</option>
           <option value="Partnership">Partnership / Integration</option>
           <option value="Other">Other</option>
         </select>
       </div>
       <div class="form-group">
         <label>Message</label>
-        <textarea id="contactMessage" placeholder="Tell us what's on your mind…"></textarea>
+        <textarea id="contactMessage" placeholder="Tell us what is on your mind..."></textarea>
       </div>
       <button class="submit-btn" id="contactSubmitBtn" onclick="submitContact()">Send Message →</button>
       <div class="success-msg" id="contactSuccess">
-        ✅ Message sent! We'll get back to you within a few hours.
+        Your message has been sent. We will get back to you within a few hours.
       </div>
     </div>
   </div>
@@ -183,10 +170,20 @@ footer { background: var(--ink); padding: 32px 60px; display: flex; align-items:
     <a href="index.html#pricing">Pricing</a>
     <a href="login.html">Sign In</a>
   </div>
-  <div class="footer-copy">© 2026 Salon Assist CX</div>
+  <div class="footer-copy">2026 Salon Assist CX</div>
 </footer>
 
 <script>
+// Topic to Gmail label prefix mapping
+const TOPIC_PREFIX = {
+  'Support':     '[Support]',
+  'Setup':       '[Support]',
+  'Feature':     '[Feedback]',
+  'Bug':         '[Bug]',
+  'Partnership': '[Partnership]',
+  'Other':       '[General]'
+};
+
 async function submitContact() {
   const btn = document.getElementById('contactSubmitBtn');
   const first = document.getElementById('contactFirst').value.trim();
@@ -201,26 +198,33 @@ async function submitContact() {
   }
 
   btn.disabled = true;
-  btn.textContent = 'Sending…';
+  btn.textContent = 'Sending...';
+
+  const prefix = TOPIC_PREFIX[topic] || '[General]';
+  const subject = prefix + ' ' + (topic || 'General') + ' from ' + first + ' ' + last;
 
   try {
     const res = await fetch('/api/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        to: 'support@salonassistcx.com',
-        subject: '[Contact Form] ' + (topic || 'General') + ' — ' + first + ' ' + last,
+        to: 'adamack44@gmail.com',
+        subject: subject,
         html: `
           <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;">
             <h2 style="color:#b8522e;">New Contact Form Submission</h2>
+            <p style="font-size:0.85rem;color:#8a6a56;margin-bottom:20px;">Topic: <strong>${topic || 'Not specified'}</strong></p>
             <table style="width:100%;border-collapse:collapse;margin-top:16px;">
               <tr><td style="padding:8px 0;font-weight:600;color:#5c3d2a;width:120px;">Name</td><td style="padding:8px 0;">${first} ${last}</td></tr>
-              <tr><td style="padding:8px 0;font-weight:600;color:#5c3d2a;">Email</td><td style="padding:8px 0;"><a href="mailto:${email}">${email}</a></td></tr>
+              <tr><td style="padding:8px 0;font-weight:600;color:#5c3d2a;">Reply To</td><td style="padding:8px 0;"><a href="mailto:${email}" style="color:#b8522e;">${email}</a></td></tr>
               <tr><td style="padding:8px 0;font-weight:600;color:#5c3d2a;">Topic</td><td style="padding:8px 0;">${topic || 'Not specified'}</td></tr>
             </table>
             <div style="margin-top:20px;padding:16px;background:#faf5ee;border-radius:8px;border-left:4px solid #b8522e;">
               <div style="font-weight:600;color:#5c3d2a;margin-bottom:8px;">Message</div>
-              <div style="color:#16100c;line-height:1.7;">${message.replace(/\n/g,'<br>')}</div>
+              <div style="color:#16100c;line-height:1.7;">${message.replace(/\n/g, '<br>')}</div>
+            </div>
+            <div style="margin-top:20px;padding:12px 16px;background:#e8f0e9;border-radius:8px;font-size:0.82rem;color:#2d6a35;">
+              Reply directly to this email to respond to ${first}.
             </div>
           </div>`
       })
@@ -240,7 +244,7 @@ async function submitContact() {
   } catch(e) {
     btn.disabled = false;
     btn.textContent = 'Send Message →';
-    alert('Something went wrong. Please email us directly at support@salonassistcx.com');
+    alert('Something went wrong. Please email us directly at adamack44@gmail.com');
   }
 }
 </script>
