@@ -95,7 +95,7 @@ export default async function handler(req, res) {
         <div class="appt-row"><span class="appt-label">Stylist</span><span class="appt-value">${stylistName}${salonName ? ' · ' + salonName : ''}</span></div>
         <div class="appt-row"><span class="appt-label">Date</span><span class="appt-value">${dateLabel}</span></div>
         <div class="appt-row"><span class="appt-label">Time</span><span class="appt-value">${appt.time}</span></div>
-        ${appt.service ? `<div class="appt-row"><span class="appt-label">Service</span><span class="appt-value">${appt.service}</span></div>` : ''}
+        ${appt.service ? '<div class="appt-row"><span class="appt-label">Service</span><span class="appt-value">' + appt.service + '</span></div>' : ''}
       </div>
       <p style="color:#7a5c4a;font-size:0.88rem;">Need to make changes? You can view or cancel your appointment below.</p>
       <a href="${manageUrl}" class="btn">Manage My Appointment →</a>
