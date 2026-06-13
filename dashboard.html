@@ -1150,6 +1150,22 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 </nav>
 
 <script>
+// ── MOBILE NAV ───────────────────────────────────────────
+function setMobileTab(id) {
+  document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
+  const mob = document.getElementById('mob-' + id);
+  if (mob) mob.classList.add('active');
+}
+
+function syncMobileBadges() {
+  const today = new Date().toISOString().split('T')[0];
+  const apptCount = appointments.filter(a => a.status === 'confirmed' && a.date >= today).length;
+  const apptBadge = document.getElementById('mobApptBadge');
+  if (apptBadge) { apptBadge.textContent = apptCount; apptBadge.style.display = apptCount > 0 ? 'block' : 'none'; }
+  const clientBadge = document.getElementById('mobClientBadge');
+  if (clientBadge) { clientBadge.textContent = clients.length; clientBadge.style.display = clients.length > 0 ? 'block' : 'none'; }
+}
+
 // ── STATE ─────────────────────────────────────────────────
 let stylist = null;
 let appointments = [];
