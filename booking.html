@@ -243,6 +243,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
       <div class="panel-header">
         <h2>Upcoming Availability</h2>
         <p id="availDateRange">Next 7 days</p>
+        <p id="availTimezone" style="font-size:0.72rem;color:var(--text-light);margin-top:2px;display:none;"></p>
       </div>
       <div class="availability-body">
         <div class="week-label">Open Slots</div>
@@ -475,6 +476,23 @@ function renderHero() {
   else if (stylist.city) locationParts.push(stylist.city);
   if (stylist.years_experience) locationParts.push(stylist.years_experience + ' yrs experience');
   document.getElementById('heroSalon').textContent = locationParts.filter(Boolean).join(' · ') || 'Independent Hair Stylist';
+
+  // Show timezone on availability panel
+  if (stylist.timezone) {
+    const tzEl = document.getElementById('availTimezone');
+    if (tzEl) {
+      const tzLabel = {
+        'America/New_York': 'Eastern Time (ET)',
+        'America/Chicago': 'Central Time (CT)',
+        'America/Denver': 'Mountain Time (MT)',
+        'America/Los_Angeles': 'Pacific Time (PT)',
+        'America/Anchorage': 'Alaska Time',
+        'Pacific/Honolulu': 'Hawaii Time'
+      }[stylist.timezone] || stylist.timezone;
+      tzEl.textContent = 'All times in ' + tzLabel;
+      tzEl.style.display = 'block';
+    }
+  }
 
   document.getElementById('chatHeaderName').textContent = stylist.name + "'s Booking Assistant";
 
