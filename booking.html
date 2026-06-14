@@ -92,9 +92,9 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 }
 .hero-socials a:hover { background: rgba(196,113,74,0.1); border-color: rgba(196,113,74,0.3); color: var(--terracotta); }
 
-.main { max-width: 1100px; margin: 0 auto; padding: 28px 60px 60px; display: flex; flex-direction: column; gap: 24px; }
-.top-panels { display: grid; grid-template-columns: 1fr 1.6fr; gap: 24px; align-items: start; }
-.bottom-panels { width: 100%; }
+.main { max-width: 1100px; margin: 0 auto; padding: 28px 60px 60px; }
+.main-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 24px; align-items: start; }
+.right-col { display: flex; flex-direction: column; gap: 24px; }
 
 .availability-panel { background: var(--warm-white); border-radius: 20px; border: 1px solid var(--sand); overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.07); }
 .panel-header { background: linear-gradient(135deg, var(--sand) 0%, #e0ccb8 100%); padding: 22px 28px; border-bottom: 1px solid var(--sand-dark); }
@@ -112,6 +112,9 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 .closed-label { font-size: 0.72rem; color: var(--sand-dark); font-style: italic; padding-top: 3px; }
 .legend { display: flex; gap: 16px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--sand); }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-light); }
+.avail-range-btn { padding: 5px 12px; border: 1.5px solid var(--sand-dark); border-radius: 20px; background: transparent; font-family: 'Lato', sans-serif; font-size: 0.72rem; color: var(--text-mid); cursor: pointer; transition: all 0.15s; font-weight: 500; }
+.avail-range-btn:hover { border-color: var(--terracotta); color: var(--terracotta); }
+.avail-range-btn.active { background: var(--terracotta); border-color: var(--terracotta); color: #fff; }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 .legend-dot.open { background: var(--sage); }
 .legend-dot.booked { background: var(--sand-dark); }
@@ -205,8 +208,8 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
   .hero-booking-note { font-size: 0.75rem; }
   .hero-socials { justify-content: center; }
   .main { padding: 16px 14px 32px; }
-  .top-panels { grid-template-columns: 1fr; }
-  .bottom-panels { padding: 0; }
+  .main-grid { grid-template-columns: 1fr; }
+  .right-col { gap: 16px; }
 }
 </style>
 </head>
@@ -242,13 +245,28 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
     <div class="availability-panel">
       <div class="panel-header">
         <h2>Upcoming Availability</h2>
-        <p id="availDateRange">Next 12 months</p>
         <p id="availTimezone" style="font-size:0.72rem;color:var(--text-light);margin-top:2px;display:none;"></p>
       </div>
-      <div class="availability-body">
-        <div class="week-label">Open Slots</div>
+
+      <!-- DATE RANGE FILTER -->
+      <div style="padding:14px 20px;border-bottom:1px solid var(--sand);background:var(--cream);">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;" id="availRangeBtns">
+          <button class="avail-range-btn active" onclick="setAvailRange('week',this)">This week</button>
+          <button class="avail-range-btn" onclick="setAvailRange('2weeks',this)">2 weeks</button>
+          <button class="avail-range-btn" onclick="setAvailRange('month',this)">Month</button>
+          <button class="avail-range-btn" onclick="setAvailRange('3months',this)">3 months</button>
+          <button class="avail-range-btn" onclick="setAvailRange('all',this)">All</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button onclick="navAvailWeek(-1)" style="width:28px;height:28px;border:1.5px solid var(--sand-dark);border-radius:7px;background:transparent;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">‹</button>
+          <span id="availNavLabel" style="flex:1;text-align:center;font-size:0.78rem;font-weight:500;color:var(--text-mid);"></span>
+          <button onclick="navAvailWeek(1)" style="width:28px;height:28px;border:1.5px solid var(--sand-dark);border-radius:7px;background:transparent;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">›</button>
+        </div>
+      </div>
+
+      <div class="availability-body" style="max-height:380px;overflow-y:auto;">
         <div id="availabilityList"><div style="text-align:center;padding:20px;color:#9c7a6a;font-size:0.82rem;">Loading availability…</div></div>
-        <div class="legend">
+        <div class="legend" style="padding-top:14px;margin-top:14px;border-top:1px solid var(--sand);">
           <div class="legend-item"><span class="legend-dot open"></span> Available to book</div>
         </div>
       </div>
@@ -591,29 +609,96 @@ function renderSocialLinks() {
   });
 }
 
+// ── AVAILABILITY PANEL WITH RANGE FILTER ─────────────────
+let availRangeMode = 'week';
+let availNavOffset = 0; // weeks offset for navigation
+
+function setAvailRange(mode, btn) {
+  availRangeMode = mode;
+  availNavOffset = 0;
+  document.querySelectorAll('.avail-range-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderAvailabilityPanel();
+}
+
+function navAvailWeek(dir) {
+  availNavOffset += dir;
+  renderAvailabilityPanel();
+}
+
 function renderAvailabilityPanel() {
   const container = document.getElementById('availabilityList');
+  const navLabel = document.getElementById('availNavLabel');
   container.innerHTML = '';
 
-  // Group by date
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().split('T')[0];
+
+  // Calculate date range based on mode + offset
+  let startDate = new Date(today);
+  let endDate = new Date(today);
+  let labelText = '';
+
+  const offsetDays = availNavOffset * 7;
+
+  if (availRangeMode === 'week') {
+    startDate.setDate(startDate.getDate() + offsetDays);
+    endDate.setDate(endDate.getDate() + offsetDays + 6);
+    labelText = startDate.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' — ' +
+                endDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  } else if (availRangeMode === '2weeks') {
+    startDate.setDate(startDate.getDate() + offsetDays);
+    endDate.setDate(endDate.getDate() + offsetDays + 13);
+    labelText = startDate.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' — ' +
+                endDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  } else if (availRangeMode === 'month') {
+    startDate.setDate(startDate.getDate() + (availNavOffset * 30));
+    endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 29);
+    labelText = startDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  } else if (availRangeMode === '3months') {
+    startDate.setDate(startDate.getDate() + (availNavOffset * 90));
+    endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 89);
+    labelText = startDate.toLocaleDateString('en-US',{month:'short',year:'numeric'}) + ' — ' +
+                endDate.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+  } else if (availRangeMode === 'all') {
+    startDate = new Date(today);
+    endDate = new Date(today);
+    endDate.setMonth(endDate.getMonth() + 12);
+    labelText = 'All upcoming availability';
+  }
+
+  const startStr = startDate.toISOString().split('T')[0];
+  const endStr = endDate.toISOString().split('T')[0];
+
+  if (navLabel) navLabel.textContent = labelText;
+
+  // Show/hide nav arrows (hide for 'all' mode)
+  const navBtns = document.querySelectorAll('[onclick^="navAvailWeek"]');
+  navBtns.forEach(b => b.style.display = availRangeMode === 'all' ? 'none' : 'flex');
+
+  // Group by date within range
   const byDate = {};
   availabilityData.forEach(slot => {
+    if (slot.date < startStr || slot.date > endStr) return;
+    if (slot.date < todayStr) return; // never show past dates
     if (!byDate[slot.date]) byDate[slot.date] = [];
     byDate[slot.date].push(slot);
   });
 
-  const dates = Object.keys(byDate).sort().slice(0, 30); // show up to 30 days of open slots
+  const dates = Object.keys(byDate).sort();
 
   if (!dates.length) {
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:#9c7a6a;font-size:0.82rem;font-style:italic;">No availability set yet</div>';
+    container.innerHTML = '<div style="text-align:center;padding:24px 20px;color:#9c7a6a;font-size:0.82rem;font-style:italic;">No open slots in this range.<br><span style="font-size:0.75rem;">Try a different time range or navigate forward.</span></div>';
     return;
   }
 
   dates.forEach(dateStr => {
     const slots = byDate[dateStr];
-    // Only show open (unbooked) slots to customers
     const openSlots = slots.filter(s => !s.is_booked);
-    if (!openSlots.length) return; // skip days with no open slots
+    if (!openSlots.length) return;
 
     const label = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
     const row = document.createElement('div');
