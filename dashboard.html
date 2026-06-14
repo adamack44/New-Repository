@@ -925,8 +925,20 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
         </select>
       </div>
 
+      <div style="margin-bottom:14px;">
+        <label class="form-label" style="margin-bottom:6px;display:block;">Repeat for how many weeks?</label>
+        <select class="date-input" id="repeatWeeks" style="width:100%;">
+          <option value="4">4 weeks (1 month)</option>
+          <option value="8">8 weeks (2 months)</option>
+          <option value="12">12 weeks (3 months)</option>
+          <option value="16">16 weeks (4 months)</option>
+          <option value="24">24 weeks (6 months)</option>
+          <option value="36">36 weeks (9 months)</option>
+          <option value="52">52 weeks (12 months)</option>
+        </select>
+      </div>
       <div style="background:var(--cream);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:var(--ink-light);margin-bottom:16px;">
-        📅 Repeats for <strong>4 weeks</strong> from today
+        📅 Slots will be added for the selected number of weeks starting today
       </div>
     </div>
 
@@ -2581,7 +2593,11 @@ function openAddSlotModal() {
 
 function openAddSlotModalForDate(dateStr) {
   document.getElementById('slotDate').value = dateStr;
-  document.getElementById('slotDate').min = new Date().toISOString().split('T')[0];
+  const todayStr = new Date().toISOString().split('T')[0];
+  const maxDate = new Date(); maxDate.setMonth(maxDate.getMonth() + 12);
+  const maxDateStr = maxDate.toISOString().split('T')[0];
+  document.getElementById('slotDate').min = todayStr;
+  document.getElementById('slotDate').max = maxDateStr;
   initModal();
   document.getElementById('modalOverlay').classList.add('open');
 }
