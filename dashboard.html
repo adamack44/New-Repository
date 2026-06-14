@@ -226,15 +226,42 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .toast.show { transform: translateY(0); opacity: 1; }
 
 /* MINI CALENDAR */
-.mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-.cal-day-name { text-align: center; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-light); padding-bottom: 6px; }
-.cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.78rem; cursor: pointer; transition: all 0.1s; color: var(--ink); }
-.cal-day:hover { background: var(--sand-light); }
-.cal-day.other-month { color: rgba(90,60,40,0.2); cursor: default; }
-.cal-day.other-month:hover { background: none; }
-.cal-day.today { background: var(--rust); color: #fff; font-weight: 600; }
-.cal-day.has-appt::after { content: ''; position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--sage); }
-.cal-day { position: relative; }
+.mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-day-name { text-align: center; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-light); padding-bottom: 6px; }
+.cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.75rem; cursor: pointer; transition: all 0.12s; color: var(--ink); position: relative; border: 1.5px solid transparent; gap: 2px; }
+.cal-day:hover { background: var(--cream); border-color: var(--border); }
+.cal-day.other-month { color: rgba(90,60,40,0.15); cursor: default; background: none; }
+.cal-day.other-month:hover { background: none; border-color: transparent; }
+
+/* Today */
+.cal-day.today { background: var(--rust) !important; color: #fff !important; font-weight: 700; border-color: var(--rust) !important; }
+.cal-day.today .cal-dots { opacity: 0.85; }
+
+/* Open slots available — green tint */
+.cal-day.has-avail { background: rgba(94,122,100,0.1); border-color: rgba(94,122,100,0.3); color: var(--ink); }
+.cal-day.has-avail:hover { background: rgba(94,122,100,0.18); }
+
+/* Has confirmed appointments — rust/amber tint */
+.cal-day.has-appt { background: rgba(184,82,46,0.1); border-color: rgba(184,82,46,0.3); color: var(--ink); font-weight: 600; }
+.cal-day.has-appt:hover { background: rgba(184,82,46,0.18); }
+
+/* Has both availability AND appointments */
+.cal-day.has-avail.has-appt { background: rgba(184,82,46,0.08); border-color: rgba(184,82,46,0.3); }
+
+/* Past days */
+.cal-day.past { color: rgba(90,60,40,0.25); cursor: default; }
+.cal-day.past:hover { background: none; border-color: transparent; }
+
+/* Dot indicators */
+.cal-dots { display: flex; gap: 2px; justify-content: center; }
+.cal-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+.cal-dot.appt { background: var(--rust); }
+.cal-dot.avail { background: var(--sage); }
+
+/* Legend */
+.cal-legend { display: flex; flex-wrap: wrap; gap: 10px; padding: 10px 16px 4px; border-top: 1px solid var(--border); }
+.cal-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; color: var(--ink-light); }
+.cal-legend-swatch { width: 12px; height: 12px; border-radius: 4px; border: 1.5px solid; }
 
 /* ── MOBILE ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
@@ -476,8 +503,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
             <h2 id="calTitle" style="font-size:0.9rem;font-weight:600;"></h2>
             <button onclick="navCalendar(1)" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:7px;background:transparent;cursor:pointer;font-size:14px;color:var(--ink-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">›</button>
           </div>
-          <div class="card-body">
+          <div class="card-body" style="padding-bottom:0;">
             <div class="mini-cal-grid" id="calGrid"></div>
+          </div>
+          <div class="cal-legend">
+            <div class="cal-legend-item"><div class="cal-legend-swatch" style="background:rgba(94,122,100,0.15);border-color:rgba(94,122,100,0.4);"></div> Open slots</div>
+            <div class="cal-legend-item"><div class="cal-legend-swatch" style="background:rgba(184,82,46,0.12);border-color:rgba(184,82,46,0.4);"></div> Appointment</div>
+            <div class="cal-legend-item"><div class="cal-legend-swatch" style="background:var(--rust);border-color:var(--rust);"></div> Today</div>
           </div>
         </div>
       </div>
@@ -3270,13 +3302,46 @@ function renderCalendar() {
   for (let d = 1; d <= daysInMonth; d++) {
     const el = document.createElement('div'); el.className = 'cal-day';
     const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const isPast = dateStr < today;
+    const isToday = dateStr === today;
+    const hasAppt = apptDates.has(dateStr);
+    const hasAvail = availDates.has(dateStr);
+    const apptCount = appointments.filter(a => a.date === dateStr && a.status !== 'cancelled').length;
+    const availCount = availability ? availability.filter(a => a.date === dateStr && !a.is_booked).length : 0;
 
-    if (dateStr === today) el.classList.add('today');
-    if (apptDates.has(dateStr)) el.classList.add('has-appt');
-    if (availDates.has(dateStr) && !apptDates.has(dateStr)) el.style.cssText = 'opacity:0.5;';
+    if (isToday) el.classList.add('today');
+    else if (isPast) el.classList.add('past');
+    if (hasAppt) el.classList.add('has-appt');
+    if (hasAvail) el.classList.add('has-avail');
 
-    el.textContent = d;
-    el.title = apptDates.has(dateStr) ? 'Has appointment' : availDates.has(dateStr) ? 'Open slot' : '';
+    // Day number
+    const num = document.createElement('span');
+    num.textContent = d;
+    el.appendChild(num);
+
+    // Dot indicators
+    if ((hasAppt || hasAvail) && !isPast) {
+      const dots = document.createElement('div');
+      dots.className = 'cal-dots';
+      if (hasAppt) {
+        const dot = document.createElement('div');
+        dot.className = 'cal-dot appt';
+        dots.appendChild(dot);
+      }
+      if (hasAvail) {
+        const dot = document.createElement('div');
+        dot.className = 'cal-dot avail';
+        dots.appendChild(dot);
+      }
+      el.appendChild(dots);
+    }
+
+    // Tooltip
+    const tips = [];
+    if (apptCount) tips.push(apptCount + ' appointment' + (apptCount !== 1 ? 's' : ''));
+    if (availCount) tips.push(availCount + ' open slot' + (availCount !== 1 ? 's' : ''));
+    el.title = tips.join(' · ') || '';
+
     grid.appendChild(el);
   }
 }
