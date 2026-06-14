@@ -751,7 +751,48 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
             <button class="btn btn-ghost" style="font-size:0.78rem;" onclick="addCustomSocialLink()">+ Add Another Link</button>
           </div>
 
-          <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <!-- REBOOKING REMINDERS SECTION -->
+          <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:8px;">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">Rebooking Reminders</div>
+
+            <div style="background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px;">
+                <input type="checkbox" id="profileRebookingEnabled" style="accent-color:var(--rust);width:16px;height:16px;" onchange="document.getElementById('rebookingSettingsFields').style.display=this.checked?'block':'none'">
+                <span style="font-size:0.88rem;font-weight:500;color:var(--ink);">Automatically remind clients to rebook</span>
+              </label>
+              <p style="font-size:0.78rem;color:var(--ink-light);font-weight:300;line-height:1.6;margin:0 0 0 26px;">When enabled, clients receive a friendly email after their set interval. A follow-up goes out 2 weeks later if they still have not booked. Clients who already have a future appointment are automatically skipped.</p>
+            </div>
+
+            <div id="rebookingSettingsFields">
+              <div class="form-group">
+                <label class="form-label">Default reminder interval</label>
+                <select class="form-input" id="profileRebookingWeeks">
+                  <option value="4">4 weeks after last visit</option>
+                  <option value="6">6 weeks after last visit</option>
+                  <option value="8">8 weeks after last visit</option>
+                  <option value="10">10 weeks after last visit</option>
+                  <option value="12">12 weeks after last visit</option>
+                </select>
+                <div style="font-size:0.72rem;color:var(--ink-light);margin-top:4px;font-weight:300;">You can set per-service intervals in your Service Menu below — great for color (shorter) vs trim-only (longer) clients.</div>
+              </div>
+
+              <!-- CUSTOM MESSAGE EDITOR -->
+              <div style="margin-bottom:14px;">
+                <label class="form-label" style="margin-bottom:8px;display:block;">Initial reminder message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(edit to personalize)</span></label>
+                <textarea class="form-input" id="profileRebookingMessage" rows="4" style="resize:vertical;font-family:'DM Sans',sans-serif;"
+                  placeholder="Hi [first name]! It has been a while since your last visit. I would love to see you again — click below to grab a spot!"></textarea>
+                <div style="font-size:0.72rem;color:var(--ink-light);margin-top:4px;">Use <strong>[first name]</strong> to personalize. Keep it warm and brief.</div>
+              </div>
+
+              <div style="margin-bottom:4px;">
+                <label class="form-label" style="margin-bottom:8px;display:block;">Follow-up message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(sent 2 weeks later if not booked)</span></label>
+                <textarea class="form-input" id="profileRebookingFollowup" rows="3" style="resize:vertical;font-family:'DM Sans',sans-serif;"
+                  placeholder="Still thinking about it? No pressure — just wanted to make sure you know I have availability. Would love to see you soon!"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
             <button class="btn btn-ghost" onclick="loadProfile()">Discard</button>
             <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
           </div>
@@ -1435,8 +1476,16 @@ async function loadStylistProfile(user) {
   // Rebooking settings
   const rebookEnabled = document.getElementById('profileRebookingEnabled');
   const rebookWeeks = document.getElementById('profileRebookingWeeks');
-  if (rebookEnabled) rebookEnabled.checked = stylist.rebooking_enabled !== false;
+  const rebookMsg = document.getElementById('profileRebookingMessage');
+  const rebookFollowup = document.getElementById('profileRebookingFollowup');
+  const rebookFields = document.getElementById('rebookingSettingsFields');
+  if (rebookEnabled) {
+    rebookEnabled.checked = stylist.rebooking_enabled !== false;
+    if (rebookFields) rebookFields.style.display = rebookEnabled.checked ? 'block' : 'none';
+  }
   if (rebookWeeks) rebookWeeks.value = stylist.rebooking_default_weeks || 6;
+  if (rebookMsg) rebookMsg.value = stylist.rebooking_message || '';
+  if (rebookFollowup) rebookFollowup.value = stylist.rebooking_followup_message || '';
 
   // Location
   document.getElementById('profileCity').value = stylist.city || '';
@@ -2970,8 +3019,10 @@ async function saveProfile() {
     bio: document.getElementById('profileBio').value,
     years_experience: parseInt(document.getElementById('profileYears').value) || null,
     booking_note: document.getElementById('profileBookingNote').value.trim() || null,
-    rebooking_enabled: document.getElementById('profileRebookingEnabled')?.checked !== false,
+    rebooking_enabled: document.getElementById('profileRebookingEnabled')?.checked || false,
     rebooking_default_weeks: parseInt(document.getElementById('profileRebookingWeeks')?.value || '6'),
+    rebooking_message: document.getElementById('profileRebookingMessage')?.value.trim() || null,
+    rebooking_followup_message: document.getElementById('profileRebookingFollowup')?.value.trim() || null,
     city: document.getElementById('profileCity').value.trim() || null,
     state: document.getElementById('profileState').value.trim() || null,
     full_address: document.getElementById('profileAddress').value.trim() || null,
