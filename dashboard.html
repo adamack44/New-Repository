@@ -460,7 +460,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       </div>
       <div class="two-col">
         <div class="card">
-          <div class="card-head"><h2>Today's Schedule</h2></div>
+          <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;">
+            <h2>Today's Schedule</h2>
+            <button class="btn btn-ghost" style="font-size:0.78rem;display:flex;align-items:center;gap:6px;" onclick="quickBroadcast()">
+              📣 Message Clients
+            </button>
+          </div>
           <div class="card-body">
             <div class="appt-list" id="todayApptList"><div class="empty-state">Loading appointments…</div></div>
           </div>
@@ -1815,6 +1820,17 @@ async function saveBranding() {
 
 // ── BROADCAST ────────────────────────────────────────────
 let broadcastHistory = [];
+
+function quickBroadcast() {
+  showPage('broadcast', document.querySelector('.nav-item:nth-child(5)'));
+  setTimeout(() => {
+    const todayRadio = document.querySelector('input[name="audience"][value="today"]');
+    if (todayRadio) { todayRadio.checked = true; updateAudiencePreview(); }
+    initBroadcast();
+    // Scroll to composer
+    document.getElementById('broadcastSubject')?.focus();
+  }, 100);
+}
 
 function initBroadcast() {
   const today = new Date().toISOString().split('T')[0];
