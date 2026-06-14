@@ -753,21 +753,41 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
           <!-- APPOINTMENT REMINDER SECTION -->
           <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:8px;margin-bottom:20px;">
-            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">24-Hour Appointment Reminder</div>
-            <div style="background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px;">
-              <p style="font-size:0.78rem;color:var(--ink-light);font-weight:300;line-height:1.6;margin:0;">Clients automatically receive a reminder email 24 hours before their appointment. Customize the message below — or leave blank to use the default.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+              <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;">24-Hour Appointment Reminder</div>
+              <span style="background:#e8eef8;color:#1a4580;font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:6px;letter-spacing:0.5px;">📧 EMAIL ONLY</span>
             </div>
-            <div class="form-group" style="margin-bottom:4px;">
-              <label class="form-label" style="margin-bottom:8px;display:block;">Reminder message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(optional)</span></label>
+
+            <!-- What goes out by default -->
+            <div style="background:#fef9f0;border:1px solid #f0d9b0;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+              <div style="font-size:0.75rem;font-weight:600;color:#7a4d08;margin-bottom:8px;">📋 Default message (sent when no custom message is set)</div>
+              <div style="font-size:0.8rem;color:#5c3d2a;line-height:1.7;font-style:italic;">
+                "Hi [first name]! Just a friendly reminder that you have an appointment tomorrow with [stylist name]. We can't wait to see you — if anything comes up, you can manage your appointment at the link below."
+              </div>
+              <div style="font-size:0.72rem;color:#9c7a6a;margin-top:8px;">The appointment date, time, and service are always shown below this message automatically.</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:6px;">
+              <label class="form-label" style="margin-bottom:8px;display:block;">Custom message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(replaces the default above)</span></label>
               <textarea class="form-input" id="profileReminderMessage" rows="4" style="resize:vertical;font-family:'DM Sans',sans-serif;"
-                placeholder="e.g. Just a reminder that you have an appointment tomorrow! Please arrive 5 minutes early and reach out if you need to reschedule. Can't wait to see you!"></textarea>
-              <div style="font-size:0.72rem;color:var(--ink-light);margin-top:4px;">Use <strong>[first name]</strong> to personalize. The appointment date and time are always included automatically.</div>
+                placeholder="Write your own reminder message here. Example: Hi [first name]! Just a reminder about your appointment tomorrow. Please arrive 5 minutes early — I can't wait to see you!"></textarea>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:6px;">
+                <div style="font-size:0.72rem;color:var(--ink-light);">Use <strong>[first name]</strong> to personalize. Leave blank to send the default message above.</div>
+                <button class="btn btn-ghost" style="font-size:0.75rem;padding:5px 12px;" onclick="clearReminderMessage()">Reset to default</button>
+              </div>
+            </div>
+
+            <div style="background:var(--sage-pale);border:1px solid rgba(94,122,100,0.3);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:#2d5a3d;margin-top:4px;">
+              ✅ Reminders go out automatically every day at 10am UTC. No action needed — just save your message below and it applies to all future reminders.
             </div>
           </div>
 
           <!-- REBOOKING REMINDERS SECTION -->
           <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:8px;">
-            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">Rebooking Reminders</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+              <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;">Rebooking Reminders</div>
+              <span style="background:#e8eef8;color:#1a4580;font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:6px;letter-spacing:0.5px;">📧 EMAIL ONLY</span>
+            </div>
 
             <div style="background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px;">
               <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px;">
@@ -778,6 +798,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
             </div>
 
             <div id="rebookingSettingsFields">
+
+              <!-- Default message preview -->
+              <div style="background:#fef9f0;border:1px solid #f0d9b0;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+                <div style="font-size:0.75rem;font-weight:600;color:#7a4d08;margin-bottom:8px;">📋 Default initial message (sent when no custom message is set)</div>
+                <div style="font-size:0.8rem;color:#5c3d2a;line-height:1.7;font-style:italic;">"Hi [first name]! It's been a while since your last visit — your hair might be ready for some attention! [Stylist name] would love to see you again. Booking takes less than 2 minutes."</div>
+              </div>
+
               <div class="form-group">
                 <label class="form-label">Default reminder interval</label>
                 <select class="form-input" id="profileRebookingWeeks">
@@ -792,16 +819,22 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
               <!-- CUSTOM MESSAGE EDITOR -->
               <div style="margin-bottom:14px;">
-                <label class="form-label" style="margin-bottom:8px;display:block;">Initial reminder message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(edit to personalize)</span></label>
+                <label class="form-label" style="margin-bottom:8px;display:block;">Initial reminder message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(replaces the default above)</span></label>
                 <textarea class="form-input" id="profileRebookingMessage" rows="4" style="resize:vertical;font-family:'DM Sans',sans-serif;"
                   placeholder="Hi [first name]! It has been a while since your last visit. I would love to see you again — click below to grab a spot!"></textarea>
-                <div style="font-size:0.72rem;color:var(--ink-light);margin-top:4px;">Use <strong>[first name]</strong> to personalize. Keep it warm and brief.</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;flex-wrap:wrap;gap:6px;">
+                  <div style="font-size:0.72rem;color:var(--ink-light);">Use <strong>[first name]</strong> to personalize. Leave blank to send the default.</div>
+                  <button class="btn btn-ghost" style="font-size:0.75rem;padding:5px 12px;" onclick="document.getElementById('profileRebookingMessage').value=''">Reset to default</button>
+                </div>
               </div>
 
               <div style="margin-bottom:4px;">
                 <label class="form-label" style="margin-bottom:8px;display:block;">Follow-up message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(sent 2 weeks later if not booked)</span></label>
                 <textarea class="form-input" id="profileRebookingFollowup" rows="3" style="resize:vertical;font-family:'DM Sans',sans-serif;"
                   placeholder="Still thinking about it? No pressure — just wanted to make sure you know I have availability. Would love to see you soon!"></textarea>
+              </div>
+              <div style="background:var(--sage-pale);border:1px solid rgba(94,122,100,0.3);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:#2d5a3d;margin-top:12px;">
+                ✅ Reminders run automatically every day. Clients who already have a future booking are skipped. Save your settings below to apply changes.
               </div>
             </div>
           </div>
@@ -1377,6 +1410,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 </nav>
 
 <script>
+// ── PROFILE HELPERS ──────────────────────────────────────
+function clearReminderMessage() {
+  const el = document.getElementById('profileReminderMessage');
+  if (el) { el.value = ''; el.focus(); }
+  showToast('Reset to default message — save profile to apply');
+}
+
 // ── MOBILE NAV ───────────────────────────────────────────
 function setMobileTab(id) {
   document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
