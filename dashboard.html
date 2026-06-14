@@ -1114,6 +1114,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
           placeholder="General notes about this client…"
           style="width:100%;resize:vertical;font-family:'DM Sans',sans-serif;"></textarea>
       </div>
+      <div style="padding-top:14px;border-top:1px solid var(--border);">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <input type="checkbox" id="clientRebookingOptOut" style="accent-color:var(--rust);width:16px;height:16px;">
+          <span style="font-size:0.82rem;color:var(--ink);">Opt out of rebooking reminders</span>
+        </label>
+        <p style="font-size:0.72rem;color:var(--ink-light);margin-top:4px;margin-left:26px;font-weight:300;">Check this if the client has asked not to receive reminder emails.</p>
+      </div>
     </div>
 
     <!-- TAB 2: HAIR PROFILE -->
@@ -1424,6 +1431,12 @@ async function loadStylistProfile(user) {
   document.getElementById('profileBio').value = stylist.bio || '';
   document.getElementById('profileYears').value = stylist.years_experience || '';
   document.getElementById('profileBookingNote').value = stylist.booking_note || '';
+
+  // Rebooking settings
+  const rebookEnabled = document.getElementById('profileRebookingEnabled');
+  const rebookWeeks = document.getElementById('profileRebookingWeeks');
+  if (rebookEnabled) rebookEnabled.checked = stylist.rebooking_enabled !== false;
+  if (rebookWeeks) rebookWeeks.value = stylist.rebooking_default_weeks || 6;
 
   // Location
   document.getElementById('profileCity').value = stylist.city || '';
@@ -2430,6 +2443,7 @@ function openEditClientModal(id) {
   document.getElementById('clientAllergies').value = c.allergies || '';
   document.getElementById('clientScalp').value = c.scalp_condition || '';
   document.getElementById('clientStylePref').value = c.style_preference || '';
+  document.getElementById('clientRebookingOptOut').checked = c.rebooking_opt_out || false;
   document.getElementById('saveClientBtn').textContent = 'Save Changes';
   document.getElementById('clientModalOverlay').classList.add('open');
 }
@@ -2463,6 +2477,7 @@ async function saveClient() {
     allergies: document.getElementById('clientAllergies').value.trim() || null,
     scalp_condition: document.getElementById('clientScalp').value || null,
     style_preference: document.getElementById('clientStylePref').value || null,
+    rebooking_opt_out: document.getElementById('clientRebookingOptOut')?.checked || false,
     updated_at: new Date().toISOString()
   };
 
@@ -2955,6 +2970,8 @@ async function saveProfile() {
     bio: document.getElementById('profileBio').value,
     years_experience: parseInt(document.getElementById('profileYears').value) || null,
     booking_note: document.getElementById('profileBookingNote').value.trim() || null,
+    rebooking_enabled: document.getElementById('profileRebookingEnabled')?.checked !== false,
+    rebooking_default_weeks: parseInt(document.getElementById('profileRebookingWeeks')?.value || '6'),
     city: document.getElementById('profileCity').value.trim() || null,
     state: document.getElementById('profileState').value.trim() || null,
     full_address: document.getElementById('profileAddress').value.trim() || null,
