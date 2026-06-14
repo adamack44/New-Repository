@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
     // Get all stylists with rebooking enabled
     const stylistsRes = await fetch(
-      `${supabaseUrl}/rest/v1/stylists?rebooking_enabled=eq.true&select=id,name,email,slug,brand_accent,brand_logo_url,rebooking_default_weeks`,
+      `${supabaseUrl}/rest/v1/stylists?rebooking_enabled=eq.true&select=id,name,email,slug,brand_accent,brand_logo_url,rebooking_default_weeks,rebooking_message,rebooking_followup_message`,
       { headers }
     );
     const stylists = await stylistsRes.json();
@@ -99,7 +99,8 @@ export default async function handler(req, res) {
           const weeksAgo = Math.round(daysSinceVisit / 7);
           const html = buildReminderEmail({
             firstName, stylistName: stylist.name, logo, accent, bookingUrl,
-            weeksAgo, isFollowup: false, clientEmail: client.email
+            weeksAgo, isFollowup: false, clientEmail: client.email,
+            customMessage: stylist.rebooking_message
           });
 
           const emailRes = await fetch('https://api.resend.com/emails', {
@@ -130,7 +131,8 @@ export default async function handler(req, res) {
         ) {
           const html = buildReminderEmail({
             firstName, stylistName: stylist.name, logo, accent, bookingUrl,
-            weeksAgo: Math.round(daysSinceVisit / 7), isFollowup: true, clientEmail: client.email
+            weeksAgo: Math.round(daysSinceVisit / 7), isFollowup: true, clientEmail: client.email,
+            customMessage: stylist.rebooking_followup_message
           });
 
           const emailRes = await fetch('https://api.resend.com/emails', {
@@ -167,7 +169,7 @@ export default async function handler(req, res) {
   }
 }
 
-function buildReminderEmail({ firstName, stylistName, logo, accent, bookingUrl, weeksAgo, isFollowup, clientEmail }) {
+function buildReminderEmail({ firstName, stylistName, logo, accent, bookingUrl, weeksAgo, isFollowup, clientEmail, customMessage }) {
   const unsubUrl = bookingUrl + '?unsubscribe=' + encodeURIComponent(clientEmail);
 
   return `<!DOCTYPE html>
@@ -196,15 +198,15 @@ function buildReminderEmail({ firstName, stylistName, logo, accent, bookingUrl, 
       <h1>Hi ${firstName}! ${isFollowup ? 'Still thinking about it?' : "It's been a while."}</h1>
     </div>
     <div class="body">
-      ${isFollowup ? `
-      <p>We noticed you haven't had a chance to rebook yet — no worries, life gets busy!</p>
-      <p>${stylistName} still has some great availability and would love to see you again. If now isn't the right time, no pressure at all.</p>
-      <div class="highlight">When you're ready, booking takes less than a minute through the link below.</div>
-      ` : `
-      <p>It's been about ${weeksAgo} week${weeksAgo !== 1 ? 's' : ''} since your last visit with <strong>${stylistName}</strong> — and your hair might be ready for some attention!</p>
-      <p>Booking is quick and easy. Just tap the button below to see available times and grab a spot.</p>
-      <div class="highlight">Fresh cuts and happy clients — that's what ${stylistName} does best. Don't wait too long to get back in the chair.</div>
-      `}
+      ${customMessage
+        ? `<div class="highlight">${customMessage.replace('[first name]', firstName).split('\n').join('<br>')}</div>`
+        : isFollowup
+          ? `<p>We noticed you have not had a chance to rebook yet — no worries, life gets busy!</p>
+             <p>${stylistName} still has some great availability and would love to see you again.</p>
+             <div class="highlight">When you are ready, booking takes less than a minute through the link below.</div>`
+          : `<p>It has been about ${weeksAgo} week${weeksAgo !== 1 ? 's' : ''} since your last visit with <strong>${stylistName}</strong> — your hair might be ready for some attention!</p>
+             <div class="highlight">Fresh cuts and happy clients — that is what ${stylistName} does best. Grab a spot before the best times fill up.</div>`
+      }
       <a href="${bookingUrl}" class="btn">Book with ${stylistName} →</a>
       <p style="font-size:0.8rem;color:#9c7a6a;text-align:center;margin:0;">Takes less than 2 minutes</p>
     </div>
