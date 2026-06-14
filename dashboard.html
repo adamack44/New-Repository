@@ -904,6 +904,27 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       </div>
       <label class="form-label" style="margin-bottom:8px;display:block;">Times on those days</label>
       <div id="repeatTimeCheckboxes" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px;"></div>
+
+      <div style="margin-bottom:16px;">
+        <label class="form-label" style="margin-bottom:6px;display:block;">Service for these slots <span style="color:var(--ink-light);font-weight:300;text-transform:none;letter-spacing:0;">(optional)</span></label>
+        <select class="date-input" id="repeatService" style="width:100%;" onchange="updateRepeatDuration()">
+          <option value="">Any service / open slot</option>
+        </select>
+      </div>
+
+      <div id="repeatDurationRow" style="margin-bottom:16px;display:none;">
+        <label class="form-label" style="margin-bottom:6px;display:block;">Duration</label>
+        <select class="date-input" id="repeatDuration" style="width:100%;">
+          <option value="30">30 min</option>
+          <option value="45">45 min</option>
+          <option value="60">60 min</option>
+          <option value="90">90 min</option>
+          <option value="120">2 hours</option>
+          <option value="180">3 hours</option>
+          <option value="240">4 hours</option>
+        </select>
+      </div>
+
       <div style="background:var(--cream);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:var(--ink-light);margin-bottom:16px;">
         📅 Repeats for <strong>4 weeks</strong> from today
       </div>
@@ -1267,12 +1288,11 @@ let stylist = null;
 let appointments = [];
 let availability = [];
 const ALL_TIMES = [
-  "12:00am","12:30am","1:00am","1:30am","2:00am","2:30am","3:00am","3:30am",
-  "4:00am","4:30am","5:00am","5:30am","6:00am","6:30am","7:00am","7:30am",
-  "8:00am","8:30am","9:00am","9:30am","10:00am","10:30am","11:00am","11:30am",
-  "12:00pm","12:30pm","1:00pm","1:30pm","2:00pm","2:30pm","3:00pm","3:30pm",
-  "4:00pm","4:30pm","5:00pm","5:30pm","6:00pm","6:30pm","7:00pm","7:30pm",
-  "8:00pm","8:30pm","9:00pm","9:30pm","10:00pm","10:30pm","11:00pm","11:30pm"
+  "7:00am","7:30am","8:00am","8:30am","9:00am","9:30am","10:00am","10:30am",
+  "11:00am","11:30am","12:00pm","12:30pm","1:00pm","1:30pm","2:00pm","2:30pm",
+  "3:00pm","3:30pm","4:00pm","4:30pm","5:00pm","5:30pm","6:00pm","6:30pm",
+  "7:00pm","7:30pm","8:00pm","8:30pm","9:00pm","9:30pm","10:00pm","10:30pm",
+  "11:00pm"
 ];
 
 const ALL_SERVICES = ["Color","Natural Hair","Braids","Locs","Silk Press","Cuts","Highlights","Extensions","Wigs","Blowout"];
@@ -1344,6 +1364,15 @@ async function loadStylistProfile(user) {
   document.getElementById('profileSalon').value = stylist.salon_name || '';
   document.getElementById('profilePhone').value = stylist.phone || '';
   document.getElementById('profileEmail').value = stylist.email || '';
+  // Timezone
+  const tzSel = document.getElementById('profileTimezone');
+  if (tzSel && stylist.timezone) tzSel.value = stylist.timezone;
+  else if (tzSel) {
+    // Auto-detect from browser as default
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz) tzSel.value = tz;
+  }
+
   document.getElementById('profileBio').value = stylist.bio || '';
   document.getElementById('profileYears').value = stylist.years_experience || '';
   document.getElementById('profileBookingNote').value = stylist.booking_note || '';
@@ -2460,6 +2489,20 @@ const DURATION_OPTIONS = [15,30,45,60,90,120,150,180,240];
 let modalMode = 'checkbox';
 let serviceDurationOverrides = {};
 
+function updateRepeatDuration() {
+  const sel = document.getElementById('repeatService');
+  const durRow = document.getElementById('repeatDurationRow');
+  const durSel = document.getElementById('repeatDuration');
+  if (!sel || !durRow) return;
+  const opt = sel.options[sel.selectedIndex];
+  if (opt && opt.dataset.dur) {
+    durSel.value = opt.dataset.dur;
+    durRow.style.display = 'block';
+  } else {
+    durRow.style.display = 'none';
+  }
+}
+
 function renderAvailability() {
   // Show or hide the services setup nudge
   const nudge = document.getElementById('availServicesNudge');
@@ -2657,8 +2700,8 @@ function renderIntervalSelects() {
     startSel.innerHTML += `<option value="${i}">${t}</option>`;
     endSel.innerHTML += `<option value="${i}">${t}</option>`;
   });
-  startSel.selectedIndex = 18; // 9:00am default
-  endSel.selectedIndex = 26;  // 1:00pm default
+  startSel.selectedIndex = 4;  // 9:00am default
+  endSel.selectedIndex = 12; // 1:00pm default
   updateIntervalPreview();
 }
 
@@ -2771,7 +2814,14 @@ async function confirmAddSlots() {
           duration = durEl ? parseInt(durEl.value) : null;
         }
         const svcObj = service ? stylistServices.find(s => s.id === service) : null;
-        slotsToAdd.push({ date: dateStr, time: t, duration_minutes: duration || (svcObj?.duration_minutes || null), service_type: svcObj?.name || null, service_id: service || null });
+        // Get repeat-specific service
+        const repSvcSel = document.getElementById('repeatService');
+        const repSvcOpt = repSvcSel?.options[repSvcSel?.selectedIndex];
+        const repSvcId = repSvcSel?.value || null;
+        const repSvcName = repSvcOpt?.dataset?.name || null;
+        const repDur = repSvcOpt?.dataset?.dur ? parseInt(repSvcOpt.dataset.dur) :
+          (document.getElementById('repeatDuration')?.value ? parseInt(document.getElementById('repeatDuration').value) : null);
+        slotsToAdd.push({ date: dateStr, time: t, duration_minutes: repDur || duration || (svcObj?.duration_minutes || null), service_type: repSvcName || svcObj?.name || null, service_id: repSvcId || service || null });
       });
 
     } else if (modalMode === 'interval') {
