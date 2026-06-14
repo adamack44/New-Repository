@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     // Fetch stylist info
     const stylistIds = [...new Set(appointments.map(a => a.stylist_id))];
     const stylistRes = await fetch(
-      `${supabaseUrl}/rest/v1/stylists?id=in.(${stylistIds.join(',')})&select=id,name,salon_name,phone,slug`,
+      `${supabaseUrl}/rest/v1/stylists?id=in.(${stylistIds.join(',')})&select=id,name,salon_name,phone,slug,brand_accent,brand_logo_url,reminder_message`,
       { headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` } }
     );
     const stylists = await stylistRes.json();
