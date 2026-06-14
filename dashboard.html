@@ -605,96 +605,152 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
     <!-- REMINDERS -->
     <div class="page-section" id="page-reminders">
+
+      <!-- CARD 1: APPOINTMENT REMINDER -->
       <div class="card" style="margin-bottom:20px;">
-        <div class="card-head"><h2>🔔 Reminders & Follow-ups</h2></div>
+        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h2 style="margin-bottom:2px;">24-Hour Appointment Reminder</h2>
+            <div style="font-size:0.78rem;color:var(--ink-light);font-weight:300;">Sent automatically the day before every confirmed appointment</div>
+          </div>
+          <div id="apptReminderSavedBadge" style="display:none;font-size:0.72rem;color:#2d6a35;background:#e8f0e9;border:1px solid #b5d4b8;padding:3px 10px;border-radius:6px;">✅ Saved</div>
+        </div>
         <div class="card-body">
 
-          <!-- APPOINTMENT REMINDER SECTION -->
-          <div style="padding-bottom:24px;margin-bottom:24px;border-bottom:1px solid var(--border);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-              <div>
-                <div style="font-size:0.9rem;font-weight:600;color:var(--ink);margin-bottom:2px;">24-Hour Appointment Reminder</div>
-                <div style="font-size:0.78rem;color:var(--ink-light);font-weight:300;">Sent automatically the day before every confirmed appointment</div>
-              </div>
-              <span style="background:#e8eef8;color:#1a4580;font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:6px;letter-spacing:0.5px;">📧 EMAIL ONLY</span>
-            </div>
-            <div style="background:#fef9f0;border:1px solid #f0d9b0;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
-              <div style="font-size:0.75rem;font-weight:600;color:#7a4d08;margin-bottom:8px;">📋 Default message (used when no custom message is set)</div>
-              <div style="font-size:0.82rem;color:#5c3d2a;line-height:1.7;font-style:italic;">"Hi [first name]! Just a friendly reminder that you have an appointment tomorrow with [stylist name]. We can't wait to see you — if anything comes up, you can manage your appointment at the link below."</div>
-              <div style="font-size:0.72rem;color:#9c7a6a;margin-top:8px;">The appointment date, time, and service are always shown below this message automatically.</div>
-            </div>
-            <div class="form-group" style="margin-bottom:6px;">
-              <label class="form-label" style="margin-bottom:8px;display:block;">Custom message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(replaces the default above)</span></label>
-              <textarea class="form-input" id="profileReminderMessage" rows="4" style="resize:vertical;font-family:'DM Sans',sans-serif;"
-                placeholder="Write your own reminder message here. Example: Hi [first name]! Just a reminder about your appointment tomorrow. Please arrive 5 minutes early — I can't wait to see you!"></textarea>
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:6px;">
-                <div style="font-size:0.72rem;color:var(--ink-light);">Use <strong>[first name]</strong> to personalize. Leave blank to send the default message above.</div>
-                <button class="btn btn-ghost" style="font-size:0.75rem;padding:5px 12px;" onclick="clearReminderMessage()">Reset to default</button>
-              </div>
-            </div>
-            <div style="background:var(--sage-pale);border:1px solid rgba(94,122,100,0.3);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:#2d5a3d;margin-top:12px;">
-              ✅ Reminders go out automatically every day at 10am UTC. No action needed — just save your message and it applies to all future reminders.
-            </div>
-          </div>
-
-          <!-- REBOOKING REMINDERS SECTION -->
-          <div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-              <div>
-                <div style="font-size:0.9rem;font-weight:600;color:var(--ink);margin-bottom:2px;">Rebooking Reminders</div>
-                <div style="font-size:0.78rem;color:var(--ink-light);font-weight:300;">Sent to clients who haven't rebooked after their service interval</div>
-              </div>
-              <span style="background:#e8eef8;color:#1a4580;font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:6px;letter-spacing:0.5px;">📧 EMAIL ONLY</span>
-            </div>
-            <div style="background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px;">
-              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px;">
-                <input type="checkbox" id="profileRebookingEnabled" style="accent-color:var(--rust);width:16px;height:16px;" onchange="document.getElementById('rebookingSettingsFields').style.display=this.checked?'block':'none'">
-                <span style="font-size:0.88rem;font-weight:500;color:var(--ink);">Automatically remind clients to rebook</span>
+          <!-- CHANNEL TOGGLE -->
+          <div style="margin-bottom:20px;">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:10px;">Delivery Channel</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;font-size:0.82rem;background:var(--cream);" id="apptChEmail">
+                <input type="checkbox" id="apptSendEmail" checked style="accent-color:var(--rust);width:15px;height:15px;" onchange="updateApptChannelUI()">
+                <span>📧 Email</span>
               </label>
-              <p style="font-size:0.78rem;color:var(--ink-light);font-weight:300;line-height:1.6;margin:0 0 0 26px;">When enabled, clients receive a friendly email after their set interval. A follow-up goes out 2 weeks later if they still haven't booked. Clients with a future appointment are automatically skipped.</p>
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;cursor:not-allowed;font-size:0.82rem;background:#f5f5f5;opacity:0.5;" title="SMS coming soon — requires business registration">
+                <input type="checkbox" id="apptSendSms" disabled style="width:15px;height:15px;">
+                <span>💬 SMS</span>
+                <span style="font-size:0.65rem;background:#e0e0e0;color:#888;padding:1px 6px;border-radius:4px;margin-left:2px;">COMING SOON</span>
+              </label>
             </div>
-            <div id="rebookingSettingsFields">
-              <div style="background:#fef9f0;border:1px solid #f0d9b0;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
-                <div style="font-size:0.75rem;font-weight:600;color:#7a4d08;margin-bottom:8px;">📋 Default initial message (used when no custom message is set)</div>
-                <div style="font-size:0.82rem;color:#5c3d2a;line-height:1.7;font-style:italic;">"Hi [first name]! It's been a while since your last visit — your hair might be ready for some attention! [Stylist name] would love to see you again. Booking takes less than 2 minutes."</div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Default reminder interval</label>
-                <select class="form-input" id="profileRebookingWeeks">
-                  <option value="4">4 weeks after last visit</option>
-                  <option value="6">6 weeks after last visit</option>
-                  <option value="8">8 weeks after last visit</option>
-                  <option value="10">10 weeks after last visit</option>
-                  <option value="12">12 weeks after last visit</option>
-                </select>
-                <div style="font-size:0.72rem;color:var(--ink-light);margin-top:4px;font-weight:300;">Set per-service intervals in your Service Menu for more precision — great for color (shorter) vs trim-only (longer) clients.</div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" style="margin-bottom:8px;display:block;">Initial reminder message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(replaces the default above)</span></label>
-                <textarea class="form-input" id="profileRebookingMessage" rows="4" style="resize:vertical;font-family:'DM Sans',sans-serif;"
-                  placeholder="Hi [first name]! It has been a while since your last visit. I would love to see you again — click below to grab a spot!"></textarea>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;flex-wrap:wrap;gap:6px;">
-                  <div style="font-size:0.72rem;color:var(--ink-light);">Use <strong>[first name]</strong> to personalize. Leave blank to send the default.</div>
-                  <button class="btn btn-ghost" style="font-size:0.75rem;padding:5px 12px;" onclick="document.getElementById('profileRebookingMessage').value=''">Reset to default</button>
-                </div>
-              </div>
-              <div style="margin-bottom:4px;">
-                <label class="form-label" style="margin-bottom:8px;display:block;">Follow-up message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(sent 2 weeks later if not booked)</span></label>
-                <textarea class="form-input" id="profileRebookingFollowup" rows="3" style="resize:vertical;font-family:'DM Sans',sans-serif;"
-                  placeholder="Still thinking about it? No pressure — just wanted to make sure you know I have availability. Would love to see you soon!"></textarea>
-              </div>
-              <div style="background:var(--sage-pale);border:1px solid rgba(94,122,100,0.3);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:#2d5a3d;margin-top:12px;">
-                ✅ Reminders run automatically every day. Clients with future bookings are skipped. Save settings below to apply changes.
-              </div>
+            <div id="apptChannelWarning" style="display:none;font-size:0.75rem;color:#c0392b;margin-top:6px;">⚠️ At least one delivery channel must be selected.</div>
+          </div>
+
+          <!-- DEFAULT MESSAGE PREVIEW -->
+          <div style="background:#fef9f0;border:1px solid #f0d9b0;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+            <div style="font-size:0.75rem;font-weight:600;color:#7a4d08;margin-bottom:8px;">📋 Default message — sent when no custom message is set below</div>
+            <div style="font-size:0.82rem;color:#5c3d2a;line-height:1.7;font-style:italic;">"Hi [first name]! Just a friendly reminder that you have an appointment tomorrow with [stylist name]. We can't wait to see you — if anything comes up, you can manage your appointment at the link below."</div>
+            <div style="font-size:0.72rem;color:#9c7a6a;margin-top:8px;">Appointment date, time, and service are always included automatically regardless of message.</div>
+          </div>
+
+          <!-- CUSTOM MESSAGE -->
+          <div class="form-group" style="margin-bottom:6px;">
+            <label class="form-label" style="margin-bottom:6px;display:block;">Custom message <span style="font-weight:300;text-transform:none;letter-spacing:0;font-size:0.78rem;">— type here to override the default above</span></label>
+            <textarea class="form-input" id="profileReminderMessage" rows="4" style="resize:vertical;font-family:'DM Sans',sans-serif;"
+              placeholder="Write your own message here. Example: Hi [first name]! Your appointment is tomorrow — please arrive 5 minutes early. Can't wait to see you!"></textarea>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:8px;">
+              <div style="font-size:0.72rem;color:var(--ink-light);line-height:1.6;">Use <strong>[first name]</strong> to personalize. <strong>Clearing this field</strong> and saving will revert to the default message above.</div>
+              <button class="btn btn-ghost" style="font-size:0.75rem;padding:5px 12px;white-space:nowrap;" onclick="clearReminderMessage()">↩ Revert to default</button>
             </div>
           </div>
 
-          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
-            <button class="btn btn-primary" onclick="saveReminders()">Save Reminder Settings</button>
+          <div style="background:var(--sage-pale);border:1px solid rgba(94,122,100,0.3);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:#2d5a3d;margin-bottom:20px;">
+            ✅ Runs automatically every day at 10am UTC — no manual action needed after saving.
           </div>
 
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-ghost" onclick="loadReminders()">Discard changes</button>
+            <button class="btn btn-primary" onclick="saveApptReminder()">Save Appointment Reminder</button>
+          </div>
         </div>
       </div>
+
+      <!-- CARD 2: REBOOKING REMINDERS -->
+      <div class="card">
+        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h2 style="margin-bottom:2px;">Rebooking Reminders</h2>
+            <div style="font-size:0.78rem;color:var(--ink-light);font-weight:300;">Sent to clients who have not rebooked after their service interval</div>
+          </div>
+          <div id="rebookSavedBadge" style="display:none;font-size:0.72rem;color:#2d6a35;background:#e8f0e9;border:1px solid #b5d4b8;padding:3px 10px;border-radius:6px;">✅ Saved</div>
+        </div>
+        <div class="card-body">
+
+          <!-- ENABLE TOGGLE -->
+          <div style="background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px;">
+              <input type="checkbox" id="profileRebookingEnabled" style="accent-color:var(--rust);width:16px;height:16px;" onchange="document.getElementById('rebookingSettingsFields').style.display=this.checked?'block':'none'">
+              <span style="font-size:0.88rem;font-weight:500;color:var(--ink);">Enable automatic rebooking reminders</span>
+            </label>
+            <p style="font-size:0.78rem;color:var(--ink-light);font-weight:300;line-height:1.6;margin:0 0 0 26px;">When on, clients receive a reminder email once their interval has passed with no new booking. A follow-up goes out 2 weeks later. Clients with a future appointment are always skipped.</p>
+          </div>
+
+          <div id="rebookingSettingsFields">
+
+            <!-- CHANNEL TOGGLE -->
+            <div style="margin-bottom:20px;">
+              <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:10px;">Delivery Channel</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:8px;padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;font-size:0.82rem;background:var(--cream);">
+                  <input type="checkbox" id="rebookSendEmail" checked style="accent-color:var(--rust);width:15px;height:15px;">
+                  <span>📧 Email</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;cursor:not-allowed;font-size:0.82rem;background:#f5f5f5;opacity:0.5;" title="SMS coming soon">
+                  <input type="checkbox" id="rebookSendSms" disabled style="width:15px;height:15px;">
+                  <span>💬 SMS</span>
+                  <span style="font-size:0.65rem;background:#e0e0e0;color:#888;padding:1px 6px;border-radius:4px;margin-left:2px;">COMING SOON</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- INTERVAL -->
+            <div class="form-group">
+              <label class="form-label">Default reminder interval</label>
+              <select class="form-input" id="profileRebookingWeeks">
+                <option value="4">4 weeks after last visit</option>
+                <option value="6">6 weeks after last visit</option>
+                <option value="8">8 weeks after last visit</option>
+                <option value="10">10 weeks after last visit</option>
+                <option value="12">12 weeks after last visit</option>
+              </select>
+              <div style="font-size:0.72rem;color:var(--ink-light);margin-top:4px;">You can set per-service intervals in your Service Menu — useful for color clients (shorter) vs trim-only (longer).</div>
+            </div>
+
+            <!-- DEFAULT MESSAGE -->
+            <div style="background:#fef9f0;border:1px solid #f0d9b0;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+              <div style="font-size:0.75rem;font-weight:600;color:#7a4d08;margin-bottom:8px;">📋 Default initial message — sent when no custom message is set</div>
+              <div style="font-size:0.82rem;color:#5c3d2a;line-height:1.7;font-style:italic;">"Hi [first name]! It's been a while since your last visit — your hair might be ready for some attention! [Stylist name] would love to see you again. Booking takes less than 2 minutes."</div>
+            </div>
+
+            <!-- INITIAL MESSAGE -->
+            <div class="form-group">
+              <label class="form-label" style="margin-bottom:6px;display:block;">Initial reminder message <span style="font-weight:300;text-transform:none;letter-spacing:0;font-size:0.78rem;">— overrides the default above</span></label>
+              <textarea class="form-input" id="profileRebookingMessage" rows="4" style="resize:vertical;font-family:'DM Sans',sans-serif;"
+                placeholder="Hi [first name]! It has been a while — I would love to see you again. Click below to grab a spot!"></textarea>
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:8px;">
+                <div style="font-size:0.72rem;color:var(--ink-light);line-height:1.6;">Use <strong>[first name]</strong> to personalize. <strong>Clear this field</strong> and save to revert to the default message above.</div>
+                <button class="btn btn-ghost" style="font-size:0.75rem;padding:5px 12px;white-space:nowrap;" onclick="document.getElementById('profileRebookingMessage').value=''">↩ Revert to default</button>
+              </div>
+            </div>
+
+            <!-- FOLLOW-UP MESSAGE -->
+            <div class="form-group" style="margin-bottom:16px;">
+              <label class="form-label" style="margin-bottom:6px;display:block;">Follow-up message <span style="font-weight:300;text-transform:none;letter-spacing:0;font-size:0.78rem;">— sent 2 weeks after initial if still not booked</span></label>
+              <textarea class="form-input" id="profileRebookingFollowup" rows="3" style="resize:vertical;font-family:'DM Sans',sans-serif;"
+                placeholder="Still thinking about it? No pressure — just checking in. Would love to see you soon!"></textarea>
+              <div style="font-size:0.72rem;color:var(--ink-light);margin-top:4px;">Leave blank to use a default friendly follow-up message.</div>
+            </div>
+
+            <div style="background:var(--sage-pale);border:1px solid rgba(94,122,100,0.3);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:#2d5a3d;margin-bottom:20px;">
+              ✅ Runs automatically every day. Clients with future bookings are always skipped.
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-ghost" onclick="loadReminders()">Discard changes</button>
+            <button class="btn btn-primary" onclick="saveRebookingReminders()">Save Rebooking Reminders</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- BROADCAST -->
