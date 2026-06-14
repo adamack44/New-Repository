@@ -751,6 +751,20 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
             <button class="btn btn-ghost" style="font-size:0.78rem;" onclick="addCustomSocialLink()">+ Add Another Link</button>
           </div>
 
+          <!-- APPOINTMENT REMINDER SECTION -->
+          <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:8px;margin-bottom:20px;">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">24-Hour Appointment Reminder</div>
+            <div style="background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px;">
+              <p style="font-size:0.78rem;color:var(--ink-light);font-weight:300;line-height:1.6;margin:0;">Clients automatically receive a reminder email 24 hours before their appointment. Customize the message below — or leave blank to use the default.</p>
+            </div>
+            <div class="form-group" style="margin-bottom:4px;">
+              <label class="form-label" style="margin-bottom:8px;display:block;">Reminder message <span style="font-weight:300;text-transform:none;letter-spacing:0;">(optional)</span></label>
+              <textarea class="form-input" id="profileReminderMessage" rows="4" style="resize:vertical;font-family:'DM Sans',sans-serif;"
+                placeholder="e.g. Just a reminder that you have an appointment tomorrow! Please arrive 5 minutes early and reach out if you need to reschedule. Can't wait to see you!"></textarea>
+              <div style="font-size:0.72rem;color:var(--ink-light);margin-top:4px;">Use <strong>[first name]</strong> to personalize. The appointment date and time are always included automatically.</div>
+            </div>
+          </div>
+
           <!-- REBOOKING REMINDERS SECTION -->
           <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:8px;">
             <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:14px;">Rebooking Reminders</div>
@@ -1472,6 +1486,10 @@ async function loadStylistProfile(user) {
   document.getElementById('profileBio').value = stylist.bio || '';
   document.getElementById('profileYears').value = stylist.years_experience || '';
   document.getElementById('profileBookingNote').value = stylist.booking_note || '';
+
+  // Appointment reminder message
+  const reminderMsg = document.getElementById('profileReminderMessage');
+  if (reminderMsg) reminderMsg.value = stylist.reminder_message || '';
 
   // Rebooking settings
   const rebookEnabled = document.getElementById('profileRebookingEnabled');
@@ -3019,6 +3037,7 @@ async function saveProfile() {
     bio: document.getElementById('profileBio').value,
     years_experience: parseInt(document.getElementById('profileYears').value) || null,
     booking_note: document.getElementById('profileBookingNote').value.trim() || null,
+    reminder_message: document.getElementById('profileReminderMessage')?.value.trim() || null,
     rebooking_enabled: document.getElementById('profileRebookingEnabled')?.checked || false,
     rebooking_default_weeks: parseInt(document.getElementById('profileRebookingWeeks')?.value || '6'),
     rebooking_message: document.getElementById('profileRebookingMessage')?.value.trim() || null,
