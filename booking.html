@@ -242,7 +242,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
     <div class="availability-panel">
       <div class="panel-header">
         <h2>Upcoming Availability</h2>
-        <p id="availDateRange">Next 7 days</p>
+        <p id="availDateRange">Next 12 months</p>
         <p id="availTimezone" style="font-size:0.72rem;color:var(--text-light);margin-top:2px;display:none;"></p>
       </div>
       <div class="availability-body">
@@ -364,7 +364,7 @@ async function loadStylistData(slug) {
 async function loadAvailability() {
   if (!stylist?.id) return;
   const today = new Date().toISOString().split('T')[0];
-  const futureDate = new Date(); futureDate.setDate(futureDate.getDate() + 14);
+  const futureDate = new Date(); futureDate.setMonth(futureDate.getMonth() + 12);
   const futureDateStr = futureDate.toISOString().split('T')[0];
 
   const { data, error } = await supabaseClient
@@ -602,7 +602,7 @@ function renderAvailabilityPanel() {
     byDate[slot.date].push(slot);
   });
 
-  const dates = Object.keys(byDate).sort().slice(0, 7);
+  const dates = Object.keys(byDate).sort().slice(0, 30); // show up to 30 days of open slots
 
   if (!dates.length) {
     container.innerHTML = '<div style="text-align:center;padding:20px;color:#9c7a6a;font-size:0.82rem;font-style:italic;">No availability set yet</div>';
