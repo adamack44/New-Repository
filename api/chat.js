@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     }
 
     const payload = {
-      model: model || 'claude-sonnet-4-20250514',
+      model: model || 'claude-sonnet-4-6',
       max_tokens: max_tokens || 1000,
       messages
     };
@@ -63,4 +63,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Server error: ' + error.message });
   }
 }
-
