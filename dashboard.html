@@ -1480,6 +1480,65 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 
 <script>
 // ── REMINDERS ────────────────────────────────────────────
+function updateApptChannelUI() {
+  const emailOn = document.getElementById('apptSendEmail')?.checked;
+  const warning = document.getElementById('apptChannelWarning');
+  if (warning) warning.style.display = emailOn ? 'none' : 'block';
+}
+
+async function saveApptReminder() {
+  const btns = document.querySelectorAll('#page-reminders button[onclick="saveApptReminder()"]');
+  btns.forEach(b => { b.disabled = true; b.textContent = 'Saving…'; });
+
+  const updates = {
+    reminder_message: document.getElementById('profileReminderMessage')?.value.trim() || null,
+  };
+
+  const { error } = await supabaseClient.from('stylists').update(updates).eq('id', stylist.id);
+
+  btns.forEach(b => { b.disabled = false; b.textContent = 'Save Appointment Reminder'; });
+
+  if (error) { showToast('⚠️ Could not save: ' + error.message); return; }
+  Object.assign(stylist, updates);
+
+  // Show green ✅ Saved badge in card header
+  const badge = document.getElementById('apptReminderSavedBadge');
+  if (badge) {
+    badge.style.display = 'inline-block';
+    badge.textContent = updates.reminder_message ? '✅ Custom message saved' : '✅ Reverted to default';
+    setTimeout(() => { badge.style.display = 'none'; }, 4000);
+  }
+  showToast(updates.reminder_message ? '✅ Custom reminder message saved!' : '✅ Reminder reverted to default message');
+}
+
+async function saveRebookingReminders() {
+  const btns = document.querySelectorAll('#page-reminders button[onclick="saveRebookingReminders()"]');
+  btns.forEach(b => { b.disabled = true; b.textContent = 'Saving…'; });
+
+  const updates = {
+    rebooking_enabled: document.getElementById('profileRebookingEnabled')?.checked || false,
+    rebooking_default_weeks: parseInt(document.getElementById('profileRebookingWeeks')?.value || '6'),
+    rebooking_message: document.getElementById('profileRebookingMessage')?.value.trim() || null,
+    rebooking_followup_message: document.getElementById('profileRebookingFollowup')?.value.trim() || null,
+  };
+
+  const { error } = await supabaseClient.from('stylists').update(updates).eq('id', stylist.id);
+
+  btns.forEach(b => { b.disabled = false; b.textContent = 'Save Rebooking Reminders'; });
+
+  if (error) { showToast('⚠️ Could not save: ' + error.message); return; }
+  Object.assign(stylist, updates);
+
+  // Show green ✅ Saved badge in card header
+  const badge = document.getElementById('rebookSavedBadge');
+  if (badge) {
+    badge.style.display = 'inline-block';
+    badge.textContent = updates.rebooking_enabled ? '✅ Reminders active' : '✅ Reminders off';
+    setTimeout(() => { badge.style.display = 'none'; }, 4000);
+  }
+  showToast(updates.rebooking_enabled ? '✅ Rebooking reminders saved and active!' : '✅ Rebooking reminders turned off');
+}
+
 function loadReminders() {
   if (!stylist) return;
   const rebookEnabled = document.getElementById('profileRebookingEnabled');
