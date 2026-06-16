@@ -268,8 +268,8 @@ async function handleSubmit() {
 
       if (profileError) { showError('Account created but profile setup failed: ' + profileError.message); btn.disabled = false; btn.textContent = 'Create Account →'; return; }
 
-      showSuccess('Account created! Redirecting to upgrade…');
-      setTimeout(() => { window.location.href = 'upgrade.html'; }, 1500);
+      showSuccess('Account created! Redirecting…');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
     }
   } catch(err) {
     showError('Something went wrong: ' + err.message);
