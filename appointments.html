@@ -201,7 +201,7 @@ async function lookupAppointments() {
       .from('appointments')
       .select(`
         id, customer_name, customer_phone, customer_email,
-        service, date, time, status,
+        service, date, time, status, availability_id,
         stylist_id, stylist:stylists(name, salon_name)
       `)
       .order('date', { ascending: true });
