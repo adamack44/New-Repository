@@ -2559,7 +2559,9 @@ async function confirmBookForClient() {
     } else if (bookingSelectedClient) {
       await supabaseClient.from('clients').update({
         visit_count: (bookingSelectedClient.visit_count || 0) + 1,
-        last_visited: dateStr
+        last_visited: dateStr,
+        rebooking_reminder_sent_at: null,
+        rebooking_followup_sent_at: null
       }).eq('id', bookingSelectedClient.id);
     }
 
