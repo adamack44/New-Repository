@@ -306,8 +306,9 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
       </div>
       <div class="availability-body" style="max-height:500px;overflow-y:auto;">
         <div id="availabilityList"><div style="text-align:center;padding:20px;color:#9c7a6a;font-size:0.82rem;">Loading availability…</div></div>
-        <div class="legend" style="padding-top:14px;margin-top:14px;border-top:1px solid var(--sand);">
+        <div class="legend" style="padding-top:14px;margin-top:14px;border-top:1px solid var(--sand);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
           <div class="legend-item"><span class="legend-dot open"></span> Available to book</div>
+          <button onclick="openWaitlistModal()" style="background:none;border:none;color:var(--terracotta);font-family:'Lato',sans-serif;font-size:0.76rem;font-weight:500;cursor:pointer;text-decoration:underline;">Don't see a time that works? Join waitlist →</button>
         </div>
       </div>
     </div>
@@ -326,6 +327,78 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
     </div>
   </div>
 
+</div>
+
+<!-- WAITLIST MODAL -->
+<div id="waitlistOverlay" style="display:none;position:fixed;inset:0;background:rgba(45,31,24,0.5);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:28px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--text-dark);margin:0;">Join the Waitlist</h3>
+      <button onclick="closeWaitlistModal()" style="background:none;border:none;font-size:20px;color:var(--text-light);cursor:pointer;">✕</button>
+    </div>
+    <p style="font-size:0.84rem;color:var(--text-light);margin-bottom:20px;line-height:1.6;">Let <span id="waitlistStylistName">your stylist</span> know you're interested in a spot. They'll reach out personally if something opens up.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div>
+        <label style="font-size:0.72rem;font-weight:600;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Your Name *</label>
+        <input type="text" id="wlName" placeholder="Jane Smith" style="width:100%;padding:10px 14px;border:1.5px solid var(--sand-dark);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.86rem;">
+      </div>
+      <div>
+        <label style="font-size:0.72rem;font-weight:600;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Phone</label>
+        <input type="tel" id="wlPhone" placeholder="615-555-0100" style="width:100%;padding:10px 14px;border:1.5px solid var(--sand-dark);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.86rem;">
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="font-size:0.72rem;font-weight:600;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Email *</label>
+      <input type="email" id="wlEmail" placeholder="jane@email.com" style="width:100%;padding:10px 14px;border:1.5px solid var(--sand-dark);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.86rem;">
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="font-size:0.72rem;font-weight:600;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Service</label>
+      <select id="wlService" style="width:100%;padding:10px 14px;border:1.5px solid var(--sand-dark);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.86rem;background:#fff;">
+        <option value="">Any service</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <label style="font-size:0.72rem;font-weight:600;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px;">When works for you?</label>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button type="button" id="wlModeSpecific" onclick="setWaitlistMode('specific')" style="flex:1;padding:9px;border:1.5px solid var(--sand-dark);border-radius:9px;background:#fff;font-family:'Lato',sans-serif;font-size:0.8rem;cursor:pointer;">📅 Specific date</button>
+        <button type="button" id="wlModeFlexible" onclick="setWaitlistMode('flexible')" style="flex:1;padding:9px;border:1.5px solid var(--terracotta);border-radius:9px;background:var(--terracotta);color:#fff;font-family:'Lato',sans-serif;font-size:0.8rem;cursor:pointer;">🗓️ Flexible range</button>
+      </div>
+
+      <div id="wlSpecificFields" style="display:none;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <input type="date" id="wlSpecificDate" style="width:100%;padding:10px 14px;border:1.5px solid var(--sand-dark);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.86rem;">
+        </div>
+        <div>
+          <select id="wlSpecificTime" style="width:100%;padding:10px 14px;border:1.5px solid var(--sand-dark);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.86rem;background:#fff;">
+            <option value="">Any time that day</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="wlFlexibleFields" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <label style="font-size:0.68rem;color:var(--text-light);display:block;margin-bottom:4px;">From</label>
+          <input type="date" id="wlRangeStart" style="width:100%;padding:10px 14px;border:1.5px solid var(--sand-dark);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.86rem;">
+        </div>
+        <div>
+          <label style="font-size:0.68rem;color:var(--text-light);display:block;margin-bottom:4px;">To</label>
+          <input type="date" id="wlRangeEnd" style="width:100%;padding:10px 14px;border:1.5px solid var(--sand-dark);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.86rem;">
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <label style="font-size:0.72rem;font-weight:600;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Notes (optional)</label>
+      <textarea id="wlNotes" rows="2" placeholder="Anything else to share..." style="width:100%;padding:10px 14px;border:1.5px solid var(--sand-dark);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.86rem;resize:vertical;"></textarea>
+    </div>
+
+    <button onclick="submitWaitlist()" id="wlSubmitBtn" style="width:100%;padding:13px;background:var(--terracotta);color:#fff;border:none;border-radius:10px;font-family:'Lato',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;">Join Waitlist</button>
+    <div id="wlSuccessMsg" style="display:none;text-align:center;padding:16px;background:#e8f0e9;border-radius:10px;color:#2d6a35;font-size:0.86rem;margin-top:12px;">✅ You're on the list! We'll reach out if a spot opens up.</div>
+  </div>
 </div>
 
 <div class="page-footer">Powered by <a href="index.html">Salon Assist CX</a> · AI scheduling for independent stylists</div>
@@ -705,7 +778,8 @@ function renderAvailabilityPanel() {
   const dates = Object.keys(byDate).sort();
 
   if (!dates.length) {
-    container.innerHTML = '<div style="text-align:center;padding:24px 20px;color:#9c7a6a;font-size:0.82rem;font-style:italic;">No open slots in this range.<br><span style="font-size:0.75rem;">Try a different time range or navigate forward.</span></div>';
+    container.innerHTML = '<div style="text-align:center;padding:24px 20px;color:#9c7a6a;font-size:0.82rem;font-style:italic;">No open slots in this range.<br><span style="font-size:0.75rem;">Try a different time range or navigate forward.</span></div>' +
+      '<div style="text-align:center;padding:0 20px 20px;"><button onclick="openWaitlistModal()" style="background:var(--terracotta);color:#fff;border:none;padding:10px 22px;border-radius:9px;font-family:\'Lato\',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;">Join the Waitlist</button></div>';
     return;
   }
 
@@ -1160,6 +1234,120 @@ function showTyping() {
 }
 
 function hideTyping() { document.getElementById('typingWrap')?.remove(); }
+
+// ── WAITLIST ─────────────────────────────────────────────
+let waitlistMode = 'flexible';
+
+function openWaitlistModal() {
+  const overlay = document.getElementById('waitlistOverlay');
+  document.getElementById('waitlistStylistName').textContent = stylist?.name || 'your stylist';
+
+  // Populate service dropdown
+  const svcSel = document.getElementById('wlService');
+  svcSel.innerHTML = '<option value="">Any service</option>';
+  (stylistServices || []).filter(s => s.is_active !== false).forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.name;
+    opt.textContent = s.name;
+    svcSel.appendChild(opt);
+  });
+
+  // Populate time dropdown
+  const timeSel = document.getElementById('wlSpecificTime');
+  timeSel.innerHTML = '<option value="">Any time that day</option>';
+  (ALL_TIMES || []).forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    timeSel.appendChild(opt);
+  });
+
+  // Set min dates to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('wlSpecificDate').min = today;
+  document.getElementById('wlRangeStart').min = today;
+  document.getElementById('wlRangeEnd').min = today;
+
+  setWaitlistMode('flexible');
+  document.getElementById('wlSubmitBtn').style.display = 'block';
+  document.getElementById('wlSuccessMsg').style.display = 'none';
+
+  overlay.style.display = 'flex';
+}
+
+function closeWaitlistModal() {
+  document.getElementById('waitlistOverlay').style.display = 'none';
+}
+
+function setWaitlistMode(mode) {
+  waitlistMode = mode;
+  const specBtn = document.getElementById('wlModeSpecific');
+  const flexBtn = document.getElementById('wlModeFlexible');
+  const specFields = document.getElementById('wlSpecificFields');
+  const flexFields = document.getElementById('wlFlexibleFields');
+
+  if (mode === 'specific') {
+    specBtn.style.background = 'var(--terracotta)'; specBtn.style.color = '#fff'; specBtn.style.borderColor = 'var(--terracotta)';
+    flexBtn.style.background = '#fff'; flexBtn.style.color = 'var(--text-dark)'; flexBtn.style.borderColor = 'var(--sand-dark)';
+    specFields.style.display = 'grid';
+    flexFields.style.display = 'none';
+  } else {
+    flexBtn.style.background = 'var(--terracotta)'; flexBtn.style.color = '#fff'; flexBtn.style.borderColor = 'var(--terracotta)';
+    specBtn.style.background = '#fff'; specBtn.style.color = 'var(--text-dark)'; specBtn.style.borderColor = 'var(--sand-dark)';
+    flexFields.style.display = 'grid';
+    specFields.style.display = 'none';
+  }
+}
+
+async function submitWaitlist() {
+  const name = document.getElementById('wlName').value.trim();
+  const email = document.getElementById('wlEmail').value.trim();
+  const phone = document.getElementById('wlPhone').value.trim();
+  const service = document.getElementById('wlService').value;
+  const notes = document.getElementById('wlNotes').value.trim();
+  const btn = document.getElementById('wlSubmitBtn');
+
+  if (!name || !email) {
+    alert('Please enter your name and email.');
+    return;
+  }
+
+  const row = {
+    stylist_id: stylist.id,
+    customer_name: name,
+    customer_email: email,
+    customer_phone: phone || null,
+    service: service || null,
+    preference_type: waitlistMode,
+    notes: notes || null,
+    status: 'waiting'
+  };
+
+  if (waitlistMode === 'specific') {
+    row.specific_date = document.getElementById('wlSpecificDate').value || null;
+    row.specific_time = document.getElementById('wlSpecificTime').value || null;
+    if (!row.specific_date) { alert('Please choose a date.'); return; }
+  } else {
+    row.flexible_range_start = document.getElementById('wlRangeStart').value || null;
+    row.flexible_range_end = document.getElementById('wlRangeEnd').value || null;
+    if (!row.flexible_range_start || !row.flexible_range_end) { alert('Please choose a date range.'); return; }
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Joining...';
+
+  try {
+    const { error } = await supabaseClient.from('waitlist').insert(row);
+    if (error) throw error;
+
+    btn.style.display = 'none';
+    document.getElementById('wlSuccessMsg').style.display = 'block';
+    setTimeout(() => closeWaitlistModal(), 2500);
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Join Waitlist';
+    alert('Something went wrong. Please try again.');
+  }
+}
 </script>
 </body>
 </html>
