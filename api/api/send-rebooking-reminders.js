@@ -87,7 +87,20 @@ export default async function handler(req, res) {
           { headers }
         );
         const futureAppts = await futureApptRes.json();
-        if (futureAppts.length > 0) continue; // already booked, skip
+        if (futureAppts.length > 0) {
+          // Client has a future booking — reset reminder timestamps so sequence restarts after visit
+          if (client.rebooking_reminder_sent_at || client.rebooking_followup_sent_at) {
+            await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${client.id}`, {
+              method: 'PATCH',
+              headers: { ...headers, 'Prefer': 'return=minimal' },
+              body: JSON.stringify({
+                rebooking_reminder_sent_at: null,
+                rebooking_followup_sent_at: null
+              })
+            });
+          }
+          continue; // skip — they're already booked
+        }
 
         const accent = stylist.brand_accent || '#b85c38';
         const logo = stylist.brand_logo_url || 'https://www.salonassistcx.com/logo.png';
