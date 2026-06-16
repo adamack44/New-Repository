@@ -171,6 +171,16 @@ body { font-family: 'Lato', sans-serif; background: var(--cream); color: var(--t
 let appointments = [];
 let cancelTargetId = null;
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ── LOOKUP ────────────────────────────────────────────────
 async function lookupAppointments() {
   const input = document.getElementById('lookupInput').value.trim();
@@ -305,7 +315,7 @@ function buildApptCard(appt) {
     </div>
     ${!isCancelled && !isPast ? `
     <div class="appt-card-footer">
-      <button class="cancel-btn" onclick="openCancelModal('${appt.id}', '${stylistName}', '${dateLabel}', '${appt.time}', '${appt.service || ''}')">
+      <button class="cancel-btn" data-appt-id="${appt.id}" data-stylist-name="${escapeHtml(stylistName)}" data-date-label="${escapeHtml(dateLabel)}" data-time="${escapeHtml(appt.time)}" data-service="${escapeHtml(appt.service || '')}">
         Cancel appointment
       </button>
     </div>` : ''}
@@ -317,9 +327,23 @@ function buildApptCard(appt) {
 function openCancelModal(id, stylist, date, time, service) {
   cancelTargetId = id;
   document.getElementById('modalSummary').innerHTML =
-    `<strong>${stylist}</strong><br>${date} at ${time}${service ? '<br>' + service : ''}`;
+    `<strong>${escapeHtml(stylist)}</strong><br>${escapeHtml(date)} at ${escapeHtml(time)}${service ? '<br>' + escapeHtml(service) : ''}`;
   document.getElementById('modalOverlay').classList.add('open');
 }
+
+// Event delegation — works regardless of special characters in data, no inline onclick needed
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.cancel-btn');
+  if (btn) {
+    openCancelModal(
+      btn.dataset.apptId,
+      btn.dataset.stylistName,
+      btn.dataset.dateLabel,
+      btn.dataset.time,
+      btn.dataset.service
+    );
+  }
+});
 
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');
