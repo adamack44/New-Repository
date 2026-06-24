@@ -1727,7 +1727,187 @@ async function saveReminders() {
   showToast('✅ Reminder settings saved!');
 }
 
+// ── SUBSCRIPTION MANAGEMENT ──────────────────────────────
+async function loadSubscription() {
+  if (!stylist?.stripe_subscription_id) {
+    renderSubscriptionEmpty();
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/billing-portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get_subscription', subscription_id: stylist.stripe_subscription_id })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error);
+    renderSubscriptionDetails(data);
+
+    // Also load invoices
+    if (stylist.stripe_customer_id) {
+      const invRes = await fetch('/api/billing-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'get_invoices', customer_id: stylist.stripe_customer_id })
+      });
+      const invData = await invRes.json();
+      if (invRes.ok && invData.invoices) renderInvoices(invData.invoices);
+    }
+  } catch(e) {
+    document.getElementById('subscriptionBody').innerHTML =
+      '<div style="font-size:0.84rem;color:var(--ink-light);">Could not load subscription details. <a href="#" onclick="loadSubscription()" style="color:var(--rust);">Try again</a></div>';
+  }
+}
+
+function renderSubscriptionEmpty() {
+  const badge = document.getElementById('subStatusBadge');
+  if (badge) { badge.textContent = 'Inactive'; badge.style.background = '#fdecea'; badge.style.color = '#c0392b'; }
+  document.getElementById('subscriptionBody').innerHTML =
+    '<div style="font-size:0.84rem;color:var(--ink-light);margin-bottom:16px;">No active subscription found.</div>' +
+    '<button class="btn btn-primary" onclick="goToUpgrade()">Choose a Plan →</button>';
+}
+
+function renderSubscriptionDetails(sub) {
+  const badge = document.getElementById('subStatusBadge');
+  const periodEnd = new Date(sub.current_period_end * 1000).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+  const amount = '$' + (sub.amount / 100).toFixed(0);
+  const planLabel = sub.plan === 'annual' ? 'Annual Plan' : 'Monthly Plan';
+  const billingLabel = sub.plan === 'annual' ? 'per year' : 'per month';
+
+  if (badge) {
+    if (sub.cancel_at_period_end) {
+      badge.textContent = 'Cancels ' + periodEnd;
+      badge.style.background = '#fef9f0';
+      badge.style.color = '#7a4d08';
+    } else {
+      badge.textContent = 'Active';
+      badge.style.background = '#e8f0e9';
+      badge.style.color = '#2d6a35';
+    }
+  }
+
+  document.getElementById('subscriptionBody').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">' +
+      '<div style="background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">' +
+        '<div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink-light);font-weight:600;margin-bottom:4px;">Current Plan</div>' +
+        '<div style="font-size:0.96rem;font-weight:600;color:var(--ink);">' + planLabel + '</div>' +
+        '<div style="font-size:0.8rem;color:var(--ink-light);">' + amount + ' ' + billingLabel + '</div>' +
+      '</div>' +
+      '<div style="background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">' +
+        '<div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink-light);font-weight:600;margin-bottom:4px;">' +
+          (sub.cancel_at_period_end ? 'Access Until' : 'Next Billing Date') + '</div>' +
+        '<div style="font-size:0.96rem;font-weight:600;color:var(--ink);">' + periodEnd + '</div>' +
+        '<div style="font-size:0.8rem;color:var(--ink-light);">' + (sub.cancel_at_period_end ? 'Then access ends' : 'Auto-renews') + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Plan switch option
+    (sub.plan === 'monthly' && !sub.cancel_at_period_end ?
+      '<div style="background:#fef9f0;border:1px solid #f0d9b0;border-radius:10px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
+        '<div><div style="font-size:0.82rem;font-weight:600;color:var(--ink);">Switch to Annual — Save $60/year</div>' +
+        '<div style="font-size:0.76rem;color:var(--ink-light);">$300/year instead of $360 · 2 months free</div></div>' +
+        '<button class="btn btn-primary" style="font-size:0.78rem;padding:7px 14px;" onclick="switchToAnnual()">Switch Now</button>' +
+      '</div>' : '') +
+
+    // Cancel / Reactivate
+    '<div style="padding-top:16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
+      '<div>' +
+        '<button class="btn btn-ghost" style="font-size:0.78rem;" onclick="openBillingPortal()">Manage Payment Method / Invoices</button>' +
+      '</div>' +
+      (sub.cancel_at_period_end
+        ? '<button class="btn btn-primary" style="font-size:0.78rem;" onclick="reactivateSubscription()">Reactivate Subscription</button>'
+        : '<button class="btn btn-ghost" style="font-size:0.78rem;color:#c0392b;border-color:#f5c6c6;" onclick="confirmCancelSubscription()">Cancel Subscription</button>'
+      ) +
+    '</div>' +
+
+    '<div id="invoiceSection"></div>';
+}
+
+function renderInvoices(invoices) {
+  if (!invoices.length) return;
+  const el = document.getElementById('invoiceSection');
+  if (!el) return;
+  el.innerHTML = '<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">' +
+    '<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink-light);font-weight:600;margin-bottom:12px;">Recent Invoices</div>' +
+    invoices.map(inv => {
+      const date = new Date(inv.date * 1000).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+      const amount = '$' + (inv.amount / 100).toFixed(2);
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">' +
+        '<div><div style="font-weight:500;color:var(--ink);">' + date + '</div></div>' +
+        '<div style="display:flex;align-items:center;gap:12px;">' +
+          '<span style="color:var(--ink);">' + amount + '</span>' +
+          (inv.pdf ? '<a href="' + inv.pdf + '" target="_blank" style="color:var(--rust);font-size:0.76rem;">Download PDF</a>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
+
+async function openBillingPortal() {
+  if (!stylist?.stripe_customer_id) { showToast('⚠️ No billing account found'); return; }
+  showToast('Opening billing portal…');
+  try {
+    const res = await fetch('/api/billing-portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'portal', customer_id: stylist.stripe_customer_id })
+    });
+    const data = await res.json();
+    if (data.url) window.open(data.url, '_blank');
+    else showToast('⚠️ Could not open billing portal: ' + (data.error || 'Unknown error'));
+  } catch(e) { showToast('⚠️ Could not open billing portal'); }
+}
+
+async function switchToAnnual() {
+  if (!confirm('Switch to the Annual Plan? You will be charged $300 now and your monthly plan will be cancelled. This cannot be undone.')) return;
+  showToast('Redirecting to checkout…');
+  try {
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stylist_id: stylist.id, email: stylist.email, plan: 'annual' })
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else showToast('⚠️ Could not start checkout: ' + (data.error || ''));
+  } catch(e) { showToast('⚠️ Error starting checkout'); }
+}
+
+async function confirmCancelSubscription() {
+  const periodEnd = document.getElementById('subStatusBadge')?.textContent;
+  if (!confirm('Cancel your subscription? You will keep full access until your current billing period ends, then your account will be deactivated. This can be undone by reactivating before that date.')) return;
+  try {
+    const res = await fetch('/api/billing-portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'cancel', subscription_id: stylist.stripe_subscription_id })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error);
+    showToast('✅ Subscription cancelled — you keep access until your billing period ends');
+    await loadSubscription();
+  } catch(e) { showToast('⚠️ Could not cancel: ' + e.message); }
+}
+
+async function reactivateSubscription() {
+  if (!confirm('Reactivate your subscription? You will continue to be billed on your normal schedule.')) return;
+  try {
+    const res = await fetch('/api/billing-portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'reactivate', subscription_id: stylist.stripe_subscription_id })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error);
+    showToast('✅ Subscription reactivated!');
+    await loadSubscription();
+  } catch(e) { showToast('⚠️ Could not reactivate: ' + e.message); }
+}
+
 // ── PROFILE HELPERS ──────────────────────────────────────
+function goToUpgrade() { window.location.href = 'upgrade.html'; }
+
 function clearReminderMessage() {
   const el = document.getElementById('profileReminderMessage');
   if (el) { el.value = ''; el.focus(); }
@@ -3689,7 +3869,7 @@ function showPage(id, el) {
   if (id === 'availability') { if (!stylistServices.length) loadServices().then(renderAvailability); else renderAvailability(); }
   if (id === 'appointments') renderAllAppointments();
   if (id === 'clients') loadClients();
-  if (id === 'profile') { loadServices(); loadBranding(); }
+  if (id === 'profile') { loadServices(); loadBranding(); loadSubscription(); }
   if (id === 'reminders') loadReminders();
   if (id === 'waitlist') loadWaitlist();
   if (id === 'broadcast') initBroadcast();
