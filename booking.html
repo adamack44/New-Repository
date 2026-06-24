@@ -193,40 +193,50 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 .services-section { background: var(--warm-white); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.07); margin-bottom: 0; }
-.services-header { background: linear-gradient(135deg, var(--sand) 0%, #e0ccb8 100%); padding: 18px 28px; border-bottom: 1px solid var(--sand-dark); }
+.services-section { background: var(--warm-white); border-radius: 20px; border: 1px solid var(--sand); overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.07); }
+.services-header { background: linear-gradient(135deg, var(--sand) 0%, #e0ccb8 100%); padding: 18px 24px; border-bottom: 1px solid var(--sand-dark); }
 .services-header h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--bark); font-weight: 600; }
-.services-header p { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; font-weight: 300; }
-.services-body { padding: 16px 20px; }
+.services-header p { font-size: 0.76rem; color: var(--text-light); margin-top: 3px; font-weight: 300; }
+.services-body { padding: 12px 16px 16px; }
 .service-category-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); font-weight: 600; margin: 14px 0 8px; }
 .service-category-label:first-child { margin-top: 0; }
-.service-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; background: var(--cream); border: 1px solid rgba(232,217,200,0.6); transition: all 0.15s; cursor: pointer; }
-.service-item:hover { border-color: var(--terracotta); background: rgba(196,113,74,0.05); }
+.service-category-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; color: var(--text-light); padding: 10px 4px 6px; margin-top: 4px; border-bottom: 1px solid rgba(232,217,200,0.5); margin-bottom: 6px; }
+.service-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 12px; margin-bottom: 6px; background: #fff; border: 1.5px solid rgba(232,217,200,0.5); transition: all 0.15s; cursor: pointer; border-left: 3px solid transparent; position: relative; }
+.service-item:hover { border-color: rgba(196,113,74,0.4); border-left-color: var(--terracotta); background: rgba(196,113,74,0.03); transform: translateX(2px); box-shadow: 0 2px 12px rgba(92,64,51,0.08); }
 .service-item:last-child { margin-bottom: 0; }
-.service-item-left { flex: 1; }
-.service-item-name { font-size: 0.85rem; font-weight: 500; color: var(--text-dark); line-height: 1.2; }
-.service-item-desc { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; font-weight: 300; }
-.service-item-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.service-item-dur { font-size: 0.72rem; color: var(--text-light); background: rgba(92,64,51,0.07); padding: 2px 8px; border-radius: 4px; }
-.service-item-price { font-size: 0.85rem; font-weight: 600; color: var(--terracotta); min-width: 40px; text-align: right; }
+.service-item-left { flex: 1; min-width: 0; padding-right: 12px; }
+.service-item-name { font-size: 0.87rem; font-weight: 600; color: var(--text-dark); line-height: 1.2; }
+.service-item-desc { font-size: 0.73rem; color: var(--text-light); margin-top: 3px; font-weight: 300; line-height: 1.4; }
+.service-item-hint { font-size: 0.68rem; color: var(--terracotta); margin-top: 4px; font-weight: 500; opacity: 0; transition: opacity 0.15s; }
+.service-item:hover .service-item-hint { opacity: 1; }
+.service-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.service-item-price { font-size: 0.96rem; font-weight: 700; color: var(--terracotta); }
+.service-item-price.free { font-size: 0.78rem; color: var(--text-light); font-weight: 400; }
+.service-item-dur { font-size: 0.7rem; color: var(--text-light); background: rgba(92,64,51,0.06); padding: 2px 8px; border-radius: 20px; font-weight: 400; }
 .services-empty { text-align: center; padding: 20px; color: var(--text-light); font-size: 0.82rem; font-style: italic; }
 
 .page-footer { text-align: center; padding: 24px; font-size: 0.75rem; color: var(--text-light); border-top: 1px solid var(--sand); }
 .services-section { background: var(--warm-white); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.07); margin-bottom: 0; }
-.services-header { background: linear-gradient(135deg, var(--sand) 0%, #e0ccb8 100%); padding: 18px 28px; border-bottom: 1px solid var(--sand-dark); }
+.services-section { background: var(--warm-white); border-radius: 20px; border: 1px solid var(--sand); overflow: hidden; box-shadow: 0 4px 24px rgba(92,64,51,0.07); }
+.services-header { background: linear-gradient(135deg, var(--sand) 0%, #e0ccb8 100%); padding: 18px 24px; border-bottom: 1px solid var(--sand-dark); }
 .services-header h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--bark); font-weight: 600; }
-.services-header p { font-size: 0.78rem; color: var(--text-light); margin-top: 2px; font-weight: 300; }
-.services-body { padding: 16px 20px; }
+.services-header p { font-size: 0.76rem; color: var(--text-light); margin-top: 3px; font-weight: 300; }
+.services-body { padding: 12px 16px 16px; }
 .service-category-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); font-weight: 600; margin: 14px 0 8px; }
 .service-category-label:first-child { margin-top: 0; }
-.service-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; background: var(--cream); border: 1px solid rgba(232,217,200,0.6); transition: all 0.15s; cursor: pointer; }
-.service-item:hover { border-color: var(--terracotta); background: rgba(196,113,74,0.05); }
+.service-category-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; color: var(--text-light); padding: 10px 4px 6px; margin-top: 4px; border-bottom: 1px solid rgba(232,217,200,0.5); margin-bottom: 6px; }
+.service-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 12px; margin-bottom: 6px; background: #fff; border: 1.5px solid rgba(232,217,200,0.5); transition: all 0.15s; cursor: pointer; border-left: 3px solid transparent; position: relative; }
+.service-item:hover { border-color: rgba(196,113,74,0.4); border-left-color: var(--terracotta); background: rgba(196,113,74,0.03); transform: translateX(2px); box-shadow: 0 2px 12px rgba(92,64,51,0.08); }
 .service-item:last-child { margin-bottom: 0; }
-.service-item-left { flex: 1; }
-.service-item-name { font-size: 0.85rem; font-weight: 500; color: var(--text-dark); line-height: 1.2; }
-.service-item-desc { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; font-weight: 300; }
-.service-item-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.service-item-dur { font-size: 0.72rem; color: var(--text-light); background: rgba(92,64,51,0.07); padding: 2px 8px; border-radius: 4px; }
-.service-item-price { font-size: 0.85rem; font-weight: 600; color: var(--terracotta); min-width: 40px; text-align: right; }
+.service-item-left { flex: 1; min-width: 0; padding-right: 12px; }
+.service-item-name { font-size: 0.87rem; font-weight: 600; color: var(--text-dark); line-height: 1.2; }
+.service-item-desc { font-size: 0.73rem; color: var(--text-light); margin-top: 3px; font-weight: 300; line-height: 1.4; }
+.service-item-hint { font-size: 0.68rem; color: var(--terracotta); margin-top: 4px; font-weight: 500; opacity: 0; transition: opacity 0.15s; }
+.service-item:hover .service-item-hint { opacity: 1; }
+.service-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.service-item-price { font-size: 0.96rem; font-weight: 700; color: var(--terracotta); }
+.service-item-price.free { font-size: 0.78rem; color: var(--text-light); font-weight: 400; }
+.service-item-dur { font-size: 0.7rem; color: var(--text-light); background: rgba(92,64,51,0.06); padding: 2px 8px; border-radius: 20px; font-weight: 400; }
 .services-empty { text-align: center; padding: 20px; color: var(--text-light); font-size: 0.82rem; font-style: italic; }
 
 .page-footer a { color: var(--terracotta); text-decoration: none; }
@@ -316,8 +326,8 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
       <div id="serviceMenuBottom" style="display:none;">
         <div class="services-section">
           <div class="services-header">
-            <h2>Services & Pricing</h2>
-            <p>Click any service to start booking</p>
+            <h2>Services &amp; Pricing</h2>
+            <p>Tap any service to start booking</p>
           </div>
           <div class="services-body" id="serviceMenuBodyBottom"></div>
         </div>
@@ -898,19 +908,22 @@ function renderServiceMenu() {
 
       const item = document.createElement('div');
       item.className = 'service-item';
-      item.innerHTML = `
-        <div class="service-item-left">
-          <div class="service-item-name">${svc.name}</div>
-          ${svc.description ? `<div class="service-item-desc">${svc.description}</div>` : ''}
-        </div>
-        <div class="service-item-right">
-          <span class="service-item-dur">${dur}</span>
-          ${price ? `<span class="service-item-price">${price}</span>` : ''}
-        </div>`;
+      item.innerHTML =
+        '<div class="service-item-left">' +
+          '<div class="service-item-name">' + svc.name + '</div>' +
+          (svc.description ? '<div class="service-item-desc">' + svc.description + '</div>' : '') +
+          '<div class="service-item-hint">Tap to book this service →</div>' +
+        '</div>' +
+        '<div class="service-item-right">' +
+          (price
+            ? '<span class="service-item-price">' + price + '</span>'
+            : '<span class="service-item-price free">Contact for price</span>') +
+          '<span class="service-item-dur">⏱ ' + dur + '</span>' +
+        '</div>';
 
       // Clicking a service pre-fills the chat
       item.onclick = () => {
-        const msg = `I'd like to book a ${svc.name}`;
+        const msg = "I'd like to book a " + svc.name;
         document.getElementById('chatInput').value = msg;
         document.getElementById('chatInput').focus();
         document.getElementById('chatInput').scrollIntoView({ behavior: 'smooth', block: 'center' });
