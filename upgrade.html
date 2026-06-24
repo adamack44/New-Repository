@@ -143,20 +143,40 @@ h1 em { font-style: italic; color: var(--rust); }
     No worries — your account is saved. Subscribe whenever you're ready.
   </div>
 
-  <div class="price-box">
-    <div class="popular-badge">Everything Included</div>
-    <div class="price"><sup>$</sup>30</div>
-    <div class="price-period">per month · everything included · cancel anytime</div>
-    <div class="features">
-      <div class="feature"><span class="feature-check">✓</span> AI-powered customer booking page</div>
-      <div class="feature"><span class="feature-check">✓</span> Unlimited appointments</div>
-      <div class="feature"><span class="feature-check">✓</span> Availability manager</div>
-      <div class="feature"><span class="feature-check">✓</span> SMS booking confirmations</div>
-      <div class="feature"><span class="feature-check">✓</span> 24-hour SMS reminders</div>
-      <div class="feature"><span class="feature-check">✓</span> Appointment dashboard</div>
-      <div class="feature"><span class="feature-check">✓</span> Customer self-service cancellations</div>
-      <div class="feature"><span class="feature-check">✓</span> Your own booking link</div>
+  <!-- PLAN SELECTOR -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;text-align:left;">
+
+    <!-- MONTHLY PLAN -->
+    <div id="planMonthly" onclick="selectPlan('monthly')" style="border:2px solid var(--rust);border-radius:16px;padding:20px;cursor:pointer;background:var(--rust-pale);position:relative;">
+      <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--rust);margin-bottom:10px;">Monthly</div>
+      <div style="font-size:2rem;font-weight:700;color:var(--ink);line-height:1;"><sup style="font-size:1rem;">$</sup>30</div>
+      <div style="font-size:0.78rem;color:var(--ink-light);margin-top:4px;">per month</div>
+      <div style="font-size:0.72rem;color:var(--ink-light);margin-top:6px;">Cancel anytime</div>
+      <div id="monthlyCheck" style="position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;background:var(--rust);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">✓</div>
     </div>
+
+    <!-- ANNUAL PLAN -->
+    <div id="planAnnual" onclick="selectPlan('annual')" style="border:2px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;background:#fff;position:relative;">
+      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--rust);color:#fff;font-size:0.65rem;font-weight:700;padding:2px 10px;border-radius:10px;white-space:nowrap;">BEST VALUE</div>
+      <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);margin-bottom:10px;">Annual</div>
+      <div style="font-size:2rem;font-weight:700;color:var(--ink);line-height:1;"><sup style="font-size:1rem;">$</sup>300</div>
+      <div style="font-size:0.78rem;color:var(--ink-light);margin-top:4px;">per year</div>
+      <div style="font-size:0.72rem;color:#2d6a35;font-weight:600;margin-top:6px;">Save $60 · 2 months free</div>
+      <div id="annualCheck" style="position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;display:none;">✓</div>
+    </div>
+  </div>
+
+  <!-- FEATURES LIST -->
+  <div class="features" style="text-align:left;margin-bottom:24px;">
+    <div class="feature"><span class="feature-check">✓</span> AI-powered customer booking page</div>
+    <div class="feature"><span class="feature-check">✓</span> Unlimited appointments & clients</div>
+    <div class="feature"><span class="feature-check">✓</span> 12-month availability manager</div>
+    <div class="feature"><span class="feature-check">✓</span> Custom branding & themes</div>
+    <div class="feature"><span class="feature-check">✓</span> Automatic email & SMS reminders</div>
+    <div class="feature"><span class="feature-check">✓</span> Client waitlist</div>
+    <div class="feature"><span class="feature-check">✓</span> Broadcast messaging</div>
+    <div class="feature"><span class="feature-check">✓</span> Mobile-friendly dashboard</div>
+    <div class="feature"><span class="feature-check">✓</span> No per-booking fees — ever</div>
   </div>
 
   <button class="btn-upgrade" id="upgradeBtn" onclick="startCheckout()">
@@ -188,6 +208,36 @@ window.addEventListener('load', async () => {
     window.location.href = 'dashboard.html';
   }
 });
+
+let selectedPlan = 'monthly';
+
+function selectPlan(plan) {
+  selectedPlan = plan;
+  const monthlyCard = document.getElementById('planMonthly');
+  const annualCard = document.getElementById('planAnnual');
+  const monthlyCheck = document.getElementById('monthlyCheck');
+  const annualCheck = document.getElementById('annualCheck');
+  const btn = document.getElementById('upgradeBtn');
+
+  if (plan === 'annual') {
+    annualCard.style.borderColor = 'var(--rust)';
+    annualCard.style.background = 'var(--rust-pale)';
+    annualCheck.style.display = 'flex';
+    annualCheck.style.background = 'var(--rust)';
+    monthlyCard.style.borderColor = 'var(--border)';
+    monthlyCard.style.background = '#fff';
+    monthlyCheck.style.display = 'none';
+    btn.textContent = 'Subscribe Now — $300/year →';
+  } else {
+    monthlyCard.style.borderColor = 'var(--rust)';
+    monthlyCard.style.background = 'var(--rust-pale)';
+    monthlyCheck.style.display = 'flex';
+    annualCard.style.borderColor = 'var(--border)';
+    annualCard.style.background = '#fff';
+    annualCheck.style.display = 'none';
+    btn.textContent = 'Subscribe Now — $30/mo →';
+  }
+}
 
 async function startCheckout() {
   const btn = document.getElementById('upgradeBtn');
