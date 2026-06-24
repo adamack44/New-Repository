@@ -67,12 +67,12 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 
 .hero-inner {
   position: relative; z-index: 2;
-  max-width: 1100px; margin: 0 auto; width: 100%;
-  padding: 60px 60px 40px;
-  display: flex; align-items: flex-end; justify-content: space-between; gap: 32px;
+  max-width: 860px; margin: 0 auto; width: 100%;
+  padding: 60px 60px 48px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
 }
 
-.hero-left { flex: 1; }
+.hero-left { width: 100%; display: flex; flex-direction: column; align-items: center; }
 
 /* Avatar — shown when no bg image */
 .stylist-avatar {
@@ -101,7 +101,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 }
 .hero-bio {
   font-size: 0.86rem; color: rgba(255,255,255,0.55); font-weight: 300;
-  line-height: 1.6; max-width: 480px; margin-bottom: 14px;
+  line-height: 1.6; max-width: 480px; margin: 0 auto 14px;
 }
 .hero-booking-note {
   display: inline-flex; align-items: center; gap: 7px;
@@ -109,13 +109,13 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
   color: rgba(255,255,255,0.75); font-size: 0.76rem;
   padding: 5px 12px; border-radius: 8px; margin-bottom: 14px;
 }
-.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; justify-content: center; }
 .badge {
   background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
   color: rgba(255,255,255,0.75); font-size: 0.7rem; padding: 4px 11px;
   border-radius: 20px; letter-spacing: 0.5px; font-weight: 500;
 }
-.hero-socials { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+.hero-socials { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; justify-content: center; }
 .hero-socials a {
   display: inline-flex; align-items: center; gap: 5px;
   background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
@@ -126,26 +126,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 .hero-address { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
 .hero-address a { color: rgba(255,255,255,0.6); text-decoration: none; }
 
-/* Right CTA */
-.hero-cta {
-  flex-shrink: 0;
-  text-align: center;
-}
-.hero-cta-btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--terracotta);
-  color: #fff; border: none; border-radius: 12px;
-  padding: 14px 28px; font-family: 'Lato', sans-serif;
-  font-size: 0.95rem; font-weight: 600; cursor: pointer;
-  box-shadow: 0 4px 20px rgba(196,113,74,0.4);
-  transition: all 0.18s; white-space: nowrap;
-  text-decoration: none;
-}
-.hero-cta-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-.hero-cta-sub {
-  font-size: 0.7rem; color: rgba(255,255,255,0.4);
-  margin-top: 8px; text-align: center;
-}
+
 
 .main { max-width: 1100px; margin: 0 auto; padding: 28px 60px 60px; }
 .top-panels { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; align-items: start; }
@@ -295,14 +276,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
       </div>
     </div>
 
-    <!-- Right CTA -->
-    <div class="hero-cta">
-      <a class="hero-cta-btn" href="#chatMessages" onclick="document.getElementById('chatInput')?.focus();return false;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Book an Appointment
-      </a>
-      <div class="hero-cta-sub">Instant AI booking · No login needed</div>
-    </div>
+
   </div>
 </div>
 
