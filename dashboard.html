@@ -1447,6 +1447,19 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
   </div>
 </div>
 
+      <!-- REFERRAL PROGRAM -->
+      <div class="card" style="margin-top:20px;margin-bottom:20px;">
+        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <h2>Referral Program</h2>
+          <span style="background:#fef9f0;color:#7a4d08;font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:6px;">Earn $5/mo per referral</span>
+        </div>
+        <div class="card-body">
+          <div id="referralBody">
+            <div style="color:var(--ink-light);font-size:0.85rem;">Loading referral info…</div>
+          </div>
+        </div>
+      </div>
+
       <!-- SUBSCRIPTION MANAGEMENT -->
       <div class="card" style="margin-top:20px;">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
@@ -1738,6 +1751,99 @@ async function saveReminders() {
   // Update local stylist object
   Object.assign(stylist, updates);
   showToast('✅ Reminder settings saved!');
+}
+
+// ── REFERRAL PROGRAM ─────────────────────────────────────
+async function loadReferral() {
+  if (!stylist) return;
+
+  // Generate code if they don't have one yet
+  if (!stylist.referral_code) {
+    try {
+      const res = await fetch('/api/referral', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'generate_code', stylist_id: stylist.id, name: stylist.name })
+      });
+      const data = await res.json();
+      if (data.code) stylist.referral_code = data.code;
+    } catch(e) { console.log('Code gen failed:', e); }
+  }
+
+  // Get referral stats
+  try {
+    const res = await fetch('/api/referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get_referrals', stylist_id: stylist.id })
+    });
+    const data = await res.json();
+    renderReferral(data);
+  } catch(e) {
+    document.getElementById('referralBody').innerHTML =
+      '<div style="font-size:0.84rem;color:var(--ink-light);">Could not load referral info.</div>';
+  }
+}
+
+function renderReferral(data) {
+  const code = data.referral_code || stylist.referral_code || 'Loading…';
+  const bookingLink = 'https://www.salonassistcx.com/login.html?ref=' + code;
+  const activeRefs = data.active_referrals || 0;
+  const monthlyDiscount = (activeRefs * 5).toFixed(0);
+  const el = document.getElementById('referralBody');
+
+  el.innerHTML =
+    // Your code
+    '<div style="margin-bottom:20px;">' +
+      '<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--ink-light);font-weight:600;margin-bottom:8px;">Your Referral Code</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
+        '<div style="background:var(--rust-pale);border:2px dashed var(--rust);border-radius:10px;padding:10px 20px;font-size:1.4rem;font-weight:700;letter-spacing:3px;color:var(--rust);">' + code + '</div>' +
+        '<button onclick="copyReferralCode(this.dataset.code)" data-code="' + code + '" class="btn btn-ghost" style="font-size:0.78rem;">📋 Copy Code</button>' +
+        '<button onclick="copyReferralLink(this.dataset.link)" data-link="' + bookingLink + '" class="btn btn-ghost" style="font-size:0.78rem;">🔗 Copy Link</button>' +
+      '</div>' +
+      '<div style="font-size:0.76rem;color:var(--ink-light);margin-top:8px;">Share this code or link with other stylists. When they sign up and subscribe, you earn $5 off your bill each month.</div>' +
+    '</div>' +
+
+    // Stats
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">' +
+      '<div style="background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">' +
+        '<div style="font-size:1.6rem;font-weight:700;color:var(--ink);">' + (data.total_referrals || 0) + '</div>' +
+        '<div style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px;">Total Referrals</div>' +
+      '</div>' +
+      '<div style="background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">' +
+        '<div style="font-size:1.6rem;font-weight:700;color:var(--sage);">' + activeRefs + '</div>' +
+        '<div style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px;">Active Now</div>' +
+      '</div>' +
+      '<div style="background:var(--rust-pale);border:1px solid rgba(184,82,46,0.3);border-radius:10px;padding:14px;text-align:center;">' +
+        '<div style="font-size:1.6rem;font-weight:700;color:var(--rust);">$' + monthlyDiscount + '</div>' +
+        '<div style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px;">Monthly Savings</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Referred by
+    (data.referred_by ?
+      '<div style="background:var(--sage-pale);border:1px solid rgba(94,122,100,0.3);border-radius:9px;padding:10px 14px;font-size:0.78rem;color:#2d5a3d;margin-bottom:16px;">' +
+        '✅ You were referred by code <strong>' + data.referred_by + '</strong>' +
+      '</div>' : '') +
+
+    // How it works
+    '<div style="background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">' +
+      '<div style="font-size:0.75rem;font-weight:600;color:var(--ink);margin-bottom:8px;">How it works</div>' +
+      '<div style="font-size:0.78rem;color:var(--ink-light);line-height:1.7;">' +
+        '1. Share your code or link with another stylist<br>' +
+        '2. They enter your code when signing up<br>' +
+        '3. Once they subscribe, you automatically earn $5 off your monthly bill<br>' +
+        '4. No limit — refer 6 stylists and your subscription is free' +
+      '</div>' +
+    '</div>';
+}
+
+function copyReferralCode(code) {
+  navigator.clipboard.writeText(code).then(() => showToast('✅ Code copied!'));
+}
+
+function copyReferralLink(link) {
+  navigator.clipboard.writeText(link).then(() => showToast('✅ Link copied!'));
 }
 
 // ── SUBSCRIPTION MANAGEMENT ──────────────────────────────
@@ -3882,7 +3988,7 @@ function showPage(id, el) {
   if (id === 'availability') { if (!stylistServices.length) loadServices().then(renderAvailability); else renderAvailability(); }
   if (id === 'appointments') renderAllAppointments();
   if (id === 'clients') loadClients();
-  if (id === 'profile') { loadServices(); loadBranding(); loadSubscription(); }
+  if (id === 'profile') { loadServices(); loadBranding(); loadSubscription(); loadReferral(); }
   if (id === 'reminders') loadReminders();
   if (id === 'waitlist') loadWaitlist();
   if (id === 'broadcast') initBroadcast();
