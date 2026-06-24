@@ -33,64 +33,119 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 #loadingScreen p { font-size: 0.82rem; color: var(--text-light); font-weight: 300; }
 
 /* ── HERO ── */
+/* ── HERO — full width cinematic ── */
 .hero {
-  background: linear-gradient(180deg, #f5ede4 0%, #eedfd2 100%);
-  position: relative; overflow: hidden;
-  border-bottom: 1px solid #e0ccb8;
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #2d1a10 0%, #1a0f08 100%);
+  display: flex; flex-direction: column; justify-content: flex-end;
 }
-.hero::before {
+
+/* Background image layer */
+.hero-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center top;
+  background-repeat: no-repeat;
+  opacity: 0.45;
+  transition: opacity 0.4s;
+}
+.hero-bg.loaded { opacity: 0.5; }
+
+/* Dark gradient overlay — bottom up */
+.hero::after {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 70% 0%, rgba(196,113,74,0.08) 0%, transparent 65%);
+  background: linear-gradient(
+    to top,
+    rgba(18,8,4,0.92) 0%,
+    rgba(18,8,4,0.6) 40%,
+    rgba(18,8,4,0.15) 100%
+  );
   pointer-events: none;
 }
+
 .hero-inner {
-  position: relative;
-  max-width: 1100px; margin: 0 auto;
-  padding: 56px 60px 48px;
-  display: flex; align-items: flex-start; gap: 48px;
+  position: relative; z-index: 2;
+  max-width: 1100px; margin: 0 auto; width: 100%;
+  padding: 60px 60px 40px;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 32px;
 }
+
+.hero-left { flex: 1; }
+
+/* Avatar — shown when no bg image */
 .stylist-avatar {
-  width: 192px; height: 192px; border-radius: 16px;
+  width: 96px; height: 96px; border-radius: 50%;
   background: linear-gradient(135deg, var(--terracotta) 0%, var(--bark) 100%);
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Playfair Display', serif; font-size: 64px; color: var(--cream);
+  font-family: 'Playfair Display', serif; font-size: 36px; color: var(--cream);
   flex-shrink: 0; overflow: hidden;
-  box-shadow: 0 12px 40px rgba(92,64,51,0.18);
+  border: 3px solid rgba(255,255,255,0.25);
+  margin-bottom: 16px;
 }
-.stylist-avatar img { width: 192px; height: 192px; object-fit: cover; object-position: center top; display: block; border-radius: 16px; }
-.hero-text { flex: 1; padding-top: 8px; }
+.stylist-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+
+.hero-eyebrow {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;
+  color: rgba(255,255,255,0.5); font-weight: 600; margin-bottom: 8px;
+}
 .hero-text h1 {
-  font-family: 'Playfair Display', serif; font-size: 2.8rem;
-  color: var(--text-dark); font-weight: 400; line-height: 1.15; margin-bottom: 6px;
+  font-family: 'Playfair Display', serif; font-size: 3.2rem;
+  color: #fff; font-weight: 400; line-height: 1.1; margin-bottom: 8px;
 }
 .hero-text h1 em { color: var(--terracotta); font-style: italic; }
-.hero-salon { font-size: 0.92rem; color: var(--text-mid); font-weight: 400; margin-bottom: 14px; }
-.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.badge {
-  background: rgba(196,113,74,0.1); border: 1px solid rgba(196,113,74,0.25);
-  color: var(--terracotta); font-size: 0.72rem; padding: 4px 12px;
-  border-radius: 20px; letter-spacing: 0.5px; font-weight: 500;
+.hero-salon {
+  font-size: 0.92rem; color: rgba(255,255,255,0.65); font-weight: 300;
+  margin-bottom: 14px; letter-spacing: 0.3px;
 }
 .hero-bio {
-  font-size: 0.88rem; color: var(--text-mid); font-weight: 300;
-  line-height: 1.65; max-width: 520px; margin-bottom: 12px;
+  font-size: 0.86rem; color: rgba(255,255,255,0.55); font-weight: 300;
+  line-height: 1.6; max-width: 480px; margin-bottom: 14px;
 }
 .hero-booking-note {
   display: inline-flex; align-items: center; gap: 7px;
-  background: rgba(196,113,74,0.08); border: 1px solid rgba(196,113,74,0.2);
-  color: var(--text-mid); font-size: 0.78rem; font-weight: 400;
-  padding: 6px 14px; border-radius: 8px; margin-bottom: 12px;
+  background: rgba(196,113,74,0.2); border: 1px solid rgba(196,113,74,0.35);
+  color: rgba(255,255,255,0.75); font-size: 0.76rem;
+  padding: 5px 12px; border-radius: 8px; margin-bottom: 14px;
 }
-.hero-address { font-size: 0.82rem; color: var(--text-mid); margin-bottom: 10px; font-weight: 400; }
-.hero-address a { color: var(--terracotta); text-decoration: none; }
-.hero-socials { display: flex; flex-wrap: wrap; gap: 7px; }
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.badge {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.75); font-size: 0.7rem; padding: 4px 11px;
+  border-radius: 20px; letter-spacing: 0.5px; font-weight: 500;
+}
+.hero-socials { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
 .hero-socials a {
   display: inline-flex; align-items: center; gap: 5px;
-  background: rgba(92,64,51,0.07); border: 1px solid rgba(92,64,51,0.15);
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
   border-radius: 20px; padding: 4px 12px; font-size: 0.72rem;
-  color: var(--text-mid); text-decoration: none; transition: all 0.15s;
+  color: rgba(255,255,255,0.7); text-decoration: none; transition: all 0.15s;
 }
-.hero-socials a:hover { background: rgba(196,113,74,0.1); border-color: rgba(196,113,74,0.3); color: var(--terracotta); }
+.hero-socials a:hover { background: rgba(255,255,255,0.18); color: #fff; }
+.hero-address { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+.hero-address a { color: rgba(255,255,255,0.6); text-decoration: none; }
+
+/* Right CTA */
+.hero-cta {
+  flex-shrink: 0;
+  text-align: center;
+}
+.hero-cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--terracotta);
+  color: #fff; border: none; border-radius: 12px;
+  padding: 14px 28px; font-family: 'Lato', sans-serif;
+  font-size: 0.95rem; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(196,113,74,0.4);
+  transition: all 0.18s; white-space: nowrap;
+  text-decoration: none;
+}
+.hero-cta-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.hero-cta-sub {
+  font-size: 0.7rem; color: rgba(255,255,255,0.4);
+  margin-top: 8px; text-align: center;
+}
 
 .main { max-width: 1100px; margin: 0 auto; padding: 28px 60px 60px; }
 .top-panels { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; align-items: start; }
@@ -217,26 +272,37 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 
 <div id="loadingScreen"><div class="spinner"></div><p>Loading booking page…</p></div>
 
-<div class="hero">
-  <div class="hero-inner">
-    <div class="stylist-avatar" id="heroInitial"><img src="/logo.png" style="width:80%;height:80%;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt=""></div>
-    <div class="hero-text">
-      <h1>Book with <em id="heroName">…</em></h1>
-      <div class="hero-salon" id="heroSalon">Independent Hair Stylist</div>
-      <div class="hero-badges" id="heroBadges"></div>
-      <div id="heroBookingNote" class="hero-booking-note" style="display:none;"></div>
-      <p id="heroBio" class="hero-bio" style="display:none;"></p>
-      <p id="heroAddress" class="hero-address" style="display:none;"></p>
-      <!-- socials moved below hero -->
-    </div>
-  </div>
-</div>
+<div class="hero" id="heroSection">
+  <!-- Background image (set via JS from photo/logo) -->
+  <div class="hero-bg" id="heroBg"></div>
 
-<!-- SOCIAL LINKS BAR -->
-<div id="socialBar" style="display:none;background:#fff;border-bottom:1px solid var(--border);padding:0 60px;">
-  <div style="max-width:1100px;margin:0 auto;padding:16px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-    <span style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-light);margin-right:4px;">Connect</span>
-    <div id="socialBarLinks" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;"></div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <!-- Avatar — circular, shown always -->
+      <div class="stylist-avatar" id="heroInitial">
+        <img src="/logo.png" style="width:100%;height:100%;object-fit:contain;padding:8px;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt="">
+      </div>
+
+      <div class="hero-text">
+        <div class="hero-eyebrow" id="heroEyebrow">Independent Stylist</div>
+        <h1 id="heroName">…</h1>
+        <div class="hero-salon" id="heroSalon"></div>
+        <p id="heroBio" class="hero-bio" style="display:none;"></p>
+        <div id="heroBookingNote" class="hero-booking-note" style="display:none;"></div>
+        <p id="heroAddress" class="hero-address" style="display:none;"></p>
+        <div class="hero-badges" id="heroBadges"></div>
+        <div class="hero-socials" id="heroSocials"></div>
+      </div>
+    </div>
+
+    <!-- Right CTA -->
+    <div class="hero-cta">
+      <a class="hero-cta-btn" href="#chatMessages" onclick="document.getElementById('chatInput')?.focus();return false;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Book an Appointment
+      </a>
+      <div class="hero-cta-sub">Instant AI booking · No login needed</div>
+    </div>
   </div>
 </div>
 
