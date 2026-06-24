@@ -1921,7 +1921,11 @@ function renderSubscriptionEmpty() {
 
 function renderSubscriptionDetails(sub) {
   const badge = document.getElementById('subStatusBadge');
-  const periodEnd = new Date(sub.current_period_end * 1000).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+  const periodEndTs = parseInt(sub.current_period_end);
+  const periodEndDate = periodEndTs ? new Date(periodEndTs * 1000) : null;
+  const periodEnd = (periodEndDate && !isNaN(periodEndDate))
+    ? periodEndDate.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' })
+    : 'Not available';
   const amount = '$' + (sub.amount / 100).toFixed(0);
   const planLabel = sub.plan === 'annual' ? 'Annual Plan' : 'Monthly Plan';
   const billingLabel = sub.plan === 'annual' ? 'per year' : 'per month';
