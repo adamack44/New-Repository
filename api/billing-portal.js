@@ -27,14 +27,16 @@ export default async function handler(req, res) {
 
       const item = sub.items?.data?.[0];
       const price = item?.price;
-      return res.status(200).json({
+      const result = {
         status: sub.status,
         cancel_at_period_end: sub.cancel_at_period_end,
         current_period_end: sub.current_period_end,
         plan: price?.recurring?.interval === 'year' ? 'annual' : 'monthly',
         amount: price?.unit_amount,
         interval: price?.recurring?.interval
-      });
+      };
+      console.log('Subscription result:', JSON.stringify(result));
+      return res.status(200).json(result);
     }
 
     if (action === 'cancel') {
