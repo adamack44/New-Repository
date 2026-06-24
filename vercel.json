@@ -98,6 +98,14 @@
       "dest": "/terms.html"
     },
     {
+      "src": "/affiliate.html",
+      "dest": "/affiliate.html"
+    },
+    {
+      "src": "/affiliate",
+      "dest": "/affiliate.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/404.html"
     }
