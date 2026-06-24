@@ -443,6 +443,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     <div class="nav-item" onclick="showPage('reminders', this)"><span class="nav-icon">🔔</span> Reminders</div>
     <div class="nav-item" onclick="showPage('broadcast', this)"><span class="nav-icon">📣</span> Broadcast</div>
     <div class="nav-item" onclick="showPage('profile', this)"><span class="nav-icon">👤</span> My Profile</div>
+    <div class="nav-item" onclick="showPage('account', this)"><span class="nav-icon">⚙️</span> Account</div>
   </div>
   <div class="sidebar-footer">
     <button class="copy-link-btn" onclick="copyBookingLink()">🔗 Copy Booking Link</button>
@@ -1460,8 +1461,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
         </div>
       </div>
 
-      <!-- SUBSCRIPTION MANAGEMENT -->
-      <div class="card" style="margin-top:20px;">
+    <!-- ACCOUNT -->
+    <div class="page-section" id="page-account">
+
+      <!-- SUBSCRIPTION CARD -->
+      <div class="card" style="margin-bottom:20px;">
         <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
           <h2>Subscription</h2>
           <div id="subStatusBadge" style="font-size:0.72rem;font-weight:600;padding:3px 10px;border-radius:6px;background:#e8f0e9;color:#2d6a35;">Active</div>
@@ -1470,6 +1474,21 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
           <div style="color:var(--ink-light);font-size:0.85rem;">Loading subscription details…</div>
         </div>
       </div>
+
+      <!-- REFERRAL PROGRAM CARD -->
+      <div class="card">
+        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <h2>Referral Program</h2>
+          <span style="background:#fef9f0;color:#7a4d08;font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:6px;">Earn $5/mo per referral</span>
+        </div>
+        <div class="card-body">
+          <div id="referralBody">
+            <div style="color:var(--ink-light);font-size:0.85rem;">Loading referral info…</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
 
     </div><!-- close page-sections wrapper -->
 
@@ -1520,6 +1539,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </div>
     Profile
+  </button>
+  <button class="mobile-nav-item" id="mob-account" onclick="showPage('account', null); setMobileTab('account')">
+    <div class="mobile-nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+    Account
   </button>
 </nav>
 
@@ -3988,7 +4013,8 @@ function showPage(id, el) {
   if (id === 'availability') { if (!stylistServices.length) loadServices().then(renderAvailability); else renderAvailability(); }
   if (id === 'appointments') renderAllAppointments();
   if (id === 'clients') loadClients();
-  if (id === 'profile') { loadServices(); loadBranding(); loadSubscription(); loadReferral(); }
+  if (id === 'profile') { loadServices(); loadBranding(); }
+  if (id === 'account') { loadSubscription(); loadReferral(); }
   if (id === 'reminders') loadReminders();
   if (id === 'waitlist') loadWaitlist();
   if (id === 'broadcast') initBroadcast();
