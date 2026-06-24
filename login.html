@@ -224,6 +224,46 @@ async function sendPasswordReset() {
   }
 }
 
+let validatedReferralCode = null;
+
+async function validateReferralCode() {
+  const code = document.getElementById('referralCodeInput').value.trim();
+  const statusEl = document.getElementById('referralStatus');
+  const btn = document.getElementById('validateRefBtn');
+  if (!code) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+
+  try {
+    const res = await fetch('/api/referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'validate_code', code })
+    });
+    const data = await res.json();
+
+    if (data.valid) {
+      validatedReferralCode = code;
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#2d6a35';
+      statusEl.textContent = '✅ Code applied! ' + data.name + ' will receive credit for your signup.';
+      btn.textContent = '✓ Applied';
+      btn.style.background = '#2d6a35';
+    } else {
+      validatedReferralCode = null;
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#c0392b';
+      statusEl.textContent = '⚠️ Code not found. Check the spelling and try again.';
+      btn.disabled = false;
+      btn.textContent = 'Apply';
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Apply';
+  }
+}
+
 async function handleSubmit() {
   const btn = document.getElementById('submitBtn');
   const email = document.getElementById('emailInput').value.trim();
@@ -267,6 +307,30 @@ async function handleSubmit() {
       });
 
       if (profileError) { showError('Account created but profile setup failed: ' + profileError.message); btn.disabled = false; btn.textContent = 'Create Account →'; return; }
+
+      // Record referral if a code was entered
+      if (validatedReferralCode) {
+        try {
+          await fetch('/api/referral', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'record_referral',
+              code: validatedReferralCode,
+              referee_stylist_id: data.user.id
+            })
+          });
+        } catch(e) { console.log('Referral record failed silently:', e); }
+      }
+
+      // Generate referral code for this new stylist
+      try {
+        await fetch('/api/referral', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'generate_code', stylist_id: data.user.id, name })
+        });
+      } catch(e) { console.log('Code generation failed silently:', e); }
 
       showSuccess('Account created! Redirecting…');
       setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
