@@ -157,8 +157,8 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 
 .chat-panel { background: var(--warm-white); border-radius: 20px; border: 1px solid var(--sand); box-shadow: 0 4px 24px rgba(92,64,51,0.07); display: flex; flex-direction: column; height: 520px; overflow: hidden; width: 100%; }
 .chat-header { background: linear-gradient(135deg, var(--terracotta) 0%, #b5603e 100%); padding: 20px 26px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-.chat-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; flex-shrink: 0; }
-.chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.chat-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.25); }
+.chat-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
 .chat-header-text h3 { font-family: 'Playfair Display', serif; font-size: 1rem; color: #fff; font-weight: 600; }
 .chat-header-text p { font-size: 0.73rem; color: rgba(255,255,255,0.75); font-weight: 300; }
 .chat-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #a8e6a3; margin-left: auto; box-shadow: 0 0 6px rgba(168,230,163,0.8); animation: pulse 2s infinite; }
@@ -170,7 +170,8 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 .message.user { flex-direction: row-reverse; }
 .msg-avatar { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; }
-.message.ai .msg-avatar { background: linear-gradient(135deg, var(--terracotta) 0%, var(--bark) 100%); }
+.message.ai .msg-avatar { background: linear-gradient(135deg, var(--terracotta) 0%, var(--bark) 100%); overflow: hidden; }
+.message.ai .msg-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; border-radius: 50%; }
 .message.user .msg-avatar { background: var(--sand); color: var(--text-mid); font-size: 10px; font-weight: 600; }
 .msg-bubble { max-width: 78%; padding: 13px 17px; border-radius: 18px; font-size: 0.875rem; line-height: 1.55; font-weight: 300; }
 .message.ai .msg-bubble { background: #fff; color: var(--text-dark); border: 1px solid var(--sand); border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(92,64,51,0.06); }
@@ -297,7 +298,7 @@ body { font-family: 'Lato', sans-serif; background-color: var(--cream); color: v
     <div class="right-col">
       <div class="chat-panel">
         <div class="chat-header">
-          <div class="chat-avatar" style="background:rgba(255,255,255,0.25);padding:6px;"><img src="/logo.png" style="width:100%;height:100%;object-fit:contain;" alt="Salon Assist CX"></div>
+          <div class="chat-avatar" id="chatHeaderAvatar"><img src="/logo.png" style="width:100%;height:100%;object-fit:contain;padding:5px;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);" alt=""></div>
           <div class="chat-header-text">
             <h3 id="chatHeaderName">Booking Assistant</h3>
             <p>Powered by AI · Replies instantly</p>
@@ -588,6 +589,17 @@ function applyBranding() {
 
   // Apply brand logo if set
   // Hero image handled in renderHero (logo > photo > initial)
+  // Update chat header avatar to use stylist photo
+  const chatAv = document.getElementById('chatHeaderAvatar');
+  if (chatAv) {
+    if (stylist.photo_url) {
+      chatAv.innerHTML = '<img src="' + stylist.photo_url + '" style="width:100%;height:100%;object-fit:cover;object-position:center top;" alt="' + (stylist.name||'') + '">';
+      chatAv.style.background = 'none';
+    } else if (stylist.brand_logo_url) {
+      chatAv.innerHTML = '<img src="' + stylist.brand_logo_url + '" style="width:100%;height:100%;object-fit:contain;padding:5px;" alt="' + (stylist.name||'') + '">';
+      chatAv.style.background = 'rgba(255,255,255,0.15)';
+    }
+  }
 }
 
 function lightenColor(hex, amount) {
@@ -1261,7 +1273,24 @@ function appendMessage(role, text) {
 
   const avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
-  if (role === 'ai') { avatar.innerHTML = '<img src="/logo.png" style="width:56px;height:56px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">'; avatar.style.background = 'rgba(196,113,74,0.1)'; avatar.style.padding = '4px'; } else { avatar.textContent = stylist?.name?.[0] || 'Y'; }
+  if (role === 'ai') {
+    const avatarImg = stylist?.photo_url || stylist?.brand_logo_url;
+    if (avatarImg && stylist?.photo_url) {
+      // Use photo — full bleed circular crop like hero
+      avatar.innerHTML = '<img src="' + avatarImg + '" style="width:100%;height:100%;object-fit:cover;object-position:center top;">';
+      avatar.style.background = 'none';
+    } else if (stylist?.brand_logo_url) {
+      // Logo — contained with slight padding
+      avatar.innerHTML = '<img src="' + stylist.brand_logo_url + '" style="width:100%;height:100%;object-fit:contain;padding:3px;">';
+      avatar.style.background = 'rgba(196,113,74,0.1)';
+    } else {
+      // Fallback — Salon Assist CX logo
+      avatar.innerHTML = '<img src="/logo.png" style="width:100%;height:100%;object-fit:contain;padding:4px;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">';
+      avatar.style.background = 'rgba(196,113,74,0.1)';
+    }
+  } else {
+    avatar.textContent = stylist?.name?.[0] || 'Y';
+  }
   if (role === 'user') { avatar.style.fontSize = '10px'; avatar.style.fontWeight = '600'; }
 
   const bubble = document.createElement('div');
@@ -1278,7 +1307,11 @@ function showTyping() {
   const container = document.getElementById('chatMessages');
   const wrap = document.createElement('div');
   wrap.className = 'message ai'; wrap.id = 'typingWrap';
-  const avatar = document.createElement('div'); avatar.className = 'msg-avatar'; avatar.style.cssText = 'background:rgba(196,113,74,0.1);padding:4px;'; avatar.innerHTML = '<img src="/logo.png" style="width:56px;height:56px;object-fit:contain;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">';
+  const avatar = document.createElement('div'); avatar.className = 'msg-avatar';
+  const tImg = stylist?.photo_url || stylist?.brand_logo_url;
+  if (stylist?.photo_url) { avatar.innerHTML = '<img src="' + tImg + '" style="width:100%;height:100%;object-fit:cover;object-position:center top;">'; }
+  else if (stylist?.brand_logo_url) { avatar.innerHTML = '<img src="' + tImg + '" style="width:100%;height:100%;object-fit:contain;padding:3px;">'; avatar.style.background = 'rgba(196,113,74,0.1)'; }
+  else { avatar.innerHTML = '<img src="/logo.png" style="width:100%;height:100%;object-fit:contain;padding:4px;filter:invert(40%) sepia(60%) saturate(600%) hue-rotate(330deg) brightness(0.75);">'; avatar.style.background = 'rgba(196,113,74,0.1)'; }
   const ind = document.createElement('div'); ind.className = 'typing-indicator';
   ind.innerHTML = '<span></span><span></span><span></span>';
   wrap.appendChild(avatar); wrap.appendChild(ind);
